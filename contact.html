@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact - Fly Wheels</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .contact-page {
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 100px 20px 40px 20px;
+        text-align: center;
+      }
+
+      .contact-page section {
+        margin-bottom: 40px;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 1s ease, transform 1s ease;
+      }
+
+      .contact-page section.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .contact-page h1,
+      .contact-page h2 {
+        margin-bottom: 20px;
+      }
+
+      .contact-page .intro {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 30px;
+      }
+
+      .image-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .image-container img {
+        width: 45%;
+        max-width: 300px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .image-container img:hover {
+        transform: scale(1.05);
+      }
+
+      /* Boutons centrés */
+      .contact-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+
+      .contact-action p {
+        margin-bottom: 10px;
+      }
+
+      .button {
+        display: inline-block;
+        background-color: #f0a500;
+        color: #333;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background 0.3s, transform 0.3s;
+      }
+
+      .button:hover,
+      .button:focus {
+        background-color: #d18e00;
+        transform: scale(1.05);
+      }
+
+      .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+      }
+
+      .lightbox img {
+        max-width: 90%;
+        max-height: 90%;
+      }
+
+      @media (max-width: 768px) {
+        .contact-page {
+          padding-top: 120px;
+        }
+
+        .image-container img {
+          width: 80%;
+          margin-bottom: 15px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header>
+      <nav>
+        <img src="assets/logo.png" alt="Logo Fly Wheels" class="logo" />
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Nos Services</a></li>
+          <li><a href="contact.html">Contactez-nous</a></li>
+        </ul>
+        <div
+          class="burger"
+          id="burger"
+          aria-label="Menu navigation"
+          role="button"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <main class="contact-page">
+      <!-- Section Contact -->
+      <section>
+        <h1>Nous contacter</h1>
+        <p class="intro">
+          Besoin d'un renseignement ou d'un rendez-vous ? Remplissez les
+          formulaires correspondant ci-dessous.
+        </p>
+
+        <div class="contact-action">
+          <p>Laisser un C.V :</p>
+          <a href="CV.html" class="button">Déposer votre C.V</a>
+        </div>
+
+        <div class="contact-action">
+          <p>Demande de rendez-vous :</p>
+          <a href="RDV.html" class="button">Prendre rendez-vous</a>
+        </div>
+      </section>
+
+      <!-- Section En Ville -->
+      <section>
+        <h2>En Ville</h2>
+        <p>
+          Adresse : Route 68, Sandy Shores<br />
+          Téléphone : ..<br />
+          Email : FlyWheels@gmail.fb
+        </p>
+
+        <div class="image-container">
+          <img src="/assets/map 1.png" alt="Plan du garage et de la ville 1" />
+          <img src="/assets/map 2.png" alt="Plan du garage et de la ville 2" />
+        </div>
+      </section>
+    </main>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+      <img src="" alt="Agrandissement image" />
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        &copy;
+        <a href="juridique.html"
+          >2025 Garage Fly Wheels. Tous droits réservés.</a
+        >
+      </p>
+    </footer>
+
+    <!-- Script menu burger et lightbox -->
+    <script>
+      const burger = document.getElementById("burger");
+      const menu = document.querySelector("nav ul");
+
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("active");
+        menu.classList.toggle("active");
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const sections = document.querySelectorAll(".contact-page section");
+        sections.forEach((section) => section.classList.add("show"));
+
+        const images = document.querySelectorAll(".image-container img");
+        const lightbox = document.getElementById("lightbox");
+        const lightboxImg = lightbox.querySelector("img");
+
+        images.forEach((img) => {
+          img.addEventListener("click", () => {
+            lightbox.style.display = "flex";
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt;
+          });
+        });
+
+        lightbox.addEventListener("click", (e) => {
+          if (e.target === lightbox || e.target === lightboxImg) {
+            lightbox.style.display = "none";
+            lightboxImg.src = "";
+            lightboxImg.alt = "";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Déposer un CV - Fly Wheels</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+
+      .cv-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 100px 20px 80px 20px;
+      }
+
+      .cv-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 30px;
+        text-align: left;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .cv-form label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .cv-form input,
+      .cv-form button {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .cv-form button {
+        background-color: #f0a500;
+        color: #333;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.3s;
+      }
+
+      .cv-form button:hover {
+        background-color: #d18e00;
+        transform: scale(1.05);
+      }
+
+      .cv-form .description {
+        font-size: 0.85rem;
+        color: #555;
+        margin: -10px 0 10px 0;
+      }
+
+      .counter {
+        font-size: 0.9rem;
+        color: red; /* texte rouge */
+        margin-top: -10px;
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        .cv-page {
+          padding-top: 140px;
+          padding-bottom: 100px;
+        }
+
+        .cv-form {
+          max-width: 90%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .cv-form {
+          max-width: 95%;
+        }
+
+        h1 {
+          font-size: 1.4rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header>
+      <nav>
+        <img src="assets/logo.png" alt="Logo Fly Wheels" class="logo" />
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Nos Services</a></li>
+          <li><a href="contact.html">Contactez-nous</a></li>
+        </ul>
+        <div
+          class="burger"
+          id="burger"
+          aria-label="Menu navigation"
+          role="button"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <main class="cv-page">
+      <h1>Déposer votre C.V</h1>
+      <p>Remplissez le formulaire ci-dessous pour postuler chez Fly Wheels.</p>
+
+      <form id="cvForm" class="cv-form">
+        <label for="name">Nom / Prénom :</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="playerID">ID du joueur :</label>
+        <input type="text" id="playerID" name="playerID" required />
+
+        <label for="birthdate">Date de Naissance :</label>
+        <input type="date" id="birthdate" name="birthdate" required />
+
+        <label for="phone">N° de téléphone :</label>
+        <input type="tel" id="phone" name="phone" />
+
+        <label for="rib">RIB :</label>
+        <input type="text" id="rib" name="rib" />
+
+        <label for="lockerCode">Code à 4 chiffres (vestiaire) :</label>
+        <p class="description">
+          Si vous êtes pris, ce code servira à votre casier personnel.
+        </p>
+        <input
+          type="number"
+          id="lockerCode"
+          name="lockerCode"
+          min="0000"
+          max="9999"
+        />
+
+        <label for="availability">Heure de disponibilité :</label>
+        <p class="description">
+          Précision importante : Nous parlons bien des plages horaires pendant
+          lesquelles vous êtes susceptible de travailler, et non des heures
+          auxquelles vous êtes simplement réveillé.
+        </p>
+        <input type="text" id="availability" name="availability" />
+
+        <button type="submit">Envoyer</button>
+        <div class="counter" id="counter"></div>
+      </form>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        &copy;
+        <a href="juridique.html"
+          >2025 Garage Fly Wheels. Tous droits réservés.</a
+        >
+      </p>
+    </footer>
+
+    <!-- Script menu burger + webhook + limitation -->
+    <script>
+      const burger = document.getElementById("burger");
+      const menu = document.querySelector("nav ul");
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("active");
+        menu.classList.toggle("active");
+      });
+
+      const form = document.getElementById("cvForm");
+      const counter = document.getElementById("counter");
+      const STORAGE_KEY = "cv_last_submit";
+      const LIMIT_HOURS = 6;
+
+      function getRemainingTime() {
+        const lastSubmit = localStorage.getItem(STORAGE_KEY);
+        if (!lastSubmit) return 0;
+        const elapsed = Date.now() - parseInt(lastSubmit, 10);
+        const remaining = LIMIT_HOURS * 3600 * 1000 - elapsed;
+        return remaining > 0 ? remaining : 0;
+      }
+
+      function updateCounter() {
+        const remaining = getRemainingTime();
+        if (remaining > 0) {
+          const h = Math.floor(remaining / 3600000);
+          const m = Math.floor((remaining % 3600000) / 60000);
+          const s = Math.floor((remaining % 60000) / 1000);
+          counter.textContent = `⏳ Veuillez patienter ${h}h ${m}m ${s}s avant de renvoyer un CV.`;
+          return false;
+        } else {
+          counter.textContent = "";
+          return true;
+        }
+      }
+
+      setInterval(updateCounter, 1000);
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!updateCounter()) return;
+
+        const webhookURL =
+          "https://discord.com/api/webhooks/1423264258896166962/l_Bo_mH0APFkMdOTM4AStmEcQl0KThEqpqdg-vwBbd2tcXMIqXZeqNRWbieyGlHFMPqk";
+
+        const nomPrenom = form.name.value;
+        const playerID = form.playerID.value;
+
+        // Reformater la date en JJ/MM/AAAA
+        const rawBirthdate = form.birthdate.value;
+        let birthdate = "Non renseigné";
+        if (rawBirthdate) {
+          const parts = rawBirthdate.split("-");
+          birthdate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        const phone = form.phone.value || "Non renseigné";
+        const rib = form.rib.value || "Non renseigné";
+        const lockerCode = form.lockerCode.value || "Non renseigné";
+        const availability = form.availability.value || "Non renseigné";
+
+        const data = {
+          content: "**📨 Nouveau CV reçu !**",
+          embeds: [
+            {
+              color: 16753920,
+              fields: [
+                { name: "__**Nom et Prénom :**__", value: nomPrenom },
+                { name: "__**ID Joueur :**__", value: playerID },
+                { name: "__**Naissance :**__", value: birthdate },
+                { name: "__**Téléphone :**__", value: phone },
+                { name: "__**RIB :**__", value: rib },
+                { name: "__**Code vestiaire :**__", value: lockerCode },
+                { name: "__**Disponibilité :**__", value: availability },
+              ],
+              footer: { text: "CV envoyé via formulaire Fly Wheels" },
+              timestamp: new Date(),
+            },
+          ],
+        };
+
+        try {
+          await fetch(webhookURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          alert("✅ CV envoyé avec succès !");
+          localStorage.setItem(STORAGE_KEY, Date.now());
+          form.reset();
+          updateCounter();
+        } catch (err) {
+          console.error("Erreur :", err);
+          alert("❌ Une erreur est survenue, réessayez.");
+        }
+      });
+
+      updateCounter();
+    </script>
+  </body>
+</html>

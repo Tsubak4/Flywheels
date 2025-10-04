@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nos Services - Fly Wheels</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+
+      main {
+        padding: 120px 20px 200px 20px; /* padding-bottom augmenté pour la galerie */
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 40px;
+      }
+
+      h2 {
+        margin: 40px 0 20px 0;
+      }
+
+      .services-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 50px;
+      }
+
+      .services-list {
+        flex: 1;
+        min-width: 250px;
+        text-align: left;
+      }
+
+      .services-list ul {
+        list-style: disc inside;
+        padding-left: 0;
+        font-size: 1rem;
+        line-height: 1.8;
+      }
+
+      .services-list ul li {
+        margin-bottom: 10px;
+      }
+
+      .services-image {
+        flex: 1;
+        min-width: 250px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .services-image img {
+        max-width: 300px;
+        width: 100%;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .services-image img:hover {
+        transform: scale(1.05);
+      }
+
+      .slider-title {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 1.5rem;
+      }
+
+      .slider {
+        display: flex;
+        overflow: hidden;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: nowrap;
+        margin-bottom: 50px;
+      }
+
+      .slider img {
+        width: 200px;
+        max-width: 100%;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        flex-shrink: 0;
+      }
+
+      .slider img:hover {
+        transform: scale(1.05);
+      }
+
+      .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+      }
+
+      .lightbox img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px 0;
+        font-size: 0.9rem;
+        position: static;
+      }
+
+      footer p {
+        margin: 0;
+      }
+
+      @media (max-width: 768px) {
+        .services-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .services-image img {
+          max-width: 250px;
+        }
+
+        .slider img {
+          width: 45%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        main {
+          padding-top: 140px;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <nav>
+        <img src="assets/logo.png" alt="Logo Fly Wheels" class="logo" />
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Nos Services</a></li>
+          <li><a href="contact.html">Contactez-nous</a></li>
+        </ul>
+        <div
+          class="burger"
+          id="burger"
+          aria-label="Menu navigation"
+          role="button"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Nos Services</h1>
+
+      <div class="services-container">
+        <div class="services-list">
+          <ul>
+            <li>Réparation moteur</li>
+            <li>Réparation complète (moteur + esthétique)</li>
+            <li>Nettoyage du véhicule</li>
+            <li>Customisation de véhicule motorisé</li>
+            <li>Dépannage extérieur rapide</li>
+            <li>Remorquage de véhicule</li>
+            <li>Retournement de véhicule</li>
+            <li>Conseil et passion</li>
+          </ul>
+        </div>
+
+        <div class="services-image">
+          <img src="assets/prix.png" alt="Prix services" />
+        </div>
+      </div>
+
+      <h2 class="slider-title">Nos customs :</h2>
+      <div class="slider" id="slider">
+        <img src="assets/galerie1.png" alt="Custom 1" />
+        <img src="assets/galerie2.png" alt="Custom 2" />
+        <img src="assets/galerie3.png" alt="Custom 3" />
+        <img src="assets/galerie4.png" alt="Custom 4" />
+        <img src="assets/galerie5.png" alt="Custom 5" />
+      </div>
+    </main>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+      <img src="" alt="Agrandissement image" />
+    </div>
+
+    <footer>
+      <p>
+        &copy;
+        <a href="juridique.html"
+          >2025 Garage Fly Wheels. Tous droits réservés.</a
+        >
+      </p>
+    </footer>
+
+    <script>
+      // Burger menu
+      const burger = document.getElementById("burger");
+      const menu = document.querySelector("nav ul");
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("active");
+        menu.classList.toggle("active");
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        // Lightbox pour images et slider
+        const images = document.querySelectorAll(
+          ".services-image img, .slider img"
+        );
+        const lightbox = document.getElementById("lightbox");
+        const lightboxImg = lightbox.querySelector("img");
+
+        images.forEach((img) => {
+          img.addEventListener("click", () => {
+            lightbox.style.display = "flex";
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt;
+          });
+        });
+
+        lightbox.addEventListener("click", (e) => {
+          if (e.target === lightbox || e.target === lightboxImg) {
+            lightbox.style.display = "none";
+            lightboxImg.src = "";
+            lightboxImg.alt = "";
+          }
+        });
+
+        // Slider automatique
+        const slider = document.getElementById("slider");
+        let scrollPos = 0;
+        const scrollAmount = 2;
+        function autoScroll() {
+          scrollPos += scrollAmount;
+          if (scrollPos >= slider.scrollWidth - slider.clientWidth)
+            scrollPos = 0;
+          slider.scrollTo({ left: scrollPos, behavior: "smooth" });
+        }
+        setInterval(autoScroll, 50);
+      });
+    </script>
+  </body>
+</html>

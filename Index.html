@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fly Wheels</title>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header>
+      <nav>
+        <img src="assets/logo.png" alt="Logo Fly Wheels" class="logo" />
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Nos Services</a></li>
+          <li><a href="contact.html">Contactez-nous</a></li>
+          <li><a href="connexion.html">Connexion</a></li>
+        </ul>
+        <div
+          class="burger"
+          id="burger"
+          aria-label="Menu navigation"
+          role="button"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main -->
+    <main>
+      <section class="Index">
+        <div class="Index-content">
+          <h1>
+            Bienvenue chez Fly Wheels,<br />
+            Votre garage spécialisé en custom et<br />
+            dépannage automobile à Los Santos !
+          </h1>
+          <p>
+            Situé sur la Route 68 ou près du célèbre Dinner Rex et à quelques
+            minutes de Sandy Shores, Fly Wheels est votre partenaire de
+            confiance pour tous vos besoins automobiles. Nous sommes spécialisés
+            dans la réparation et la personnalisation de véhicules custom, et
+            nous proposons également un service de dépannage extérieur rapide et
+            efficace pour que vous puissiez reprendre la route sans stress.
+          </p>
+          <p>
+            Chez Fly Wheels, nous allions passion, savoir-faire et réactivité
+            pour offrir à chaque client un service sur mesure. Que vous ayez
+            besoin d’une réparation mécanique, d’une modification esthétique ou
+            d’une assistance en urgence, notre équipe est là pour vous
+            accompagner.
+          </p>
+          <p>
+            Fly Wheels – L’endroit où vos véhicules retrouvent puissance, style
+            et performance !
+          </p>
+          <a href="contact.html" class="button">Contactez-nous</a>
+        </div>
+        <div class="Index-image">
+          <img src="assets/back.png" alt="Garage Fly Wheels" />
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        &copy;
+        <a href="juridique.html"
+          >2025 Garage Fly Wheels. Tous droits réservés.</a
+        >
+      </p>
+    </footer>
+
+    <!-- Script menu burger -->
+    <script>
+      const burger = document.getElementById("burger");
+      const menu = document.querySelector("nav ul");
+
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("active");
+        menu.classList.toggle("active");
+      });
+
+      window.addEventListener("load", () => {
+        document.querySelector(".Index-content").classList.add("show");
+        document.querySelector(".Index-image").classList.add("show");
+      });
+    </script>
+  </body>
+</html>

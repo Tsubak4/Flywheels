@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crédit - Fly Wheels</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+
+      main {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 120px 20px 150px 20px; /* padding-bottom augmenté */
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 40px;
+      }
+
+      .credit-images {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        margin-top: 20px;
+      }
+
+      .credit-images img {
+        width: 45%;
+        max-width: 300px;
+        cursor: pointer;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .credit-images img:hover {
+        transform: scale(1.05);
+      }
+
+      .credit-footer {
+        margin-top: 30px;
+        font-size: 0.9rem;
+        color: #555;
+      }
+
+      footer {
+        margin-top: 40px;
+        padding: 15px 0;
+        text-align: center;
+      }
+
+      .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+      }
+
+      .lightbox img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+      }
+
+      @media (max-width: 768px) {
+        main {
+          padding-top: 140px;
+        }
+        .credit-images img {
+          width: 70%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 1.5rem;
+        }
+        .credit-images img {
+          width: 90%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <img src="assets/logo.png" alt="Logo Fly Wheels" class="logo" />
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Nos Services</a></li>
+          <li><a href="contact.html">Contactez-nous</a></li>
+        </ul>
+        <div
+          class="burger"
+          id="burger"
+          aria-label="Menu navigation"
+          role="button"
+        >
+          <span></span><span></span><span></span>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Crédit</h1>
+
+      <div class="credit-images">
+        <img src="assets/credit1.png" alt="Crédit 1" />
+        <img src="assets/credit2.png" alt="Crédit 2" />
+        <img src="assets/credit3.png" alt="Crédit 3" />
+        <img src="assets/credit4.png" alt="Crédit 4" />
+        <img src="assets/credit5.png" alt="Crédit 5" />
+      </div>
+
+      <div class="credit-footer">
+        Patron : Luca Jackson<br />
+        Co-Patron : Alice Larsen<br />
+        Dev Web : Angel Lobo
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        &copy;
+        <a href="juridique.html"
+          >2025 Garage Fly Wheels. Tous droits réservés.</a
+        >
+      </p>
+    </footer>
+
+    <div class="lightbox" id="lightbox">
+      <img src="" alt="Agrandissement image" />
+    </div>
+
+    <script>
+      // Burger menu
+      const burger = document.getElementById("burger");
+      const menu = document.querySelector("nav ul");
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("active");
+        menu.classList.toggle("active");
+      });
+
+      // Lightbox
+      document.addEventListener("DOMContentLoaded", () => {
+        const images = document.querySelectorAll(".credit-images img");
+        const lightbox = document.getElementById("lightbox");
+        const lightboxImg = lightbox.querySelector("img");
+
+        images.forEach((img) => {
+          img.addEventListener("click", () => {
+            lightbox.style.display = "flex";
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt;
+          });
+        });
+
+        lightbox.addEventListener("click", (e) => {
+          if (e.target === lightbox || e.target === lightboxImg) {
+            lightbox.style.display = "none";
+            lightboxImg.src = "";
+            lightboxImg.alt = "";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

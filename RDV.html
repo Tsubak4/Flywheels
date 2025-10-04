@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demande de RDV - Fly Wheels</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+
+      .rdv-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 100px 20px 80px 20px;
+      }
+
+      .rdv-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 30px;
+        text-align: left;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .rdv-form label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      .rdv-form input,
+      .rdv-form textarea,
+      .rdv-form button {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .rdv-form button {
+        background-color: #f0a500;
+        color: #333;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.3s;
+      }
+
+      .rdv-form button:hover {
+        background-color: #d18e00;
+        transform: scale(1.05);
+      }
+
+      #timerMessage {
+        color: red;
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      @media (max-width: 768px) {
+        .rdv-page {
+          padding-top: 140px;
+          padding-bottom: 100px;
+        }
+
+        .rdv-form {
+          max-width: 90%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .rdv-form {
+          max-width: 95%;
+        }
+
+        h1 {
+          font-size: 1.4rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header>
+      <nav>
+        <img src="assets/logo.png" alt="Logo Fly Wheels" class="logo" />
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Nos Services</a></li>
+          <li><a href="contact.html">Contactez-nous</a></li>
+        </ul>
+        <div
+          class="burger"
+          id="burger"
+          aria-label="Menu navigation"
+          role="button"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </nav>
+    </header>
+
+    <main class="rdv-page">
+      <h1>Demande de Rendez-vous</h1>
+      <p>Remplissez le formulaire ci-dessous pour prendre rendez-vous.</p>
+
+      <form id="rdvForm" class="rdv-form">
+        <label for="name">Nom entreprise ou particulier :</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="phone">N° de téléphone :</label>
+        <input type="tel" id="phone" name="phone" required />
+
+        <label for="reason">Motif du rendez-vous :</label>
+        <textarea id="reason" name="reason" rows="4" required></textarea>
+
+        <button type="submit">Envoyer</button>
+        <p id="timerMessage"></p>
+      </form>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        &copy;
+        <a href="juridique.html"
+          >2025 Garage Fly Wheels. Tous droits réservés.</a
+        >
+      </p>
+    </footer>
+
+    <!-- Script menu burger + webhook + limitation -->
+    <script>
+      const burger = document.getElementById("burger");
+      const menu = document.querySelector("nav ul");
+      burger.addEventListener("click", () => {
+        burger.classList.toggle("active");
+        menu.classList.toggle("active");
+      });
+
+      const form = document.getElementById("rdvForm");
+      const timerMessage = document.getElementById("timerMessage");
+      const submissionKey = "rdv_last_submission";
+
+      function updateTimer() {
+        const last = localStorage.getItem(submissionKey);
+        if (!last) {
+          timerMessage.textContent = "";
+          return true;
+        }
+        const now = new Date().getTime();
+        const remaining = 6 * 60 * 60 * 1000 - (now - parseInt(last));
+        if (remaining > 0) {
+          const hours = Math.floor(remaining / (1000 * 60 * 60));
+          const minutes = Math.floor(
+            (remaining % (1000 * 60 * 60)) / (1000 * 60)
+          );
+          const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+          timerMessage.textContent = `⏱ Vous devez attendre ${hours}h ${minutes}m ${seconds}s avant de renvoyer une demande.`;
+          return false;
+        } else {
+          timerMessage.textContent = "";
+          return true;
+        }
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!updateTimer()) return;
+
+        const webhookURL =
+          "https://discord.com/api/webhooks/1423421432616058920/1AlFvCoNn4f_Xj4oxgKzQuLvd9krsHEi3G2may21lAbxQV4zJ5Tgf3ia1Qe7P502ZTPd";
+
+        const nom = form.name.value;
+        const phone = form.phone.value;
+        const reason = form.reason.value;
+
+        const data = {
+          content: "**📨 Nouvelle demande de RDV !**",
+          embeds: [
+            {
+              color: 3447003,
+              fields: [
+                { name: "__**Nom :**__", value: nom },
+                { name: "__**Téléphone :**__", value: phone },
+                { name: "__**Motif du rendez-vous :**__", value: reason },
+              ],
+              footer: { text: "RDV envoyé via formulaire Fly Wheels" },
+              timestamp: new Date(),
+            },
+          ],
+        };
+
+        try {
+          await fetch(webhookURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          alert(
+            "✅ Demande envoyée avec succès, nous vous répondrons sous 72h maximum !"
+          );
+          form.reset();
+          localStorage.setItem(submissionKey, new Date().getTime());
+          updateTimer();
+        } catch (err) {
+          console.error("Erreur :", err);
+          alert("❌ Une erreur est survenue, réessayez.");
+        }
+      });
+
+      // Mettre à jour le timer toutes les secondes
+      setInterval(updateTimer, 1000);
+      updateTimer();
+    </script>
+  </body>
+</html>
