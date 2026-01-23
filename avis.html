@@ -800,7 +800,6 @@
       const GOOGLE_FORM_URL =
         "https://docs.google.com/forms/d/e/1FAIpQLSclKV8Ehyz0RjZSlM6-H4KDW6CusLqNMByxwJHKjpsZcBwSjg/viewform?embedded=true";
 
-      // A changer
       const DISCORD_WEBHOOK_URL =
         "https://discord.com/api/webhooks/1460302239267815719/g7Yo98osgz4Aqf-U7XLtVZp0_xvL-zcrgD3PkAwnqHMsjtkM4H_cbSqM33cDHJbeECDL";
       const DISCORD_ROLE_ID = "1463942045977804880";
@@ -817,9 +816,15 @@
       const loadingMessage = document.getElementById("loadingMessage");
       const noReviewsMessage = document.getElementById("noReviewsMessage");
 
-      let lastReviewCount = 0;
+      let knownReviewsHashes = [];
+      let isFirstLoad = true;
 
       document.addEventListener("DOMContentLoaded", function () {
+        const savedHashes = localStorage.getItem("flywheels_known_reviews");
+        if (savedHashes) {
+          knownReviewsHashes = JSON.parse(savedHashes);
+        }
+
         burger.addEventListener("click", () => {
           navMenu.classList.toggle("active");
           burger.classList.toggle("active");
@@ -901,21 +906,7 @@
           }
 
           const csvText = await response.text();
-
-          console.log(
-            "CSV brut (premiers 500 caractères):",
-            csvText.substring(0, 500),
-          );
-          const lines = csvText.split("\n");
-          console.log("Nombre de lignes:", lines.length);
-          if (lines.length > 1) {
-            console.log("Première ligne de données:", lines[1]);
-            console.log("Colonnes:", lines[1].split(","));
-          }
-
           const reviews = parseCSV(csvText);
-
-          console.log("Avis parsés:", reviews);
 
           reviews.sort((a, b) => {
             if (a.timestamp && b.timestamp) {
@@ -931,15 +922,37 @@
             });
             loadingMessage.style.display = "none";
 
-            if (reviews.length > lastReviewCount) {
-              const newReviews = reviews.slice(
-                0,
-                reviews.length - lastReviewCount,
+            const currentHashes = reviews.map((review) =>
+              btoa(
+                `${review.user}|${review.timestamp}|${review.comment.substring(0, 100)}`,
+              ),
+            );
+
+            const newReviews = reviews.filter((review, index) => {
+              const reviewHash = currentHashes[index];
+              return !knownReviewsHashes.includes(reviewHash);
+            });
+
+            if (newReviews.length > 0 && !isFirstLoad) {
+              newReviews.sort(
+                (a, b) => new Date(a.rawDate) - new Date(b.rawDate),
               );
-              newReviews.reverse().forEach((review) => {
+
+              newReviews.forEach((review) => {
                 sendDiscordNotification(review);
               });
-              lastReviewCount = reviews.length;
+
+              console.log(`${newReviews.length} nouveau(x) avis notifié(s)`);
+            }
+
+            knownReviewsHashes = currentHashes;
+            localStorage.setItem(
+              "flywheels_known_reviews",
+              JSON.stringify(knownReviewsHashes),
+            );
+
+            if (isFirstLoad) {
+              isFirstLoad = false;
             }
           } else {
             loadingMessage.style.display = "none";
