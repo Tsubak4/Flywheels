@@ -1178,8 +1178,12 @@
     </footer>
 
     <script>
-      const RECRUITMENT_WEBHOOK = "VOTRE_WEBHOOK_RECRUTEMENT";
-      const CONTACT_WEBHOOK = "VOTRE_WEBHOOK_CONTACT";
+      // A Changer
+      const RECRUITMENT_WEBHOOK_URL =
+        "https://discord.com/api/webhooks/1460302239267815719/g7Yo98osgz4Aqf-U7XLtVZp0_xvL-zcrgD3PkAwnqHMsjtkM4H_cbSqM33cDHJbeECDL";
+      const CONTACT_WEBHOOK_URL =
+        "https://discord.com/api/webhooks/1464233948107247726/8mziqIiqOkl_EXNICusrK7pQeoXupzxRCtZ2j2uM24CaKFi2gR752dCEGZ9vRmv2Ek4U";
+      const DISCORD_ROLE_ID = "1463942045977804880";
       const COOLDOWN_TIME = 6 * 60 * 60 * 1000;
 
       let recruitmentActive = false;
@@ -1367,8 +1371,10 @@
           '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
 
         try {
-          // À MODIFIER : Envoyer vers le webhook Discord
-          await new Promise((resolve) => setTimeout(resolve, 1500));
+          const discordPayload = formatRecruitmentEmbed(formData);
+          discordPayload.content = `📋 **Bonjour** <@&${DISCORD_ROLE_ID}>**, NOUVELLE CANDIDATURE !**`;
+
+          await sendToDiscord(RECRUITMENT_WEBHOOK_URL, discordPayload);
 
           localStorage.setItem(STORAGE_KEYS.RECRUTEMENT, Date.now().toString());
 
@@ -1427,8 +1433,10 @@
           '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
 
         try {
-          // À MODIFIER : Envoyer vers le webhook Discord
-          await new Promise((resolve) => setTimeout(resolve, 1500));
+          const discordPayload = formatContactEmbed(formData);
+          discordPayload.content = `📋 **Bonjour** <@&${DISCORD_ROLE_ID}>**, NOUVELLE DEMANDE DE CONTACT !**`;
+
+          await sendToDiscord(CONTACT_WEBHOOK_URL, discordPayload);
 
           localStorage.setItem(STORAGE_KEYS.CONTACT, Date.now().toString());
 
@@ -1452,16 +1460,16 @@
         return {
           embeds: [
             {
-              title: "📋 NOUVELLE DEMANDE DE RECRUTEMENT",
+              title: "📋 NOUVELLE CANDIDATURE",
               color: 0xd4af37,
               fields: [
                 {
-                  name: "👤 Nom complet",
-                  value: `${data.prenom} ${data.nom}`,
-                  inline: true,
+                  name: "👤 Nom/Prénom",
+                  value: `${data.nom} ${data.prenom}`,
+                  inline: false,
                 },
-                { name: "🎂 Âge", value: data.age, inline: true },
-                { name: "📞 Téléphone", value: data.telephone, inline: true },
+                { name: "🎂 Âge", value: data.age, inline: false },
+                { name: "☎️ Téléphone", value: data.telephone, inline: false },
                 {
                   name: "⏰ Horaire disponible",
                   value: data.horaire,
@@ -1470,15 +1478,18 @@
                 {
                   name: "🚗 Permis de conduire",
                   value: data.permis ? "✅ Oui" : "❌ Non",
-                  inline: true,
+                  inline: false,
                 },
                 {
-                  name: "🕐 Date et heure",
+                  name: "📅 Date et heure",
                   value: data.timestamp,
-                  inline: true,
+                  inline: false,
                 },
               ],
-              footer: { text: "Formulaire de recrutement - Fly Wheels" },
+              footer: {
+                text: "Formulaire de recrutement - Fly Wheels",
+              },
+              timestamp: new Date().toISOString(),
             },
           ],
         };
@@ -1494,24 +1505,24 @@
         return {
           embeds: [
             {
-              title: "📞 NOUVELLE DEMANDE DE CONTACT",
+              title: "📅 NOUVELLE DEMANDE DE CONTACT",
               color: 0xd4af37,
               fields: [
                 {
-                  name: "👤 Nom complet",
-                  value: `${data.prenom} ${data.nom}`,
-                  inline: true,
+                  name: "👤 Nom/Prénom",
+                  value: `${data.nom} ${data.prenom}`,
+                  inline: false,
                 },
-                { name: "📞 Téléphone", value: data.telephone, inline: true },
+                { name: "☎️ Téléphone", value: data.telephone, inline: false },
                 {
                   name: "⏰ Horaire disponible",
                   value: data.horaire,
-                  inline: true,
+                  inline: false,
                 },
                 {
                   name: "📋 Type de demande",
                   value: typeLabels[data.typeDemande] || data.typeDemande,
-                  inline: true,
+                  inline: false,
                 },
                 {
                   name: "💬 Message",
@@ -1522,12 +1533,15 @@
                   inline: false,
                 },
                 {
-                  name: "🕐 Date et heure",
+                  name: "📅 Date et heure",
                   value: data.timestamp,
-                  inline: true,
+                  inline: false,
                 },
               ],
-              footer: { text: "Formulaire de contact - Fly Wheels" },
+              footer: {
+                text: "Formulaire de contact - Fly Wheels",
+              },
+              timestamp: new Date().toISOString(),
             },
           ],
         };
