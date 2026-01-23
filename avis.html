@@ -366,10 +366,13 @@
         font-weight: 600;
       }
 
-      .review-date {
+      .review-timestamp {
         font-size: 0.8rem;
         color: var(--fw-gold);
         opacity: 0.8;
+        font-style: italic;
+        text-align: right;
+        flex-shrink: 0;
       }
 
       .review-stars {
@@ -762,13 +765,21 @@
           <button class="close-form-modal" id="closeGoogleFormModal">×</button>
         </div>
         <div class="form-modal-body">
-          <iframe 
-            class="form-iframe" 
+          <iframe
+            class="form-iframe"
             id="googleFormIframe"
             src=""
             title="Formulaire d'avis Fly Wheels"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+            "
+            allowfullscreen
+          >
           </iframe>
         </div>
       </div>
@@ -784,18 +795,29 @@
     </footer>
 
     <script>
-      const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRvRGjVrvHMi7r5eKwrrLG7a-6vVnuVjGWerN4VAYz7JNbLpNZTJl0LUjHS0vOo7-wSyZTXlZsMBe4/pub?gid=1185778982&single=true&output=csv";
-      const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSclKV8Ehyz0RjZSlM6-H4KDW6CusLqNMByxwJHKjpsZcBwSjg/viewform?embedded=true";
+      const GOOGLE_SHEET_URL =
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRvRGjVrvHMi7r5eKwrrLG7a-6vVnuVjGWerN4VAYz7JNbLpNZTJl0LUjHS0vOo7-wSyZTXlZsMBe4/pub?gid=1185778982&single=true&output=csv";
+      const GOOGLE_FORM_URL =
+        "https://docs.google.com/forms/d/e/1FAIpQLSclKV8Ehyz0RjZSlM6-H4KDW6CusLqNMByxwJHKjpsZcBwSjg/viewform?embedded=true";
+
+      // A changer
+      const DISCORD_WEBHOOK_URL =
+        "https://discord.com/api/webhooks/1460302239267815719/g7Yo98osgz4Aqf-U7XLtVZp0_xvL-zcrgD3PkAwnqHMsjtkM4H_cbSqM33cDHJbeECDL";
+      const DISCORD_ROLE_ID = "1463942045977804880";
 
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
       const addReviewBtn = document.getElementById("addReviewBtn");
       const googleFormModal = document.getElementById("googleFormModal");
-      const closeGoogleFormModal = document.getElementById("closeGoogleFormModal");
+      const closeGoogleFormModal = document.getElementById(
+        "closeGoogleFormModal",
+      );
       const googleFormIframe = document.getElementById("googleFormIframe");
       const reviewsGrid = document.getElementById("reviewsGrid");
       const loadingMessage = document.getElementById("loadingMessage");
       const noReviewsMessage = document.getElementById("noReviewsMessage");
+
+      let lastReviewCount = 0;
 
       document.addEventListener("DOMContentLoaded", function () {
         burger.addEventListener("click", () => {
@@ -812,7 +834,10 @@
 
         addReviewBtn.addEventListener("click", openGoogleForm);
 
-        closeGoogleFormModal.addEventListener("click", closeGoogleFormModalFunc);
+        closeGoogleFormModal.addEventListener(
+          "click",
+          closeGoogleFormModalFunc,
+        );
 
         window.addEventListener("click", (e) => {
           if (e.target === googleFormModal) {
@@ -841,8 +866,8 @@
           }
         });
 
-        window.addEventListener('message', function(event) {
-          if (event.data === 'formSubmitted') {
+        window.addEventListener("message", function (event) {
+          if (event.data === "formSubmitted") {
             closeGoogleFormModalFunc();
             setTimeout(() => {
               loadReviews();
@@ -876,16 +901,25 @@
           }
 
           const csvText = await response.text();
-          console.log("CSV reçu:", csvText.substring(0, 200));
+
+          console.log(
+            "CSV brut (premiers 500 caractères):",
+            csvText.substring(0, 500),
+          );
+          const lines = csvText.split("\n");
+          console.log("Nombre de lignes:", lines.length);
+          if (lines.length > 1) {
+            console.log("Première ligne de données:", lines[1]);
+            console.log("Colonnes:", lines[1].split(","));
+          }
 
           const reviews = parseCSV(csvText);
 
+          console.log("Avis parsés:", reviews);
+
           reviews.sort((a, b) => {
-            if (b.stars !== a.stars) {
-              return b.stars - a.stars;
-            }
-            if (a.date && b.date) {
-              return new Date(b.date) - new Date(a.date);
+            if (a.timestamp && b.timestamp) {
+              return new Date(b.rawDate) - new Date(a.rawDate);
             }
             return 0;
           });
@@ -896,6 +930,17 @@
               reviewsGrid.appendChild(reviewCard);
             });
             loadingMessage.style.display = "none";
+
+            if (reviews.length > lastReviewCount) {
+              const newReviews = reviews.slice(
+                0,
+                reviews.length - lastReviewCount,
+              );
+              newReviews.reverse().forEach((review) => {
+                sendDiscordNotification(review);
+              });
+              lastReviewCount = reviews.length;
+            }
           } else {
             loadingMessage.style.display = "none";
             noReviewsMessage.style.display = "block";
@@ -909,73 +954,91 @@
 
       function parseCSV(csvText) {
         const reviews = [];
-        const rows = csvText.split("\n").filter(row => row.trim() !== '');
 
-        if (rows.length <= 1) {
-          return reviews;
-        }
+        csvText = csvText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+        const rows = csvText.split("\n").filter((row) => row.trim() !== "");
+
+        if (rows.length <= 1) return reviews;
 
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          
-          let columns = [];
-          let currentColumn = "";
+
           let insideQuotes = false;
-          
+          let currentField = "";
+          const fields = [];
+
           for (let j = 0; j < row.length; j++) {
             const char = row[j];
-            const nextChar = row[j + 1];
-            
-            if (char === '"' && insideQuotes && nextChar === '"') {
-              currentColumn += '"';
-              j++;
-            } else if (char === '"') {
+
+            if (char === '"') {
               insideQuotes = !insideQuotes;
-            } else if (char === ',' && !insideQuotes) {
-              columns.push(currentColumn.trim());
-              currentColumn = "";
+              currentField += char;
+            } else if (char === "," && !insideQuotes) {
+              fields.push(currentField);
+              currentField = "";
             } else {
-              currentColumn += char;
+              currentField += char;
             }
           }
+          fields.push(currentField);
 
-          columns.push(currentColumn.trim());
+          const cleanedFields = fields.map((field) => {
+            let clean = field.trim();
+            if (clean.startsWith('"') && clean.endsWith('"')) {
+              clean = clean.substring(1, clean.length - 1);
+            }
+            return clean;
+          });
 
-          if (columns.length >= 3) {
-            const user = columns[0] || "Anonyme";
-            const stars = parseInt(columns[1]) || 0;
-            const comment = columns[2] || "";
-            const date = columns[3] || "";
+          if (cleanedFields.length >= 4) {
+            const rawTimestamp = cleanedFields[0] || new Date().toISOString();
+            const user = cleanedFields[1] || "Client anonyme";
 
-            let formattedDate = "";
-            if (date) {
-              try {
-                const dateObj = new Date(date);
-                if (!isNaN(dateObj.getTime())) {
-                  formattedDate = dateObj.toLocaleDateString("fr-FR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric"
-                  });
-                } else {
-                  formattedDate = date;
-                }
-              } catch (e) {
-                formattedDate = date;
+            let stars = 0;
+            const noteStr = cleanedFields[2] || "0";
+            const noteMatch = noteStr.match(/\d+/);
+            if (noteMatch) {
+              stars = parseInt(noteMatch[0]);
+            }
+            stars = Math.max(0, Math.min(5, stars));
+
+            const comment = cleanedFields[3] || "";
+
+            let formattedTimestamp = "";
+            let dateObj = new Date();
+            try {
+              dateObj = new Date(rawTimestamp);
+              if (!isNaN(dateObj.getTime())) {
+                const day = String(dateObj.getDate()).padStart(2, "0");
+                const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+                const year = dateObj.getFullYear();
+                const hours = String(dateObj.getHours()).padStart(2, "0");
+                const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+                formattedTimestamp = `${day}/${month}/${year} ${hours}:${minutes}`;
+              } else {
+                formattedTimestamp = rawTimestamp;
               }
+            } catch (e) {
+              formattedTimestamp = rawTimestamp;
             }
 
-            if (comment.trim()) {
+            const cleanComment = comment
+              .replace(/\\n/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
+
+            if (cleanComment && cleanComment !== "") {
               reviews.push({
                 user: user,
-                stars: Math.min(5, Math.max(0, stars)),
-                comment: comment,
-                date: formattedDate
+                stars: stars,
+                comment: cleanComment,
+                timestamp: formattedTimestamp,
+                rawDate: dateObj,
               });
             }
           }
         }
-        
+
         return reviews;
       }
 
@@ -994,7 +1057,7 @@
         card.innerHTML = `
           <div class="review-header">
             <div class="review-user">${escapeHtml(review.user)}</div>
-            ${review.date ? `<div class="review-date">${escapeHtml(review.date)}</div>` : ''}
+            ${review.timestamp ? `<div class="review-timestamp">${escapeHtml(review.timestamp)}</div>` : ""}
           </div>
           <div class="review-stars">
             ${starsHtml}
@@ -1012,13 +1075,63 @@
         return div.innerHTML;
       }
 
+      async function sendDiscordNotification(review) {
+        if (!DISCORD_WEBHOOK_URL) {
+          console.log("URL Discord webhook non configurée");
+          return;
+        }
+
+        try {
+          const starsEmoji =
+            "⭐".repeat(review.stars) + "☆".repeat(5 - review.stars);
+          const message = {
+            content: `📢 Bonjour <@&${DISCORD_ROLE_ID}>, **NOUVEL AVIS REÇU !** `,
+            embeds: [
+              {
+                title: `Avis de ${review.user}`,
+                description: review.comment,
+                color: 0xd4af37,
+                fields: [
+                  {
+                    name: "Note",
+                    value: starsEmoji,
+                    inline: true,
+                  },
+                  {
+                    name: "Date",
+                    value: review.timestamp,
+                    inline: true,
+                  },
+                ],
+                footer: {
+                  text: "Fly Wheels Garage - Nouvel avis",
+                },
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          };
+
+          await fetch(DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+          });
+
+          console.log("Notification Discord envoyée");
+        } catch (error) {
+          console.error("Erreur lors de l'envoi à Discord:", error);
+        }
+      }
+
       window.refreshReviews = function () {
         loadReviews();
       };
 
       setInterval(() => {
         loadReviews();
-      }, 30000);
+      }, 300000);
     </script>
   </body>
 </html>
