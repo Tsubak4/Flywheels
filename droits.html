@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
@@ -47,7 +47,8 @@
         }
         100% {
           border-color: #0f0;
-          box-shadow: 0 0 40px rgba(0, 255, 0, 0.6),
+          box-shadow:
+            0 0 40px rgba(0, 255, 0, 0.6),
             0 0 60px rgba(0, 255, 0, 0.3);
         }
       }
@@ -95,6 +96,13 @@
         z-index: 2;
         max-width: 800px;
         width: 100%;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+        cursor: pointer;
+      }
+
+      .content.rotated {
+        transform: rotateY(180deg);
       }
 
       .back-arrow {
@@ -118,11 +126,15 @@
 
       @keyframes matrixGlow {
         0% {
-          box-shadow: 0 0 10px #0f0, 0 0 20px rgba(0, 255, 0, 0.5);
+          box-shadow:
+            0 0 10px #0f0,
+            0 0 20px rgba(0, 255, 0, 0.5);
           border-color: #0f0;
         }
         100% {
-          box-shadow: 0 0 25px #0f0, 0 0 40px rgba(0, 255, 0, 0.8),
+          box-shadow:
+            0 0 25px #0f0,
+            0 0 40px rgba(0, 255, 0, 0.8),
             0 0 60px rgba(0, 255, 0, 0.3);
           border-color: #0f0;
         }
@@ -131,7 +143,9 @@
       .back-arrow:hover {
         transform: translateX(-5px);
         background: rgba(0, 255, 0, 0.1);
-        box-shadow: 0 0 30px #0f0, 0 0 50px rgba(0, 255, 0, 0.5);
+        box-shadow:
+          0 0 30px #0f0,
+          0 0 50px rgba(0, 255, 0, 0.5);
       }
 
       .back-arrow i {
@@ -146,12 +160,14 @@
         background: rgba(0, 0, 0, 0.85);
         border: 2px solid #0f0;
         border-radius: 15px;
-        box-shadow: 0 0 40px rgba(0, 255, 0, 0.3),
+        box-shadow:
+          0 0 40px rgba(0, 255, 0, 0.3),
           inset 0 0 20px rgba(0, 255, 0, 0.1);
         backdrop-filter: blur(5px);
         position: relative;
         overflow: hidden;
         z-index: 2;
+        backface-visibility: hidden;
       }
 
       .main-content::before {
@@ -180,6 +196,43 @@
         }
       }
 
+      .mentions-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding: 40px;
+        background: rgba(0, 0, 0, 0.85);
+        border: 2px solid #0f0;
+        border-radius: 15px;
+        box-shadow:
+          0 0 40px rgba(0, 255, 0, 0.3),
+          inset 0 0 20px rgba(0, 255, 0, 0.1);
+        backdrop-filter: blur(5px);
+        transform: rotateY(180deg);
+        backface-visibility: hidden;
+        overflow-y: auto;
+        text-align: left;
+      }
+
+      .mentions-content::before {
+        content: "";
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          to bottom,
+          transparent,
+          rgba(0, 255, 0, 0.1),
+          transparent
+        );
+        animation: scanLine 3s linear infinite;
+        z-index: 1;
+      }
+
       .title {
         font-family: "Orbitron", sans-serif;
         font-size: 2.5rem;
@@ -189,8 +242,11 @@
         letter-spacing: 2px;
         position: relative;
         padding-bottom: 20px;
-        text-shadow: 0 0 15px #0f0, 0 0 30px rgba(0, 255, 0, 0.5);
+        text-shadow:
+          0 0 15px #0f0,
+          0 0 30px rgba(0, 255, 0, 0.5);
         animation: titleFlicker 4s infinite alternate;
+        text-align: center;
       }
 
       @keyframes titleFlicker {
@@ -202,13 +258,17 @@
         54%,
         56%,
         100% {
-          text-shadow: 0 0 15px #0f0, 0 0 30px rgba(0, 255, 0, 0.5);
+          text-shadow:
+            0 0 15px #0f0,
+            0 0 30px rgba(0, 255, 0, 0.5);
           opacity: 1;
         }
         20%,
         24%,
         55% {
-          text-shadow: 0 0 5px #0f0, 0 0 10px rgba(0, 255, 0, 0.2);
+          text-shadow:
+            0 0 5px #0f0,
+            0 0 10px rgba(0, 255, 0, 0.2);
           opacity: 0.8;
         }
       }
@@ -236,7 +296,9 @@
         100% {
           width: 55%;
           opacity: 1;
-          box-shadow: 0 0 20px #0f0, 0 0 30px rgba(0, 255, 0, 0.5);
+          box-shadow:
+            0 0 20px #0f0,
+            0 0 30px rgba(0, 255, 0, 0.5);
         }
       }
 
@@ -279,14 +341,18 @@
         border-radius: 50%;
         border: 4px solid #0f0;
         object-fit: cover;
-        box-shadow: 0 0 30px #0f0, inset 0 0 20px rgba(0, 255, 0, 0.2);
+        box-shadow:
+          0 0 30px #0f0,
+          inset 0 0 20px rgba(0, 255, 0, 0.2);
         transition: all 0.3s ease;
         filter: contrast(1.2) brightness(1.1);
       }
 
       .profile-image img:hover {
         transform: scale(1.05) rotate(5deg);
-        box-shadow: 0 0 50px #0f0, 0 0 80px rgba(0, 255, 0, 0.4),
+        box-shadow:
+          0 0 50px #0f0,
+          0 0 80px rgba(0, 255, 0, 0.4),
           inset 0 0 30px rgba(0, 255, 0, 0.3);
       }
 
@@ -434,6 +500,87 @@
         text-shadow: 0 0 15px #0f0;
       }
 
+      .mentions-section {
+        margin-bottom: 25px;
+      }
+
+      .mentions-section h2 {
+        font-family: "Orbitron", sans-serif;
+        color: #0f0;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px #0f0;
+        border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+        padding-bottom: 8px;
+      }
+
+      .mentions-section p {
+        color: #0f0;
+        margin-bottom: 10px;
+        line-height: 1.6;
+        text-shadow: 0 0 3px #0f0;
+      }
+
+      .mentions-section ul {
+        list-style-type: none;
+        padding-left: 20px;
+        color: #0f0;
+        text-shadow: 0 0 3px #0f0;
+      }
+
+      .mentions-section li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 15px;
+      }
+
+      .mentions-section li:before {
+        content: "▸";
+        color: #0f0;
+        position: absolute;
+        left: 0;
+        text-shadow: 0 0 5px #0f0;
+      }
+
+      .mentions-link {
+        color: #0f0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-bottom: 1px dashed rgba(0, 255, 0, 0.5);
+      }
+
+      .mentions-link:hover {
+        color: #0f0;
+        text-shadow: 0 0 10px #0f0;
+        border-bottom-color: #0f0;
+      }
+
+      .back-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: rgba(0, 20, 0, 0.3);
+        border: 1px solid rgba(0, 255, 0, 0.3);
+        border-radius: 5px;
+        color: #0f0;
+        font-family: "Orbitron", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+      }
+
+      .back-button:hover {
+        background: rgba(0, 30, 0, 0.4);
+        border-color: #0f0;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        transform: translateY(-2px);
+      }
+
       @media (max-width: 768px) {
         body {
           margin: 5px;
@@ -459,9 +606,9 @@
           font-size: 1.5rem;
         }
 
-        .main-content {
+        .main-content,
+        .mentions-content {
           padding: 30px 20px;
-          margin-top: 40px;
         }
 
         .title {
@@ -490,6 +637,10 @@
         .info-value {
           font-size: 1rem;
         }
+
+        .mentions-section h2 {
+          font-size: 1.2rem;
+        }
       }
 
       @media (max-width: 480px) {
@@ -513,7 +664,8 @@
           height: 45px;
         }
 
-        .main-content {
+        .main-content,
+        .mentions-content {
           padding: 25px 15px;
         }
 
@@ -531,6 +683,10 @@
         .profile-image img {
           width: 100px;
           height: 100px;
+        }
+
+        .mentions-section h2 {
+          font-size: 1.1rem;
         }
       }
     </style>
@@ -553,7 +709,7 @@
         <div class="info-container">
           <div class="info-item">
             <div class="info-label">
-              <span class="underlined">Développeur :</span>
+              <span class="underlined"><strong>Développeur :</strong></span>
             </div>
             <div class="info-value">
               <a
@@ -570,18 +726,122 @@
 
           <div class="info-item">
             <div class="info-label">
-              <span class="underlined">Hébergeur :</span>
+              <span class="underlined"
+                ><strong>Mentions Légales :</strong></span
+              >
             </div>
             <div class="info-value">
-              <a
-                href="https://github.com/Tsubak4"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                https://github.com/Tsubak4
+              <a href="#" id="show-mentions" class="mentions-link">
+                Cliquez ici pour afficher les mentions légales
               </a>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="mentions-content">
+        <h1 class="title">Mentions Légales</h1>
+
+        <div class="mentions-section">
+          <h2>Éditeur du site</h2>
+          <p><strong>Nom :</strong> Alexandre Prieto</p>
+          <p>
+            <strong>Statut :</strong> Freelance – personne physique non
+            immatriculée
+          </p>
+          <p><strong>Adresse :</strong> Bayonne France</p>
+          <p>
+            <strong>Email :</strong>
+            <a href="mailto:ton@email.fr" class="mentions-link">ton@email.fr</a>
+          </p>
+        </div>
+
+        <div class="mentions-section">
+          <h2>Hébergement</h2>
+          <p><strong>Hébergeur :</strong> GitHub / Firebase</p>
+          <p>
+            <strong>Site web GitHub :</strong>
+            <a href="https://github.com" target="_blank" class="mentions-link"
+              >https://github.com</a
+            >
+          </p>
+          <p>
+            <strong>Site web Firebase :</strong>
+            <a
+              href="https://firebase.google.com"
+              target="_blank"
+              class="mentions-link"
+              >https://firebase.google.com</a
+            >
+          </p>
+        </div>
+
+        <div class="mentions-section">
+          <h2>Propriété intellectuelle</h2>
+          <p>
+            L'ensemble du site (structure, contenu, textes, images, graphismes,
+            logo, code source, et plus généralement tout élément composant le
+            site) est protégé par le droit d'auteur conformément aux
+            dispositions du Code de la propriété intellectuelle.
+          </p>
+          <p>
+            Toute reproduction, représentation, modification, publication,
+            adaptation ou exploitation, totale ou partielle, de tout ou partie
+            du site, par quelque procédé que ce soit, sans l'autorisation écrite
+            préalable de l'éditeur, est strictement interdite et constitue une
+            contrefaçon pouvant engager la responsabilité civile et pénale de
+            son auteur.
+          </p>
+        </div>
+
+        <div class="mentions-section">
+          <h2>Création et développement</h2>
+          <p>Site conçu et développé par Alexandre Prieto.</p>
+          <p>Tous droits réservés.</p>
+        </div>
+
+        <div class="mentions-section">
+          <h2>Responsabilité</h2>
+          <p>
+            L'éditeur s'efforce de fournir des informations aussi précises que
+            possible. Toutefois, il ne pourra être tenu responsable des
+            omissions, inexactitudes ou carences dans la mise à jour du site.
+          </p>
+          <p>
+            L'éditeur ne saurait être tenu responsable de tout dommage direct ou
+            indirect, matériel ou immatériel, résultant de l'accès ou de
+            l'utilisation du site, incluant notamment les bugs, interruptions,
+            ou problèmes techniques.
+          </p>
+        </div>
+
+        <div class="mentions-section">
+          <h2>Absence de collecte de données personnelles</h2>
+          <p>Le site ne collecte aucune donnée personnelle.</p>
+          <p>
+            Aucun formulaire, cookie de suivi, outil d'analyse ou système de
+            traitement de données n'est utilisé.
+          </p>
+          <p>
+            Conformément au Règlement Général sur la Protection des Données
+            (RGPD), aucune information personnelle n'est enregistrée ou
+            exploitée via ce site.
+          </p>
+        </div>
+
+        <div class="mentions-section">
+          <h2>Droit applicable</h2>
+          <p>Le présent site est soumis au droit français.</p>
+          <p>
+            En cas de litige, et à défaut de résolution amiable, les tribunaux
+            français seront seuls compétents.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px">
+          <a href="#" id="hide-mentions" class="back-button">
+            <i class="fas fa-arrow-left"></i> Retour
+          </a>
         </div>
       </div>
     </div>
@@ -655,6 +915,45 @@
         .addEventListener("mouseleave", function () {
           this.style.animationPlayState = "running";
         });
+
+      const content = document.querySelector(".content");
+      const showMentionsBtn = document.getElementById("show-mentions");
+      const hideMentionsBtn = document.getElementById("hide-mentions");
+
+      function showMentions() {
+        content.classList.add("rotated");
+      }
+
+      function hideMentions() {
+        content.classList.remove("rotated");
+      }
+
+      showMentionsBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        showMentions();
+      });
+
+      hideMentionsBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        hideMentions();
+      });
+
+      document.addEventListener("click", function (e) {
+        if (
+          content.classList.contains("rotated") &&
+          !content.contains(e.target) &&
+          e.target !== showMentionsBtn
+        ) {
+          hideMentions();
+        }
+      });
+
+      const infoItem = document.querySelector(".info-item:nth-child(2)");
+      infoItem.addEventListener("click", function (e) {
+        if (!e.target.closest("#show-mentions")) {
+          showMentions();
+        }
+      });
 
       setInterval(() => {
         const title = document.querySelector(".title");
