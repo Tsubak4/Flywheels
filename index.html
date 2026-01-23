@@ -672,6 +672,185 @@
         line-height: 1.5;
       }
 
+      /* Styles pour la section Recrutement */
+      .recruitment-section {
+        width: 100%;
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 0 20px;
+      }
+
+      .recruitment-bar {
+        width: 50%;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        margin: 10px auto 30px auto;
+        border-radius: 2px;
+        position: relative;
+        animation: titleBarGlow 2s infinite alternate;
+      }
+
+      .recruitment-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.2rem;
+        color: var(--fw-beige-light);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        text-align: center;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.8),
+          0 0 20px rgba(212, 175, 55, 0.5);
+      }
+
+      .recruitment-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .recruitment-status {
+        background: linear-gradient(135deg, var(--fw-dark), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 800px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          0 0 20px rgba(212, 175, 55, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .recruitment-status:hover {
+        transform: translateY(-5px);
+        box-shadow:
+          0 15px 40px rgba(0, 0, 0, 0.6),
+          0 0 30px rgba(212, 175, 55, 0.4);
+        border-color: var(--fw-gold-light);
+      }
+
+      .recruitment-status h3 {
+        font-family: "Orbitron", sans-serif;
+        color: var(--fw-gold);
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+      }
+
+      .recruitment-status p {
+        color: var(--fw-beige);
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .status-indicator {
+        display: inline-block;
+        padding: 8px 20px;
+        background: rgba(212, 175, 55, 0.15);
+        border: 2px solid var(--fw-gold);
+        border-radius: 25px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--fw-gold);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 10px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+        }
+      }
+
+      .recruitment-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 35px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold),
+          var(--fw-gold-dark)
+        );
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        color: var(--fw-dark);
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .recruitment-btn:hover {
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold-light),
+          var(--fw-gold)
+        );
+        transform: translateY(-5px);
+        box-shadow:
+          0 10px 30px rgba(212, 175, 55, 0.6),
+          0 0 20px rgba(212, 175, 55, 0.3);
+        color: var(--fw-darker);
+      }
+
+      .recruitment-btn::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+      }
+
+      .recruitment-btn:hover::before {
+        opacity: 0.6;
+      }
+
+      .recruitment-btn i {
+        font-size: 1.4rem;
+      }
+
       footer {
         background: linear-gradient(
           135deg,
@@ -791,7 +970,8 @@
           font-size: 3rem;
         }
 
-        .localisation-title {
+        .localisation-title,
+        .recruitment-title {
           font-size: 2rem;
         }
       }
@@ -846,17 +1026,23 @@
           height: 75%;
         }
 
-        .localisation-title {
+        .localisation-title,
+        .recruitment-title {
           font-size: 1.8rem;
           margin-bottom: 25px;
         }
 
-        .localisation-card {
+        .localisation-card,
+        .recruitment-status {
           min-width: 280px;
         }
 
         .localisation-card img {
           height: 220px;
+        }
+
+        .recruitment-bar {
+          width: 60%;
         }
       }
 
@@ -993,22 +1179,38 @@
           margin-bottom: 40px;
         }
 
-        .localisation-title {
+        .localisation-title,
+        .recruitment-title {
           font-size: 1.6rem;
           margin-bottom: 20px;
         }
 
-        .localisation-images {
+        .localisation-images,
+        .recruitment-container {
           gap: 20px;
         }
 
-        .localisation-card {
+        .localisation-card,
+        .recruitment-status {
           min-width: 100%;
           max-width: 500px;
         }
 
         .localisation-card img {
           height: 200px;
+        }
+
+        .recruitment-bar {
+          width: 70%;
+        }
+
+        .recruitment-status h3 {
+          font-size: 1.5rem;
+        }
+
+        .recruitment-btn {
+          padding: 12px 25px;
+          font-size: 1.1rem;
         }
 
         footer {
@@ -1092,7 +1294,8 @@
           font-size: 0.9rem;
         }
 
-        .localisation-title {
+        .localisation-title,
+        .recruitment-title {
           font-size: 1.4rem;
           margin-bottom: 15px;
         }
@@ -1111,6 +1314,35 @@
 
         .localisation-info p {
           font-size: 0.9rem;
+        }
+
+        .recruitment-bar {
+          width: 80%;
+          margin-bottom: 20px;
+        }
+
+        .recruitment-status {
+          padding: 20px;
+        }
+
+        .recruitment-status h3 {
+          font-size: 1.3rem;
+          margin-bottom: 15px;
+        }
+
+        .recruitment-status p {
+          font-size: 1rem;
+        }
+
+        .status-indicator {
+          padding: 6px 15px;
+          font-size: 1rem;
+        }
+
+        .recruitment-btn {
+          padding: 10px 20px;
+          font-size: 1rem;
+          gap: 8px;
         }
 
         footer {
@@ -1273,6 +1505,16 @@
           </div>
         </div>
       </div>
+
+      <div class="recruitment-section">
+        <div class="recruitment-bar"></div>
+        <h2 class="recruitment-title">Recrutement</h2>
+
+          <a href="contact.html" class="recruitment-btn">
+            <i class="fas fa-briefcase"></i> Recrutement ici
+          </a>
+        </div>
+      </div>
     </main>
 
     <footer>
@@ -1361,6 +1603,41 @@
             400 + index * 200,
           );
         });
+
+        const recruitmentSection = document.querySelector(
+          ".recruitment-section",
+        );
+        const recruitmentStatus = document.querySelector(".recruitment-status");
+        const recruitmentBtn = document.querySelector(".recruitment-btn");
+
+        if (recruitmentSection && recruitmentStatus && recruitmentBtn) {
+          recruitmentSection.style.opacity = "0";
+          recruitmentSection.style.transform = "translateY(30px)";
+          recruitmentSection.style.transition = "all 0.8s ease 0.6s";
+
+          recruitmentStatus.style.opacity = "0";
+          recruitmentStatus.style.transform = "translateY(20px)";
+          recruitmentStatus.style.transition = "all 0.6s ease 0.8s";
+
+          recruitmentBtn.style.opacity = "0";
+          recruitmentBtn.style.transform = "translateY(20px)";
+          recruitmentBtn.style.transition = "all 0.6s ease 1s";
+
+          setTimeout(() => {
+            recruitmentSection.style.opacity = "1";
+            recruitmentSection.style.transform = "translateY(0)";
+
+            setTimeout(() => {
+              recruitmentStatus.style.opacity = "1";
+              recruitmentStatus.style.transform = "translateY(0)";
+
+              setTimeout(() => {
+                recruitmentBtn.style.opacity = "1";
+                recruitmentBtn.style.transform = "translateY(0)";
+              }, 200);
+            }, 200);
+          }, 600);
+        }
       });
     </script>
   </body>
