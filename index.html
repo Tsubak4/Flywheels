@@ -347,6 +347,34 @@
         line-height: 1.6;
       }
 
+      .text-divider {
+        width: 50%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        margin: 40px auto 40px;
+        border-radius: 2px;
+        position: relative;
+        animation: dividerGlow 2s infinite alternate;
+      }
+
+      @keyframes dividerGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5);
+        }
+      }
+
       .image-column {
         position: relative;
         height: 450px;
@@ -560,6 +588,90 @@
         opacity: 0.9;
       }
 
+      .localisation-section {
+        width: 100%;
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 0 20px;
+      }
+
+      .localisation-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.2rem;
+        color: var(--fw-beige-light);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        text-align: center;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.8),
+          0 0 20px rgba(212, 175, 55, 0.5);
+      }
+
+      .localisation-images {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .localisation-card {
+        flex: 1;
+        min-width: 300px;
+        max-width: 450px;
+        background: linear-gradient(135deg, var(--fw-dark), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .localisation-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+          0 15px 40px rgba(0, 0, 0, 0.6),
+          0 0 30px rgba(212, 175, 55, 0.4);
+        border-color: var(--fw-gold-light);
+      }
+
+      .localisation-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s ease;
+      }
+
+      .localisation-card:hover img {
+        transform: scale(1.05);
+      }
+
+      .localisation-info {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .localisation-info h4 {
+        font-family: "Orbitron", sans-serif;
+        color: var(--fw-beige);
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .localisation-info p {
+        color: var(--fw-beige);
+        font-size: 0.95rem;
+        opacity: 0.9;
+        line-height: 1.5;
+      }
+
       footer {
         background: linear-gradient(
           135deg,
@@ -678,6 +790,10 @@
         .main-title {
           font-size: 3rem;
         }
+
+        .localisation-title {
+          font-size: 2rem;
+        }
       }
 
       @media (max-width: 992px) {
@@ -728,6 +844,19 @@
         .deformed-rectangle img {
           width: 75%;
           height: 75%;
+        }
+
+        .localisation-title {
+          font-size: 1.8rem;
+          margin-bottom: 25px;
+        }
+
+        .localisation-card {
+          min-width: 280px;
+        }
+
+        .localisation-card img {
+          height: 220px;
         }
       }
 
@@ -811,6 +940,11 @@
           margin-bottom: 20px;
         }
 
+        .text-divider {
+          width: 70%;
+          margin: 30px auto 30px;
+        }
+
         .image-column {
           height: 350px;
           max-width: 600px;
@@ -859,6 +993,24 @@
           margin-bottom: 40px;
         }
 
+        .localisation-title {
+          font-size: 1.6rem;
+          margin-bottom: 20px;
+        }
+
+        .localisation-images {
+          gap: 20px;
+        }
+
+        .localisation-card {
+          min-width: 100%;
+          max-width: 500px;
+        }
+
+        .localisation-card img {
+          height: 200px;
+        }
+
         footer {
           margin-top: 40px;
         }
@@ -899,6 +1051,11 @@
           height: 3px;
         }
 
+        .text-divider {
+          width: 80%;
+          margin: 25px auto 25px;
+        }
+
         .main-content p {
           font-size: 1rem;
           margin-bottom: 15px;
@@ -932,6 +1089,27 @@
         }
 
         .image-overlay h3 {
+          font-size: 0.9rem;
+        }
+
+        .localisation-title {
+          font-size: 1.4rem;
+          margin-bottom: 15px;
+        }
+
+        .localisation-card img {
+          height: 180px;
+        }
+
+        .localisation-info {
+          padding: 15px;
+        }
+
+        .localisation-info h4 {
+          font-size: 1.1rem;
+        }
+
+        .localisation-info p {
           font-size: 0.9rem;
         }
 
@@ -979,7 +1157,7 @@
                 </a>
               </li>
               <li>
-                <a href="equipe.html">
+                <a href="equipes.html">
                   <span class="nav-icon"><i class="fas fa-users"></i></span>
                   <span class="nav-text">Équipe</span>
                 </a>
@@ -1016,7 +1194,6 @@
       <div class="image-column">
         <div class="deformed-rectangle">
           <img src="assets/facade.png" alt="Garage automobile Fly Wheels" />
-          
           <div class="image-overlay">
             <h3>EXPERTISE • PERFORMANCE • PASSION</h3>
           </div>
@@ -1066,6 +1243,35 @@
       <div class="main-description">
         Fly Wheels – L’endroit où vos véhicules retrouvent puissance, style et
         performance !
+      </div>
+
+      <div class="text-divider"></div>
+
+      <div class="localisation-section">
+        <h2 class="localisation-title">Nos Localisations</h2>
+        <div class="localisation-images">
+          <div class="localisation-card">
+            <img
+              src="assets/localisation1.png"
+              alt="Localisation 1 - Fly Wheels"
+            />
+            <div class="localisation-info">
+              <h4>Siège Principal</h4>
+              <p>Route 68, près de Sandy Shores, notre garage principal.</p>
+            </div>
+          </div>
+
+          <div class="localisation-card">
+            <img
+              src="assets/localisation2.png"
+              alt="Localisation 2 - Fly Wheels"
+            />
+            <div class="localisation-info">
+              <h4>Point de Service</h4>
+              <p>Près du Diner Rex, accès facile depuis la ville.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -1139,6 +1345,22 @@
               "perspective(1000px) rotateY(-10deg) rotateX(5deg) scale(1)";
           });
         }
+
+        const localisationCards =
+          document.querySelectorAll(".localisation-card");
+        localisationCards.forEach((card, index) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(20px)";
+          card.style.transition = `all 0.6s ease ${0.3 + index * 0.2}s`;
+
+          setTimeout(
+            () => {
+              card.style.opacity = "1";
+              card.style.transform = "translateY(0)";
+            },
+            400 + index * 200,
+          );
+        });
       });
     </script>
   </body>
