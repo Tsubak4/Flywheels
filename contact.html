@@ -7,7 +7,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="firebase-config.js"></script>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
@@ -909,7 +908,7 @@
               <input
                 type="tel"
                 id="recruitPhone"
-                placeholder="Ex: 06 12 34 56 78"
+                placeholder="Ex: XXX-XXXX"
                 required
               />
             </div>
@@ -996,7 +995,7 @@
               <input
                 type="tel"
                 id="contactPhone"
-                placeholder="Ex: 06 12 34 56 78"
+                placeholder="Ex: XXX-XXXX"
                 required
               />
             </div>
@@ -1104,17 +1103,6 @@
     </footer>
 
     <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyD1BQIb2nkGyr4m-elfZlcE88YvGG5pLaE",
-        authDomain: "src-admin-e9b49.firebaseapp.com",
-        databaseURL:
-          "https://src-admin-e9b49-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "src-admin-e9b49",
-        storageBucket: "src-admin-e9b49.firebasestorage.app",
-        messagingSenderId: "42898128978",
-        appId: "1:42898128978:web:c899eccb8b9aeb465d5f8b",
-      };
-
       const RECRUITMENT_WEBHOOK_URL =
         "https://discord.com/api/webhooks/1460302239267815719/g7Yo98osgz4Aqf-U7XLtVZp0_xvL-zcrgD3PkAwnqHMsjtkM4H_cbSqM33cDHJbeECDL";
       const CONTACT_WEBHOOK_URL =
@@ -1146,22 +1134,61 @@
       const contactSuccess = document.getElementById("contactSuccess");
 
       document.addEventListener("DOMContentLoaded", function () {
-        console.log("Page publique chargée - Initialisation Firebase...");
+        console.log("Page publique chargée - Vérification Firebase...");
 
-        try {
-          if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            console.log("Firebase initialisé sur la page publique");
-          }
-          database = firebase.database();
-          console.log("Database disponible sur page publique:", !!database);
-        } catch (error) {
-          console.error(
-            "Erreur d'initialisation Firebase page publique:",
-            error,
+        if (typeof firebase === "undefined") {
+          console.error("❌ Firebase n'est pas chargé !");
+          showNotification(
+            "⚠️ Erreur technique - Firebase non chargé",
+            "error",
           );
           return;
         }
+
+        if (firebase.apps.length === 0) {
+          console.error("❌ Firebase non initialisé !");
+          showNotification("⚠️ Problème de configuration Firebase", "error");
+
+          try {
+            const emergencyConfig = {
+              apiKey: "AIzaSyD1BQIb2nkGyr4m-elfZlcE88YvGG5pLaE",
+              authDomain: "src-admin-e9b49.firebaseapp.com",
+              databaseURL:
+                "https://src-admin-e9b49-default-rtdb.europe-west1.firebasedatabase.app",
+              projectId: "src-admin-e9b49",
+              storageBucket: "src-admin-e9b49.firebasestorage.app",
+              messagingSenderId: "42898128978",
+              appId: "1:42898128978:web:c899eccb8b9aeb465d5f8b",
+            };
+
+            firebase.initializeApp(emergencyConfig);
+            console.log("✅ Firebase initialisé en mode d'urgence");
+            showNotification("✅ Connexion établie", "success");
+          } catch (error) {
+            console.error("❌ Échec initialisation d'urgence:", error);
+            showNotification(
+              "⚠️ Connexion impossible - Rechargez la page",
+              "error",
+            );
+            return;
+          }
+        } else {
+          console.log(
+            "✅ Firebase est initialisé, apps:",
+            firebase.apps.length,
+          );
+        }
+
+        try {
+          database = firebase.database();
+          console.log("✅ Database initialisée");
+        } catch (error) {
+          console.error("❌ Erreur initialisation database:", error);
+          showNotification("⚠️ Problème de connexion base de données", "error");
+          return;
+        }
+
+        testFirebaseConnection();
 
         burger.addEventListener("click", () => {
           navMenu.classList.toggle("active");
@@ -1175,8 +1202,6 @@
           });
         });
 
-        setupFirebaseListener();
-
         recruitmentForm.addEventListener("submit", handleRecruitmentSubmit);
         generalContactForm.addEventListener("submit", handleContactSubmit);
 
@@ -1185,47 +1210,110 @@
         window.addEventListener("scroll", handleScroll);
       });
 
+      function testFirebaseConnection() {
+        console.log("🔍 Test de connexion Firebase...");
+
+        const testRef = database.ref(".info/connected");
+
+        testRef.on(
+          "value",
+          (snapshot) => {
+            const connected = snapshot.val();
+            console.log(
+              "📡 Statut connexion Firebase:",
+              connected ? "✅ Connecté" : "❌ Déconnecté",
+            );
+
+            if (connected) {
+              console.log("✅ Connexion Firebase établie");
+              setupFirebaseListener();
+              showNotification(
+                "✅ Connexion base de données établie",
+                "success",
+              );
+            } else {
+              console.log("⏳ En attente de connexion Firebase...");
+              showNotification("⏳ Connexion en cours...", "info");
+
+              setTimeout(() => {
+                console.log("🔄 Tentative de reconnexion...");
+                testFirebaseConnection();
+              }, 3000);
+            }
+          },
+          (error) => {
+            console.error("❌ Erreur test connexion Firebase:", error);
+            showNotification("⚠️ Connexion base de données instable", "error");
+
+            setTimeout(() => {
+              console.log("🔄 Tentative de reconnexion après erreur...");
+              testFirebaseConnection();
+            }, 5000);
+          },
+        );
+
+        const testRecruitmentRef = database.ref("recruitment/status");
+        testRecruitmentRef
+          .once("value")
+          .then((snapshot) => {
+            console.log("✅ Test de lecture réussi, valeur:", snapshot.val());
+          })
+          .catch((error) => {
+            console.error("❌ Test de lecture échoué:", error);
+          });
+      }
+
       function setupFirebaseListener() {
-        console.log("Écouteur Firebase mis en place sur: recruitment/status");
+        console.log("👂 Mise en place de l'écouteur Firebase...");
 
         const recruitmentRef = database.ref("recruitment/status");
 
         recruitmentRef.on(
           "value",
           (snapshot) => {
-            const isActive = snapshot.val();
-            console.log("État reçu de Firebase:", isActive);
+            try {
+              const isActive = snapshot.val();
+              console.log("📊 État recrutement reçu:", isActive);
 
-            recruitmentActive = isActive === true;
-            updateRecruitmentStatus();
+              recruitmentActive = isActive === true;
 
-            if (isActive !== null) {
-              showNotification(
-                recruitmentActive
-                  ? "✅ Recrutement OUVERT - Vous pouvez postuler"
-                  : "⭕ Recrutement FERMÉ - Réessayez plus tard",
-                recruitmentActive ? "success" : "info",
-              );
+              updateRecruitmentStatus();
+
+              if (isActive !== null && isActive !== undefined) {
+                console.log(
+                  "📢 Changement d'état:",
+                  recruitmentActive ? "OUVERT" : "FERMÉ",
+                );
+              }
+            } catch (error) {
+              console.error("❌ Erreur traitement données Firebase:", error);
             }
           },
           (error) => {
-            console.error("Erreur écoute Firebase:", error);
-            showNotification("⚠️ Connexion base de données instable", "error");
+            console.error("❌ Erreur écoute Firebase:", error);
+
+            setTimeout(() => {
+              console.log("🔄 Tentative de reconnexion écouteur...");
+              setupFirebaseListener();
+            }, 3000);
           },
         );
 
         recruitmentRef
           .once("value")
           .then((snapshot) => {
-            console.log("Test connexion Firebase OK, valeur:", snapshot.val());
+            console.log(
+              "✅ Test écouteur réussi, valeur initiale:",
+              snapshot.val(),
+            );
           })
           .catch((error) => {
-            console.error("Test connexion Firebase échoué:", error);
+            console.error("❌ Test écouteur échoué:", error);
           });
       }
 
       function updateRecruitmentStatus() {
-        console.log("Mise à jour état recrutement:", recruitmentActive);
+        console.log("🔄 Mise à jour état recrutement:", recruitmentActive);
 
         if (recruitmentActive) {
           recruitmentStatusIndicator.classList.remove("status-off");
@@ -1251,15 +1339,20 @@
       }
 
       function showNotification(message, type) {
-        console.log("Notification:", message);
+        console.log("💬 Notification:", message);
+
+        const existingNotifications =
+          document.querySelectorAll(".fw-notification");
+        existingNotifications.forEach((notif) => notif.remove());
 
         const notification = document.createElement("div");
+        notification.className = "fw-notification";
         notification.style.cssText = `
           position: fixed;
           top: 100px;
           right: 20px;
           padding: 12px 20px;
-          background: ${type === "success" ? "rgba(40, 167, 69, 0.9)" : "rgba(220, 53, 69, 0.9)"};
+          background: ${type === "success" ? "rgba(40, 167, 69, 0.95)" : type === "info" ? "rgba(13, 110, 253, 0.95)" : "rgba(220, 53, 69, 0.95)"};
           color: white;
           border-radius: 8px;
           z-index: 10000;
@@ -1267,7 +1360,9 @@
           font-size: 0.9rem;
           animation: slideIn 0.3s ease;
           box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-          border: 2px solid ${type === "success" ? "#28a745" : "#dc3545"};
+          border: 2px solid ${type === "success" ? "#28a745" : type === "info" ? "#0d6efd" : "#dc3545"};
+          max-width: 300px;
+          word-wrap: break-word;
         `;
 
         notification.textContent = message;
@@ -1289,6 +1384,10 @@
         @keyframes slideOut {
           from { transform: translateX(0); opacity: 1; }
           to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .fw-notification {
+          font-family: 'Orbitron', sans-serif !important;
         }
       `;
       document.head.appendChild(style);
@@ -1347,14 +1446,18 @@
         e.preventDefault();
 
         if (!recruitmentActive) {
-          alert(
+          showNotification(
             "❌ Le recrutement est actuellement fermé. Veuillez réessayer ultérieurement.",
+            "error",
           );
           return;
         }
 
         if (getRemainingCooldown(STORAGE_KEYS.RECRUITMENT) > 0) {
-          alert("⏰ Veuillez attendre 6h entre chaque demande de recrutement.");
+          showNotification(
+            "⏰ Veuillez attendre 6h entre chaque demande de recrutement.",
+            "info",
+          );
           return;
         }
 
@@ -1376,7 +1479,10 @@
           !formData.telephone ||
           !formData.horaire
         ) {
-          alert("⚠️ Veuillez remplir tous les champs obligatoires.");
+          showNotification(
+            "⚠️ Veuillez remplir tous les champs obligatoires.",
+            "error",
+          );
           return;
         }
 
@@ -1400,9 +1506,10 @@
             checkCooldowns();
           }, 3000);
         } catch (error) {
-          console.error("Erreur lors de l'envoi:", error);
-          alert(
+          console.error("❌ Erreur lors de l'envoi:", error);
+          showNotification(
             "❌ Une erreur est survenue lors de l'envoi. Veuillez réessayer.",
+            "error",
           );
           submitRecruitment.disabled = false;
           submitRecruitment.innerHTML =
@@ -1414,7 +1521,10 @@
         e.preventDefault();
 
         if (getRemainingCooldown(STORAGE_KEYS.CONTACT) > 0) {
-          alert("⏰ Veuillez attendre 6h entre chaque demande de contact.");
+          showNotification(
+            "⏰ Veuillez attendre 6h entre chaque demande de contact.",
+            "info",
+          );
           return;
         }
 
@@ -1440,7 +1550,10 @@
           !formData.typeDemande ||
           !formData.message
         ) {
-          alert("⚠️ Veuillez remplir tous les champs obligatoires.");
+          showNotification(
+            "⚠️ Veuillez remplir tous les champs obligatoires.",
+            "error",
+          );
           return;
         }
 
@@ -1464,9 +1577,10 @@
             checkCooldowns();
           }, 3000);
         } catch (error) {
-          console.error("Erreur lors de l'envoi:", error);
-          alert(
+          console.error("❌ Erreur lors de l'envoi:", error);
+          showNotification(
             "❌ Une erreur est survenue lors de l'envoi. Veuillez réessayer.",
+            "error",
           );
           submitContact.disabled = false;
           submitContact.innerHTML =
