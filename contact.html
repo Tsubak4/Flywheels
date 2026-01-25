@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fly Wheels - FlashFA</title>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
@@ -620,85 +624,8 @@
         display: none;
       }
 
-      /* Interrupteur de test */
       .test-switch {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(26, 26, 26, 0.9);
-        border: 2px solid var(--fw-gold);
-        border-radius: 10px;
-        padding: 15px;
-        z-index: 1000;
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-      }
-
-      .switch-label {
-        font-family: "Orbitron", sans-serif;
-        font-size: 0.9rem;
-        color: var(--fw-beige);
-        margin-bottom: 10px;
-        text-align: center;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-
-      .switch-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-      }
-
-      .toggle-switch {
-        position: relative;
-        width: 60px;
-        height: 30px;
-      }
-
-      .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: var(--fw-red);
-        transition: 0.4s;
-        border-radius: 34px;
-      }
-
-      .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 22px;
-        width: 22px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-      }
-
-      input:checked + .toggle-slider {
-        background-color: var(--fw-green);
-      }
-
-      input:checked + .toggle-slider:before {
-        transform: translateX(30px);
-      }
-
-      .switch-status {
-        font-family: "Orbitron", sans-serif;
-        font-size: 1rem;
-        color: var(--fw-beige);
-        min-width: 40px;
+        display: none !important;
       }
 
       footer {
@@ -1155,7 +1082,6 @@
       </div>
     </main>
 
-    <!-- Interrupteur de test (à retirer plus tard) -->
     <div class="test-switch" id="testSwitch">
       <div class="switch-label">TEST RECRUTEMENT</div>
       <div class="switch-container">
@@ -1178,7 +1104,17 @@
     </footer>
 
     <script>
-      // A Changer
+      const firebaseConfig = {
+        apiKey: "AIzaSyD1BQIb2nkGyr4m-elfZlcE88YvGG5pLaE",
+        authDomain: "src-admin-e9b49.firebaseapp.com",
+        databaseURL:
+          "https://src-admin-e9b49-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "src-admin-e9b49",
+        storageBucket: "src-admin-e9b49.firebasestorage.app",
+        messagingSenderId: "42898128978",
+        appId: "1:42898128978:web:c899eccb8b9aeb465d5f8b",
+      };
+
       const RECRUITMENT_WEBHOOK_URL =
         "https://discord.com/api/webhooks/1460302239267815719/g7Yo98osgz4Aqf-U7XLtVZp0_xvL-zcrgD3PkAwnqHMsjtkM4H_cbSqM33cDHJbeECDL";
       const CONTACT_WEBHOOK_URL =
@@ -1187,6 +1123,7 @@
       const COOLDOWN_TIME = 6 * 60 * 60 * 1000;
 
       let recruitmentActive = false;
+      let database;
 
       const STORAGE_KEYS = {
         RECRUITMENT: "flywheels_recruitment_cooldown",
@@ -1195,7 +1132,8 @@
 
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
-      const recruitmentStatus = document.getElementById("recruitmentStatus");
+      const recruitmentStatusIndicator =
+        document.getElementById("recruitmentStatus");
       const statusText = document.getElementById("statusText");
       const recruitmentFormContainer = document.getElementById(
         "recruitmentFormContainer",
@@ -1206,12 +1144,25 @@
       const generalContactForm = document.getElementById("generalContactForm");
       const submitContact = document.getElementById("submitContact");
       const contactSuccess = document.getElementById("contactSuccess");
-      const recruitmentToggle = document.getElementById("recruitmentToggle");
-      const switchStatus = document.getElementById("switchStatus");
-      const switchStatusOn = document.getElementById("switchStatusOn");
-      const testSwitch = document.getElementById("testSwitch");
 
       document.addEventListener("DOMContentLoaded", function () {
+        console.log("Page publique chargée - Initialisation Firebase...");
+
+        try {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log("Firebase initialisé sur la page publique");
+          }
+          database = firebase.database();
+          console.log("Database disponible sur page publique:", !!database);
+        } catch (error) {
+          console.error(
+            "Erreur d'initialisation Firebase page publique:",
+            error,
+          );
+          return;
+        }
+
         burger.addEventListener("click", () => {
           navMenu.classList.toggle("active");
           burger.classList.toggle("active");
@@ -1224,71 +1175,127 @@
           });
         });
 
-        updateRecruitmentStatus();
-
-        recruitmentToggle.addEventListener("change", function () {
-          recruitmentActive = this.checked;
-          updateRecruitmentStatus();
-
-          switchStatus.textContent = recruitmentActive ? "OFF" : "OFF";
-          switchStatusOn.textContent = recruitmentActive ? "ON" : "ON";
-          switchStatus.style.color = recruitmentActive ? "#8c8c8c" : "#f5e8c8";
-          switchStatusOn.style.color = recruitmentActive
-            ? "#f5e8c8"
-            : "#8c8c8c";
-
-          if (recruitmentActive) {
-            recruitmentFormContainer.classList.add("show");
-          } else {
-            recruitmentFormContainer.classList.remove("show");
-          }
-        });
+        setupFirebaseListener();
 
         recruitmentForm.addEventListener("submit", handleRecruitmentSubmit);
         generalContactForm.addEventListener("submit", handleContactSubmit);
 
         checkCooldowns();
 
-        window.addEventListener("scroll", () => {
-          const header = document.querySelector("header");
-          if (window.scrollY > 50) {
-            header.style.background =
-              "linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(51, 51, 51, 0.98) 100%)";
-            header.style.boxShadow = "0 5px 25px rgba(212, 175, 55, 0.3)";
-          } else {
-            header.style.background =
-              "linear-gradient(135deg, var(--fw-dark) 0%, var(--fw-gray) 100%)";
-            header.style.boxShadow = "0 4px 20px rgba(212, 175, 55, 0.2)";
-          }
-        });
-
-        window.hideTestSwitch = function () {
-          testSwitch.style.display = "none";
-        };
-
-        window.showTestSwitch = function () {
-          testSwitch.style.display = "block";
-        };
+        window.addEventListener("scroll", handleScroll);
       });
 
+      function setupFirebaseListener() {
+        console.log("Écouteur Firebase mis en place sur: recruitment/status");
+
+        const recruitmentRef = database.ref("recruitment/status");
+
+        recruitmentRef.on(
+          "value",
+          (snapshot) => {
+            const isActive = snapshot.val();
+            console.log("État reçu de Firebase:", isActive);
+
+            recruitmentActive = isActive === true;
+            updateRecruitmentStatus();
+
+            if (isActive !== null) {
+              showNotification(
+                recruitmentActive
+                  ? "✅ Recrutement OUVERT - Vous pouvez postuler"
+                  : "⭕ Recrutement FERMÉ - Réessayez plus tard",
+                recruitmentActive ? "success" : "info",
+              );
+            }
+          },
+          (error) => {
+            console.error("Erreur écoute Firebase:", error);
+            showNotification("⚠️ Connexion base de données instable", "error");
+          },
+        );
+
+        recruitmentRef
+          .once("value")
+          .then((snapshot) => {
+            console.log("Test connexion Firebase OK, valeur:", snapshot.val());
+          })
+          .catch((error) => {
+            console.error("Test connexion Firebase échoué:", error);
+          });
+      }
+
       function updateRecruitmentStatus() {
+        console.log("Mise à jour état recrutement:", recruitmentActive);
+
         if (recruitmentActive) {
-          recruitmentStatus.classList.remove("status-off");
-          recruitmentStatus.classList.add("status-on");
+          recruitmentStatusIndicator.classList.remove("status-off");
+          recruitmentStatusIndicator.classList.add("status-on");
           statusText.textContent = "ON";
-          recruitmentFormContainer.classList.add("show");
+          statusText.style.color = "#28a745";
+
+          recruitmentFormContainer.style.display = "block";
+          setTimeout(() => {
+            recruitmentFormContainer.classList.add("show");
+          }, 10);
         } else {
-          recruitmentStatus.classList.remove("status-on");
-          recruitmentStatus.classList.add("status-off");
+          recruitmentStatusIndicator.classList.remove("status-on");
+          recruitmentStatusIndicator.classList.add("status-off");
           statusText.textContent = "OFF";
+          statusText.style.color = "#dc3545";
 
           recruitmentFormContainer.classList.remove("show");
+          setTimeout(() => {
+            recruitmentFormContainer.style.display = "none";
+          }, 500);
         }
       }
 
+      function showNotification(message, type) {
+        console.log("Notification:", message);
+
+        const notification = document.createElement("div");
+        notification.style.cssText = `
+          position: fixed;
+          top: 100px;
+          right: 20px;
+          padding: 12px 20px;
+          background: ${type === "success" ? "rgba(40, 167, 69, 0.9)" : "rgba(220, 53, 69, 0.9)"};
+          color: white;
+          border-radius: 8px;
+          z-index: 10000;
+          font-family: 'Orbitron', sans-serif;
+          font-size: 0.9rem;
+          animation: slideIn 0.3s ease;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+          border: 2px solid ${type === "success" ? "#28a745" : "#dc3545"};
+        `;
+
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.animation = "slideOut 0.3s ease";
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(100%); opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+
       function checkCooldowns() {
         const recruitmentCooldown = getRemainingCooldown(
-          STORAGE_KEYS.RECRUTEMENT,
+          STORAGE_KEYS.RECRUITMENT,
         );
         const contactCooldown = getRemainingCooldown(STORAGE_KEYS.CONTACT);
 
@@ -1339,8 +1346,15 @@
       async function handleRecruitmentSubmit(e) {
         e.preventDefault();
 
-        if (getRemainingCooldown(STORAGE_KEYS.RECRUTEMENT) > 0) {
-          alert("Veuillez attendre 6h entre chaque demande de recrutement.");
+        if (!recruitmentActive) {
+          alert(
+            "❌ Le recrutement est actuellement fermé. Veuillez réessayer ultérieurement.",
+          );
+          return;
+        }
+
+        if (getRemainingCooldown(STORAGE_KEYS.RECRUITMENT) > 0) {
+          alert("⏰ Veuillez attendre 6h entre chaque demande de recrutement.");
           return;
         }
 
@@ -1362,7 +1376,7 @@
           !formData.telephone ||
           !formData.horaire
         ) {
-          alert("Veuillez remplir tous les champs obligatoires.");
+          alert("⚠️ Veuillez remplir tous les champs obligatoires.");
           return;
         }
 
@@ -1376,7 +1390,7 @@
 
           await sendToDiscord(RECRUITMENT_WEBHOOK_URL, discordPayload);
 
-          localStorage.setItem(STORAGE_KEYS.RECRUTEMENT, Date.now().toString());
+          localStorage.setItem(STORAGE_KEYS.RECRUITMENT, Date.now().toString());
 
           recruitmentSuccess.style.display = "block";
 
@@ -1387,7 +1401,9 @@
           }, 3000);
         } catch (error) {
           console.error("Erreur lors de l'envoi:", error);
-          alert("Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+          alert(
+            "❌ Une erreur est survenue lors de l'envoi. Veuillez réessayer.",
+          );
           submitRecruitment.disabled = false;
           submitRecruitment.innerHTML =
             '<i class="fas fa-paper-plane"></i> Envoyer ma candidature';
@@ -1398,7 +1414,7 @@
         e.preventDefault();
 
         if (getRemainingCooldown(STORAGE_KEYS.CONTACT) > 0) {
-          alert("Veuillez attendre 6h entre chaque demande de contact.");
+          alert("⏰ Veuillez attendre 6h entre chaque demande de contact.");
           return;
         }
 
@@ -1424,7 +1440,7 @@
           !formData.typeDemande ||
           !formData.message
         ) {
-          alert("Veuillez remplir tous les champs obligatoires.");
+          alert("⚠️ Veuillez remplir tous les champs obligatoires.");
           return;
         }
 
@@ -1449,7 +1465,9 @@
           }, 3000);
         } catch (error) {
           console.error("Erreur lors de l'envoi:", error);
-          alert("Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+          alert(
+            "❌ Une erreur est survenue lors de l'envoi. Veuillez réessayer.",
+          );
           submitContact.disabled = false;
           submitContact.innerHTML =
             '<i class="fas fa-paper-plane"></i> Envoyer mon message';
@@ -1563,22 +1581,18 @@
         return response;
       }
 
-      window.updateRecruitmentState = function (isActive) {
-        recruitmentActive = isActive;
-        recruitmentToggle.checked = isActive;
-        updateRecruitmentStatus();
-
-        switchStatus.textContent = recruitmentActive ? "OFF" : "OFF";
-        switchStatusOn.textContent = recruitmentActive ? "ON" : "ON";
-        switchStatus.style.color = recruitmentActive ? "#8c8c8c" : "#f5e8c8";
-        switchStatusOn.style.color = recruitmentActive ? "#f5e8c8" : "#8c8c8c";
-
-        if (recruitmentActive) {
-          recruitmentFormContainer.classList.add("show");
+      function handleScroll() {
+        const header = document.querySelector("header");
+        if (window.scrollY > 50) {
+          header.style.background =
+            "linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(51, 51, 51, 0.98) 100%)";
+          header.style.boxShadow = "0 5px 25px rgba(212, 175, 55, 0.3)";
         } else {
-          recruitmentFormContainer.classList.remove("show");
+          header.style.background =
+            "linear-gradient(135deg, var(--fw-dark) 0%, var(--fw-gray) 100%)";
+          header.style.boxShadow = "0 4px 20px rgba(212, 175, 55, 0.2)";
         }
-      };
+      }
     </script>
   </body>
 </html>
