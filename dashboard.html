@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Fly Wheels</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        color: var(--fw-beige);
+        background-color: var(--fw-dark);
+        min-height: 100vh;
+        background: linear-gradient(
+          135deg,
+          var(--fw-darker) 0%,
+          var(--fw-dark) 100%
+        );
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 80%,
+            rgba(212, 175, 55, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 50%
+          );
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        padding: 1rem 0;
+        border-bottom: 3px solid var(--fw-gold);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        padding: 8px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        animation: logoGlow 2s infinite alternate;
+        text-decoration: none;
+      }
+
+      @keyframes logoGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .logo-container img {
+        height: 40px;
+        width: auto;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      }
+
+      .logo-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 15px;
+      }
+
+      .logo-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--fw-beige);
+        text-shadow: 0 0 10px rgba(245, 232, 200, 0.5);
+      }
+
+      .logo-subtitle {
+        font-family: "Roboto", sans-serif;
+        font-size: 0.8rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+        width: 100%;
+        margin-top: 2px;
+        text-transform: uppercase;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 5px;
+      }
+
+      nav a {
+        color: var(--fw-beige);
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 10px 15px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: 2px solid var(--fw-beige);
+        position: relative;
+        overflow: hidden;
+        background: rgba(245, 232, 200, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 70px;
+      }
+
+      .nav-icon {
+        font-size: 1rem;
+        margin-bottom: 3px;
+        color: var(--fw-beige);
+        display: block;
+        color: #d4af37;
+      }
+
+      .nav-text {
+        font-size: 0.8rem;
+        display: block;
+        color: #d4af37;
+      }
+
+      nav a:hover {
+        border: 2px solid var(--fw-gold);
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        transform: translateY(-2px);
+      }
+
+      nav a::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+      }
+
+      nav a:hover::before {
+        opacity: 0.4;
+      }
+
+      .main-content {
+        padding-top: 120px;
+        padding-bottom: 60px;
+      }
+
+      .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .dashboard-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.5rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 40px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-align: center;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.8),
+          0 0 20px rgba(212, 175, 55, 0.5);
+        background: linear-gradient(
+          to bottom,
+          var(--fw-beige-light) 0%,
+          var(--fw-beige) 50%,
+          var(--fw-beige-dark) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+      }
+
+      .dashboard-title::after {
+        content: "";
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--fw-gold);
+      }
+
+      .section-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 40px;
+        margin-top: 40px;
+      }
+
+      .dashboard-card {
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 15px;
+        padding: 35px 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.7),
+          0 0 30px rgba(212, 175, 55, 0.4),
+          0 0 50px rgba(212, 175, 55, 0.3);
+        animation: cardGlow 3s infinite alternate;
+      }
+
+      @keyframes cardGlow {
+        0% {
+          box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.7),
+            0 0 30px rgba(212, 175, 55, 0.4),
+            0 0 50px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.7),
+            0 0 40px rgba(212, 175, 55, 0.7),
+            0 0 60px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .card-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .card-title i {
+        color: var(--fw-gold);
+        font-size: 1.5rem;
+        text-shadow: 0 0 10px var(--fw-gold);
+      }
+
+      .toggle-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-beige);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .toggle-label {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.2rem;
+        color: var(--fw-beige);
+        text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+      }
+
+      .toggle-description {
+        color: rgba(245, 232, 200, 0.7);
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(51, 51, 51, 0.8);
+        border: 2px solid var(--fw-beige);
+        transition: 0.4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 2px;
+        background-color: var(--fw-beige);
+        transition: 0.4s;
+        box-shadow: 0 0 10px rgba(245, 232, 200, 0.5);
+      }
+
+      input:checked + .slider {
+        background-color: var(--fw-gold);
+        border-color: var(--fw-gold-light);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(34px);
+        background-color: var(--fw-beige-light);
+        box-shadow: 0 0 15px rgba(245, 232, 200, 0.8);
+      }
+
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+      .coming-soon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        text-align: center;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-beige);
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+
+      .coming-soon-icon {
+        font-size: 3rem;
+        color: var(--fw-gold);
+        margin-bottom: 20px;
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+      }
+
+      .coming-soon-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.5rem;
+        color: var(--fw-beige);
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      }
+
+      .status-indicator {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-left: 15px;
+      }
+
+      .status-active {
+        background: rgba(0, 100, 0, 0.3);
+        color: #4caf50;
+        border: 2px solid #4caf50;
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+      }
+
+      .status-inactive {
+        background: rgba(100, 0, 0, 0.3);
+        color: #f44336;
+        border: 2px solid #f44336;
+        box-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+      }
+
+      .current-status {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(26, 26, 26, 0.6);
+        border-radius: 10px;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        text-align: center;
+      }
+
+      .current-status-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.1rem;
+        color: var(--fw-gold);
+        margin-bottom: 8px;
+      }
+
+      .current-status-value {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--fw-beige);
+      }
+
+      .status-active-text {
+        color: #4caf50;
+        text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+      }
+
+      .status-inactive-text {
+        color: #f44336;
+        text-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+      }
+
+      footer {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        padding: 20px 0;
+        border-top: 3px solid var(--fw-gold);
+        text-align: center;
+        position: relative;
+        margin-top: 60px;
+      }
+
+      footer::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--fw-gold);
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .footer-bottom {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      .burger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid var(--fw-gold);
+        margin-left: 15px;
+        animation: burgerGlow 2s infinite alternate;
+      }
+
+      @keyframes burgerGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 10px var(--fw-gold),
+            0 0 20px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .burger span {
+        width: 25px;
+        height: 3px;
+        background: var(--fw-gold);
+        margin: 3px 0;
+        transition: 0.3s;
+        border-radius: 2px;
+      }
+
+      @media (max-width: 1200px) {
+        .container {
+          padding: 0 20px;
+        }
+
+        nav a {
+          padding: 10px 12px;
+          min-width: 65px;
+        }
+
+        .nav-icon {
+          font-size: 0.9rem;
+        }
+
+        .nav-text {
+          font-size: 0.75rem;
+        }
+
+        .section-container {
+          grid-template-columns: 1fr;
+          max-width: 800px;
+          margin: 40px auto 0;
+        }
+      }
+
+      @media (max-width: 768px) {
+        nav ul {
+          display: none;
+          position: fixed;
+          top: 100px;
+          left: 0;
+          width: 100%;
+          background: linear-gradient(
+            135deg,
+            var(--fw-dark) 0%,
+            var(--fw-gray) 100%
+          );
+          flex-direction: column;
+          padding: 20px;
+          text-align: center;
+          gap: 10px;
+          border-top: 2px solid var(--fw-gold);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+
+        nav ul.active {
+          display: flex;
+        }
+
+        nav a {
+          padding: 12px;
+          min-width: auto;
+          width: 100%;
+          max-width: 300px;
+          margin: 0 auto;
+          flex-direction: row;
+          justify-content: center;
+          gap: 10px;
+          border-radius: 8px;
+        }
+
+        .nav-icon {
+          margin-bottom: 0;
+          font-size: 1rem;
+        }
+
+        .nav-text {
+          font-size: 0.85rem;
+        }
+
+        .burger {
+          display: flex;
+        }
+
+        .logo-text {
+          font-size: 1.2rem;
+        }
+
+        .logo-container img {
+          height: 35px;
+        }
+
+        .main-content {
+          padding-top: 100px;
+        }
+
+        .dashboard-title {
+          font-size: 2rem;
+        }
+
+        .section-container {
+          padding: 0 15px;
+        }
+
+        .dashboard-card {
+          padding: 25px 20px;
+        }
+
+        .card-title {
+          font-size: 1.5rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .logo-text {
+          font-size: 1rem;
+        }
+
+        .logo-container img {
+          height: 30px;
+        }
+
+        .dashboard-title {
+          font-size: 1.8rem;
+        }
+
+        .container {
+          padding: 0 15px;
+        }
+
+        .section-container {
+          grid-template-columns: 1fr;
+        }
+
+        .dashboard-card {
+          padding: 20px 15px;
+        }
+
+        .card-title {
+          font-size: 1.3rem;
+        }
+
+        .toggle-container {
+          flex-direction: column;
+          gap: 15px;
+          text-align: center;
+        }
+
+        footer {
+          margin-top: 40px;
+          padding: 15px 0;
+        }
+
+        .footer-bottom {
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="nav-container">
+          <div class="logo-container">
+            <img src="assets/logo.png" alt="Fly Wheels Logo" />
+            <div class="logo-text-container">
+              <div class="logo-text">FLY WHEELS</div>
+              <div class="logo-subtitle">ADMIN PANEL</div>
+            </div>
+          </div>
+
+          <nav>
+            <ul id="nav-menu">
+              <li>
+                <a href="dashboard.html" class="active">
+                  <span class="nav-icon"
+                    ><i class="fas fa-tachometer-alt"></i
+                  ></span>
+                  <span class="nav-text">Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a href="recrut.html">
+                  <span class="nav-icon"
+                    ><i class="fas fa-clipboard-list"></i
+                  ></span>
+                  <span class="nav-text">Questionnaire</span>
+                </a>
+              </li>
+              <li>
+                <a href="planning.html">
+                  <span class="nav-icon"
+                    ><i class="fas fa-calendar-alt"></i
+                  ></span>
+                  <span class="nav-text">Planning</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" id="logoutBtn">
+                  <span class="nav-icon"
+                    ><i class="fas fa-sign-out-alt"></i
+                  ></span>
+                  <span class="nav-text">Log out</span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="burger" id="burger">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="dashboard-container">
+        <h1 class="dashboard-title">TABLEAU DE BORD ADMIN</h1>
+
+        <div class="section-container">
+          <div class="dashboard-card">
+            <div class="card-title">
+              <i class="fas fa-user-plus"></i>
+              Recrutement
+            </div>
+
+            <div class="toggle-container">
+              <div>
+                <div class="toggle-label">Gestion du recrutement</div>
+                <div class="toggle-description">
+                  Activer/Désactiver le système de recrutement
+                </div>
+              </div>
+
+              <label class="switch">
+                <input type="checkbox" id="recruitmentToggle" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="current-status" id="currentStatusDisplay">
+              <div class="current-status-title">
+                ÉTAT ACTUEL DU RECRUTEMENT :
+              </div>
+              <div
+                class="current-status-value status-inactive-text"
+                id="statusText"
+              >
+                INACTIF
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 30px;
+                padding: 20px;
+                background: rgba(26, 26, 26, 0.6);
+                border-radius: 10px;
+                border: 1px solid rgba(212, 175, 55, 0.3);
+              "
+            >
+              <h3
+                style="
+                  font-family: &quot;Orbitron&quot;, sans-serif;
+                  color: var(--fw-gold);
+                  margin-bottom: 15px;
+                  font-size: 1.2rem;
+                "
+              >
+                <i class="fas fa-info-circle"></i> Informations
+              </h3>
+              <p
+                style="
+                  color: rgba(245, 232, 200, 0.8);
+                  line-height: 1.6;
+                  font-size: 0.95rem;
+                "
+              >
+                Lorsque le recrutement est <strong>ACTIF</strong>, les candidats
+                peuvent soumettre leurs demandes via la page publique de
+                contact. <br /><br />
+                Lorsque le recrutement est <strong>INACTIF</strong>, la page
+                publique affiche un message indiquant que les recrutements sont
+                fermés.
+              </p>
+            </div>
+          </div>
+
+          <div class="dashboard-card">
+            <div class="card-title">
+              <i class="fas fa-users"></i>
+              Équipe
+            </div>
+
+            <div class="coming-soon">
+              <div class="coming-soon-icon">
+                <i class="fas fa-tools"></i>
+              </div>
+              <div class="coming-soon-text">
+                Section en développement
+                <p
+                  style="
+                    font-size: 1rem;
+                    margin-top: 10px;
+                    color: rgba(245, 232, 200, 0.7);
+                  "
+                >
+                  Fonctionnalité à venir prochainement
+                </p>
+              </div>
+            </div>
+
+            <div
+              style="
+                margin-top: 30px;
+                padding: 20px;
+                background: rgba(26, 26, 26, 0.6);
+                border-radius: 10px;
+                border: 1px solid rgba(212, 175, 55, 0.3);
+              "
+            >
+              <h3
+                style="
+                  font-family: &quot;Orbitron&quot;, sans-serif;
+                  color: var(--fw-gold);
+                  margin-bottom: 15px;
+                  font-size: 1.2rem;
+                "
+              >
+                <i class="fas fa-lightbulb"></i> À venir
+              </h3>
+              <ul
+                style="
+                  color: rgba(245, 232, 200, 0.8);
+                  line-height: 1.6;
+                  font-size: 0.95rem;
+                  padding-left: 20px;
+                "
+              >
+                <li>Gestion des membres de l'équipe</li>
+                <li>Statistiques de performance</li>
+                <li>Planning des rotations</li>
+                <li>Gestion des permissions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-bottom">
+            © 2024 Fly Wheels Garage - Dashboard Admin v1.0
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyD1BQIb2nkGyr4m-elfZlcE88YvGG5pLaE",
+        authDomain: "src-admin-e9b49.firebaseapp.com",
+        databaseURL:
+          "https://src-admin-e9b49-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "src-admin-e9b49",
+        storageBucket: "src-admin-e9b49.firebasestorage.app",
+        messagingSenderId: "42898128978",
+        appId: "1:42898128978:web:c899eccb8b9aeb465d5f8b",
+      };
+
+      let app;
+      if (!firebase.apps.length) {
+        app = firebase.initializeApp(firebaseConfig);
+      } else {
+        app = firebase.app();
+      }
+
+      const auth = firebase.auth();
+      const database = firebase.database();
+
+      let authCheckDone = false;
+      auth.onAuthStateChanged((user) => {
+        if (!authCheckDone) {
+          authCheckDone = true;
+          if (!user) {
+            window.location.href = "admin.html";
+          }
+        }
+      });
+
+      const burger = document.getElementById("burger");
+      const navMenu = document.getElementById("nav-menu");
+      const recruitmentToggle = document.getElementById("recruitmentToggle");
+      const statusText = document.getElementById("statusText");
+      const currentStatusDisplay = document.getElementById(
+        "currentStatusDisplay",
+      );
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      function updateStatusDisplay(isActive) {
+        if (isActive) {
+          statusText.textContent = "ACTIF";
+          statusText.className = "current-status-value status-active-text";
+          currentStatusDisplay.style.borderColor = "#4caf50";
+          currentStatusDisplay.style.boxShadow =
+            "0 0 10px rgba(76, 175, 80, 0.3)";
+        } else {
+          statusText.textContent = "INACTIF";
+          statusText.className = "current-status-value status-inactive-text";
+          currentStatusDisplay.style.borderColor = "#f44336";
+          currentStatusDisplay.style.boxShadow =
+            "0 0 10px rgba(244, 67, 54, 0.3)";
+        }
+      }
+
+      burger.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+        burger.classList.toggle("active");
+      });
+
+      document.querySelectorAll("#nav-menu a").forEach((link) => {
+        link.addEventListener("click", () => {
+          navMenu.classList.remove("active");
+          burger.classList.remove("active");
+        });
+      });
+
+      recruitmentToggle.addEventListener("change", function () {
+        const isActive = this.checked;
+
+        updateStatusDisplay(isActive);
+
+        database
+          .ref("recruitment/status")
+          .set(isActive)
+          .then(() => {
+            if (isActive) {
+              showNotification("Recrutement activé avec succès", "success");
+            } else {
+              showNotification("Recrutement désactivé", "info");
+            }
+          })
+          .catch((error) => {
+            showNotification("Erreur lors de la sauvegarde", "error");
+            recruitmentToggle.checked = !isActive;
+            updateStatusDisplay(!isActive);
+          });
+      });
+
+      function showNotification(message, type) {
+        const notification = document.createElement("div");
+        notification.style.cssText = `
+          position: fixed;
+          top: 100px;
+          right: 20px;
+          padding: 15px 25px;
+          background: ${type === "success" ? "rgba(0, 100, 0, 0.9)" : type === "info" ? "rgba(212, 175, 55, 0.9)" : "rgba(244, 67, 54, 0.9)"};
+          color: var(--fw-beige-light);
+          border: 2px solid ${type === "success" ? "#4caf50" : type === "info" ? "var(--fw-gold)" : "#f44336"};
+          border-radius: 10px;
+          font-family: 'Orbitron', sans-serif;
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          z-index: 10000;
+          animation: slideIn 0.3s ease;
+          box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        `;
+
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.style.animation = "slideOut 0.3s ease";
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideOut {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      logoutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        auth
+          .signOut()
+          .then(() => {
+            showNotification("Déconnexion réussie", "info");
+            setTimeout(() => {
+              window.location.href = "admin.html";
+            }, 1000);
+          })
+          .catch((error) => {
+            showNotification("Erreur de déconnexion", "error");
+          });
+      });
+
+      database
+        .ref("recruitment/status")
+        .once("value")
+        .then((snapshot) => {
+          const isActive = snapshot.val();
+
+          if (isActive !== null) {
+            recruitmentToggle.checked = isActive;
+            updateStatusDisplay(isActive);
+          } else {
+            recruitmentToggle.checked = false;
+            updateStatusDisplay(false);
+            database.ref("recruitment/status").set(false);
+          }
+        })
+        .catch((error) => {
+          showNotification("Erreur de connexion à la base de données", "error");
+        });
+
+      database.ref("recruitment/status").on("value", (snapshot) => {
+        const isActive = snapshot.val();
+        if (isActive !== null) {
+          recruitmentToggle.checked = isActive;
+          updateStatusDisplay(isActive);
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const cards = document.querySelectorAll(".dashboard-card");
+        cards.forEach((card, index) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(30px)";
+          card.style.transition = `all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${0.3 + index * 0.2}s`;
+
+          setTimeout(
+            () => {
+              card.style.opacity = "1";
+              card.style.transform = "translateY(0)";
+            },
+            300 + index * 200,
+          );
+        });
+      });
+
+      window.addEventListener("scroll", () => {
+        const header = document.querySelector("header");
+        if (window.scrollY > 50) {
+          header.style.background =
+            "linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(51, 51, 51, 0.98) 100%)";
+          header.style.boxShadow = "0 5px 25px rgba(212, 175, 55, 0.3)";
+        } else {
+          header.style.background =
+            "linear-gradient(135deg, var(--fw-dark) 0%, var(--fw-gray) 100%)";
+          header.style.boxShadow = "0 4px 20px rgba(212, 175, 55, 0.2)";
+        }
+      });
+    </script>
+  </body>
+</html>
