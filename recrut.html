@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fly Wheels - Formulaire RH</title>
+    <title>Fly Wheels - FlashFA</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
@@ -27,10 +27,15 @@
 
       body {
         font-family: "Roboto", sans-serif;
-        color: #fff;
-        background-color: #1a1a1a;
-        overflow-x: hidden;
-        padding-top: 100px;
+        color: var(--fw-beige);
+        background-color: var(--fw-dark);
+        min-height: 100vh;
+        background: linear-gradient(
+          135deg,
+          var(--fw-darker) 0%,
+          var(--fw-dark) 100%
+        );
+        position: relative;
       }
 
       :root {
@@ -80,11 +85,12 @@
       .logo-container {
         display: flex;
         align-items: center;
-        padding: 5px;
+        padding: 8px 15px;
         background: rgba(212, 175, 55, 0.1);
         border: 2px solid var(--fw-gold);
         border-radius: 10px;
         animation: logoGlow 2s infinite alternate;
+        text-decoration: none;
       }
 
       @keyframes logoGlow {
@@ -101,7 +107,7 @@
       }
 
       .logo-container img {
-        height: 60px;
+        height: 40px;
         width: auto;
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
       }
@@ -115,10 +121,10 @@
 
       .logo-text {
         font-family: "Orbitron", sans-serif;
-        font-size: 1.8rem;
+        font-size: 1.4rem;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
         color: var(--fw-beige);
         text-shadow: 0 0 10px rgba(245, 232, 200, 0.5);
       }
@@ -127,7 +133,7 @@
         font-family: "Roboto", sans-serif;
         font-size: 0.8rem;
         color: var(--fw-gold);
-        font-weight: 300;
+        font-weight: 500;
         letter-spacing: 1px;
         text-align: center;
         width: 100%;
@@ -151,8 +157,8 @@
         text-decoration: none;
         font-family: "Orbitron", sans-serif;
         font-weight: 600;
-        font-size: 1rem;
-        padding: 12px 20px;
+        font-size: 0.9rem;
+        padding: 10px 15px;
         border-radius: 10px;
         transition: all 0.3s ease;
         border: 2px solid var(--fw-beige);
@@ -162,18 +168,19 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-width: 90px;
+        min-width: 70px;
       }
 
       .nav-icon {
-        font-size: 1.5rem;
-        margin-bottom: 5px;
-        color: var(--fw-gold);
+        font-size: 1rem;
+        margin-bottom: 3px;
+        color: var(--fw-beige);
         display: block;
+        color: #d4af37;
       }
 
       .nav-text {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         display: block;
         color: #d4af37;
       }
@@ -250,7 +257,7 @@
 
       .main-content {
         max-width: 1000px;
-        margin: 40px auto;
+        margin: 120px auto 40px;
         padding: 40px;
         background: linear-gradient(
           145deg,
@@ -575,46 +582,6 @@
         box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
       }
 
-      .progress-container {
-        margin: 30px 0;
-        padding: 20px;
-        background: rgba(245, 232, 200, 0.05);
-        border-radius: 10px;
-        border: 1px solid rgba(212, 175, 55, 0.2);
-      }
-
-      .progress-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-
-      .progress-text {
-        font-family: "Orbitron", sans-serif;
-        font-size: 1.1rem;
-        color: var(--fw-gold);
-      }
-
-      .progress-bar {
-        height: 10px;
-        background: rgba(245, 232, 200, 0.1);
-        border-radius: 5px;
-        overflow: hidden;
-      }
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          var(--fw-gold),
-          var(--fw-gold-light)
-        );
-        border-radius: 5px;
-        transition: width 0.5s ease;
-        width: 0%;
-      }
-
       footer {
         background: linear-gradient(
           135deg,
@@ -676,7 +643,7 @@
       @media (max-width: 992px) {
         .main-content {
           padding: 30px;
-          margin: 30px 20px;
+          margin: 120px 20px 40px;
         }
 
         .form-header h1 {
@@ -689,10 +656,6 @@
       }
 
       @media (max-width: 768px) {
-        body {
-          padding-top: 120px;
-        }
-
         nav ul {
           display: none;
           position: fixed;
@@ -730,7 +693,7 @@
 
         .nav-icon {
           margin-bottom: 0;
-          font-size: 1.4rem;
+          font-size: 1.2rem;
         }
 
         .nav-text {
@@ -753,12 +716,17 @@
         .author-fields {
           grid-template-columns: 1fr;
         }
+
+        .main-content {
+          margin: 100px 20px 40px;
+          padding: 20px;
+        }
       }
 
       @media (max-width: 576px) {
         .main-content {
           padding: 20px;
-          margin: 20px 10px;
+          margin: 100px 10px 20px;
         }
 
         .form-header h1 {
@@ -779,32 +747,46 @@
     <header>
       <div class="container">
         <div class="nav-container">
-          <div class="logo-container">
+          <a href="index.html" class="logo-container">
             <img src="assets/logo.png" alt="Fly Wheels Logo" />
             <div class="logo-text-container">
               <div class="logo-text">FLY WHEELS</div>
-              <div class="logo-subtitle">FORMULAIRE RH</div>
+              <div class="logo-subtitle">QUESTIONNAIRE RH</div>
             </div>
-          </div>
+          </a>
 
           <nav>
             <ul id="nav-menu">
               <li>
-                <a href="index.html">
-                  <span class="nav-icon">🏠</span>
-                  <span class="nav-text">Accueil</span>
+                <a href="dashboard.html">
+                  <span class="nav-icon"
+                    ><i class="fas fa-tachometer-alt"></i
+                  ></span>
+                  <span class="nav-text">Dashboard</span>
                 </a>
               </li>
               <li>
                 <a href="#" class="active">
-                  <span class="nav-icon">📋</span>
-                  <span class="nav-text">Recrutement</span>
+                  <span class="nav-icon"
+                    ><i class="fas fa-clipboard-list"></i
+                  ></span>
+                  <span class="nav-text">Questionnaire</span>
                 </a>
               </li>
               <li>
                 <a href="planning.html">
-                  <span class="nav-icon">📅</span>
+                  <span class="nav-icon"
+                    ><i class="fas fa-calendar-alt"></i
+                  ></span>
                   <span class="nav-text">Planning</span>
+                </a>
+              </li>
+              <li>
+                <a href="index.html" id="logoutBtn">
+                  <span class="nav-icon"
+                    ><i class="fas fa-sign-out-alt"></i
+                  ></span>
+                  <span class="nav-text">Log out</span>
                 </a>
               </li>
             </ul>
@@ -825,20 +807,22 @@
         <p>Répondez aux questions suivantes pour votre candidature</p>
       </div>
 
-      <div class="progress-container">
-        <div class="progress-header">
-          <span class="progress-text">PROGRESSION</span>
-          <span class="progress-text" id="progress-percent">0%</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-      </div>
-
       <div class="author-fields">
         <div class="input-group">
           <label for="author"><i class="fas fa-user"></i> Nom du RH</label>
           <input type="text" id="author" placeholder="Votre nom" required />
+        </div>
+
+        <div class="input-group">
+          <label for="candidateName"
+            ><i class="fas fa-user-tie"></i> Nom du candidat</label
+          >
+          <input
+            type="text"
+            id="candidateName"
+            placeholder="Nom et Prénom du candidat"
+            required
+          />
         </div>
       </div>
 
@@ -1259,15 +1243,15 @@
 
     <footer>
       <div class="container">
-        <div class="footer-bottom">
-          © 2024 Fly Wheels Garage -
-          <strong><a href="droits.html">Mentions légales</a></strong>
+        <div class="footer-content">
+          <div class="footer-bottom">
+            © 2024 Fly Wheels Garage - Dashboard Admin v1.0
+          </div>
         </div>
       </div>
     </footer>
 
     <script>
-      // === CONFIGURATION ===
       const DISCORD_WEBHOOK =
         "https://discord.com/api/webhooks/1460302239267815719/g7Yo98osgz4Aqf-U7XLtVZp0_xvL-zcrgD3PkAwnqHMsjtkM4H_cbSqM33cDHJbeECDL";
       const MAX_DISCORD_LENGTH = 2000;
@@ -1325,18 +1309,16 @@
         { title: "MISES EN SITUATION", start: 20, end: 25, icon: "🎯" },
       ];
 
-      let currentProgress = 0;
-
       const form = document.getElementById("rh-form");
       const submitBtn = document.getElementById("submit-btn");
       const resetBtn = document.getElementById("reset-btn");
-      const progressFill = document.getElementById("progress-fill");
-      const progressPercent = document.getElementById("progress-percent");
       const authorInput = document.getElementById("author");
+      const candidateNameInput = document.getElementById("candidateName");
       const successModal = document.getElementById("success-modal");
       const errorModal = document.getElementById("error-modal");
       const errorMessage = document.getElementById("error-message");
       const closeModalBtns = document.querySelectorAll(".btn-close");
+      const logoutBtn = document.getElementById("logoutBtn");
 
       document.addEventListener("DOMContentLoaded", function () {
         const burger = document.getElementById("burger");
@@ -1352,12 +1334,23 @@
             navMenu.classList.remove("active");
             burger.classList.remove("active");
 
-            document
-              .querySelectorAll("#nav-menu a")
-              .forEach((a) => a.classList.remove("active"));
-            link.classList.add("active");
+            if (!link.classList.contains("logoutBtn")) {
+              document
+                .querySelectorAll("#nav-menu a")
+                .forEach((a) => a.classList.remove("active"));
+              link.classList.add("active");
+            }
           });
         });
+
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (confirm("Voulez-vous vraiment vous déconnecter ?")) {
+              window.location.href = "index.html";
+            }
+          });
+        }
 
         questions.forEach((q, index) => {
           const textarea = document.getElementById(q.id);
@@ -1379,7 +1372,7 @@
                 counter.classList.add("error");
               }
 
-              updateProgress();
+              checkFormValidity();
             });
 
             counter.textContent = `0/${
@@ -1388,9 +1381,8 @@
           }
         });
 
-        updateProgress();
-
-        authorInput.addEventListener("input", updateProgress);
+        authorInput.addEventListener("input", checkFormValidity);
+        candidateNameInput.addEventListener("input", checkFormValidity);
 
         resetBtn.addEventListener("click", resetForm);
 
@@ -1409,11 +1401,15 @@
         });
 
         form.addEventListener("submit", handleSubmit);
+
+        const questionnaireLink = document.querySelector('a[href="#"]');
+        if (questionnaireLink) {
+          questionnaireLink.classList.add("active");
+        }
       });
 
-      function updateProgress() {
+      function checkFormValidity() {
         let answered = 0;
-        let total = questions.length;
 
         questions.forEach((q) => {
           const textarea = document.getElementById(q.id);
@@ -1422,16 +1418,10 @@
           }
         });
 
-        if (authorInput.value.trim().length > 0) {
-          answered++;
-          total++;
-        }
+        const hasAuthor = authorInput.value.trim().length > 0;
+        const hasCandidateName = candidateNameInput.value.trim().length > 0;
 
-        currentProgress = Math.round((answered / total) * 100);
-        progressFill.style.width = `${currentProgress}%`;
-        progressPercent.textContent = `${currentProgress}%`;
-
-        submitBtn.disabled = currentProgress < 20;
+        submitBtn.disabled = !(answered >= 5 && hasAuthor && hasCandidateName);
       }
 
       function resetForm() {
@@ -1453,7 +1443,8 @@
           });
 
           authorInput.value = "";
-          updateProgress();
+          candidateNameInput.value = "";
+          checkFormValidity();
         }
       }
 
@@ -1465,8 +1456,11 @@
           minute: "2-digit",
         });
 
+        const nomCandidat =
+          candidateNameInput.value.trim().toUpperCase() || "NOM PRENOM";
+
         let messages = [];
-        let currentMessage = `📋 **NOUVELLE CANDIDATURE - FLY WHEELS**\n\n`;
+        let currentMessage = `📋 **NOUVELLE CANDIDATURE - ${nomCandidat}**\n\n`;
 
         sections.forEach((section) => {
           let sectionContent = `__**${section.title}**__\n\n`;
@@ -1484,7 +1478,7 @@
                 currentMessage += `\n*Candidature reçue le ${dateStr} à ${timeStr}, entretien fait par : ${author}*`;
                 messages.push(currentMessage);
 
-                currentMessage = `📋 **NOUVELLE CANDIDATURE - FLY WHEELS** *(suite)*\n\n`;
+                currentMessage = `📋 **NOUVELLE CANDIDATURE - ${nomCandidat}** *(suite)*\n\n`;
               }
 
               sectionContent += line;
@@ -1498,7 +1492,7 @@
 
         if (
           currentMessage !==
-          `📋 **NOUVELLE CANDIDATURE - FLY WHEELS** *(suite)*\n\n`
+          `📋 **NOUVELLE CANDIDATURE - ${nomCandidat}** *(suite)*\n\n`
         ) {
           currentMessage += `\n*Candidature reçue le ${dateStr} à ${timeStr}, entretien fait par : ${author}*`;
           messages.push(currentMessage);
@@ -1549,8 +1543,15 @@
         e.preventDefault();
 
         const author = authorInput.value.trim();
+        const candidateName = candidateNameInput.value.trim();
+
         if (!author) {
           showError("Veuillez entrer votre nom (interviewer)");
+          return;
+        }
+
+        if (!candidateName) {
+          showError("Veuillez entrer le nom du candidat");
           return;
         }
 
