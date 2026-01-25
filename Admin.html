@@ -592,6 +592,12 @@
       const btnLoading = document.getElementById("btnLoading");
       const messageDiv = document.getElementById("message");
 
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          window.location.href = "dashboard.html";
+        }
+      });
+
       function showMessage(text, type) {
         messageDiv.textContent = text;
         messageDiv.className = "message " + type;
@@ -609,19 +615,10 @@
         }
       }
 
-      function forceLogout() {
-        auth.signOut().catch(() => {});
-
+      window.addEventListener("load", () => {
         emailInput.value = "";
         passwordInput.value = "";
-
         emailInput.focus();
-      }
-
-      window.addEventListener("load", forceLogout);
-
-      window.addEventListener("beforeunload", function () {
-        auth.signOut().catch(() => {});
       });
 
       loginForm.addEventListener("submit", async function (e) {
@@ -644,13 +641,11 @@
             password,
           );
 
-          window.lastLoginTime = Date.now();
-
           showMessage("Connexion réussie ! Redirection...", "success");
 
           setTimeout(() => {
             window.location.href = "dashboard.html";
-          }, 2000);
+          }, 1000);
         } catch (error) {
           console.error("Erreur de connexion:", error);
 
@@ -684,19 +679,6 @@
         }
       });
 
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          const currentTime = Date.now();
-          if (
-            !window.lastLoginTime ||
-            currentTime - window.lastLoginTime > 10000
-          ) {
-            auth.signOut();
-            forceLogout();
-          }
-        }
-      });
-
       setInterval(() => {
         const title = document.querySelector(".title");
         if (Math.random() > 0.7) {
@@ -706,29 +688,6 @@
           }, 50);
         }
       }, 3000);
-
-      window.addEventListener("load", () => {
-        emailInput.focus();
-      });
-
-      document.addEventListener("DOMContentLoaded", function () {
-        emailInput.setAttribute("autocomplete", "new-email");
-        passwordInput.setAttribute("autocomplete", "new-password");
-
-        emailInput.value = "";
-        passwordInput.value = "";
-
-        setTimeout(() => {
-          emailInput.value = "";
-          passwordInput.value = "";
-        }, 100);
-      });
-
-      window.addEventListener("pageshow", function (event) {
-        if (event.persisted) {
-          forceLogout();
-        }
-      });
 
       document.addEventListener("DOMContentLoaded", function () {
         const loginContainer = document.querySelector(".login-container");
@@ -763,6 +722,9 @@
         .addEventListener("mouseleave", function () {
           this.style.animationPlayState = "running";
         });
+
+      emailInput.setAttribute("autocomplete", "new-email");
+      passwordInput.setAttribute("autocomplete", "new-password");
     </script>
   </body>
 </html>
