@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fly Wheels - FlashFA</title>
+    <title>Admin - Fly Wheels</title>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -592,9 +592,11 @@
       const btnLoading = document.getElementById("btnLoading");
       const messageDiv = document.getElementById("message");
 
+      let authStateChecked = false;
       auth.onAuthStateChanged((user) => {
-        if (user) {
-          window.location.href = "index.html";
+        if (!authStateChecked) {
+          authStateChecked = true;
+          console.log("État auth:", user ? "Connecté" : "Non connecté");
         }
       });
 
@@ -644,8 +646,8 @@
           showMessage("Connexion réussie ! Redirection...", "success");
 
           setTimeout(() => {
-            window.location.href = "index.html";
-          }, 1000);
+            window.location.href = "dashboard.html";
+          }, 1500);
         } catch (error) {
           console.error("Erreur de connexion:", error);
 
