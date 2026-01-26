@@ -15,6 +15,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
       * {
         margin: 0;
@@ -850,10 +853,12 @@
           </div>
           <div class="service-info">
             <h2 class="service-name">Réparation Complète</h2>
-            <p class="service-description">
+            <p class="service-description" id="reparation_complete_inside">
               - Réparation Moteur et Carroserie : 550 $
             </p>
-            <p class="service-description">- En extérieur : 650 $</p>
+            <p class="service-description" id="reparation_complete_outside">
+              - En extérieur : 650 $
+            </p>
           </div>
         </div>
 
@@ -863,8 +868,12 @@
           </div>
           <div class="service-info">
             <h2 class="service-name">Réparation Moteur</h2>
-            <p class="service-description">- Réparation Moteur : 350 $</p>
-            <p class="service-description">- En extérieur : 450 $</p>
+            <p class="service-description" id="reparation_moteur_inside">
+              - Réparation Moteur : 350 $
+            </p>
+            <p class="service-description" id="reparation_moteur_outside">
+              - En extérieur : 450 $
+            </p>
           </div>
         </div>
 
@@ -874,7 +883,7 @@
           </div>
           <div class="service-info">
             <h2 class="service-name">Kit de Nettoyage</h2>
-            <p class="service-description">
+            <p class="service-description" id="kit_nettoyage_price">
               Nettoyage extérieur professionnel : 50$
             </p>
           </div>
@@ -886,10 +895,10 @@
           </div>
           <div class="service-info">
             <h2 class="service-name">Remorquage</h2>
-            <p class="service-description">
+            <p class="service-description" id="remorquage_gas">
               - Remorquage a une station essence : 100 $
             </p>
-            <p class="service-description">
+            <p class="service-description" id="remorquage_flip">
               - Retournement de véhicule : 100 $
             </p>
           </div>
@@ -936,6 +945,25 @@
     </footer>
 
     <script>
+      const firebaseConfigServices = {
+        apiKey: "AIzaSyD1BQIb2nkGyr4m-elfZlcE88YvGG5pLaE",
+        authDomain: "src-admin-e9b49.firebaseapp.com",
+        databaseURL:
+          "https://src-admin-e9b49-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "src-admin-e9b49",
+        storageBucket: "src-admin-e9b49.firebasestorage.app",
+        messagingSenderId: "42898128978",
+        appId: "1:42898128978:web:c899eccb8b9aeb465d5f8b",
+      };
+
+      let database;
+      if (typeof firebase !== "undefined") {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfigServices);
+        }
+        database = firebase.database();
+      }
+
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
 
@@ -994,7 +1022,109 @@
             600 + index * 150,
           );
         });
+
+        if (database) {
+          updateServicePrices();
+
+          database.ref("service_prices").on("value", () => {
+            updateServicePrices();
+          });
+        }
       });
+
+      function updateServicePrices() {
+        if (!database) return;
+
+        database
+          .ref("service_prices")
+          .once("value")
+          .then((snapshot) => {
+            const prices = snapshot.val();
+
+            if (prices) {
+              if (prices.reparation_complete) {
+                if (
+                  prices.reparation_complete.reparation_complete_inside !==
+                  undefined
+                ) {
+                  const element = document.getElementById(
+                    "reparation_complete_inside",
+                  );
+                  if (element) {
+                    element.textContent = `- Réparation Moteur et Carroserie : ${prices.reparation_complete.reparation_complete_inside} $`;
+                  }
+                }
+
+                if (
+                  prices.reparation_complete.reparation_complete_outside !==
+                  undefined
+                ) {
+                  const element = document.getElementById(
+                    "reparation_complete_outside",
+                  );
+                  if (element) {
+                    element.textContent = `- En extérieur : ${prices.reparation_complete.reparation_complete_outside} $`;
+                  }
+                }
+              }
+
+              if (prices.reparation_moteur) {
+                if (
+                  prices.reparation_moteur.reparation_moteur_inside !==
+                  undefined
+                ) {
+                  const element = document.getElementById(
+                    "reparation_moteur_inside",
+                  );
+                  if (element) {
+                    element.textContent = `- Réparation Moteur : ${prices.reparation_moteur.reparation_moteur_inside} $`;
+                  }
+                }
+
+                if (
+                  prices.reparation_moteur.reparation_moteur_outside !==
+                  undefined
+                ) {
+                  const element = document.getElementById(
+                    "reparation_moteur_outside",
+                  );
+                  if (element) {
+                    element.textContent = `- En extérieur : ${prices.reparation_moteur.reparation_moteur_outside} $`;
+                  }
+                }
+              }
+
+              if (
+                prices.kit_nettoyage &&
+                prices.kit_nettoyage.kit_nettoyage_price !== undefined
+              ) {
+                const element = document.getElementById("kit_nettoyage_price");
+                if (element) {
+                  element.textContent = `Nettoyage extérieur professionnel : ${prices.kit_nettoyage.kit_nettoyage_price}$`;
+                }
+              }
+
+              if (prices.remorquage) {
+                if (prices.remorquage.remorquage_gas !== undefined) {
+                  const element = document.getElementById("remorquage_gas");
+                  if (element) {
+                    element.textContent = `- Remorquage a une station essence : ${prices.remorquage.remorquage_gas} $`;
+                  }
+                }
+
+                if (prices.remorquage.remorquage_flip !== undefined) {
+                  const element = document.getElementById("remorquage_flip");
+                  if (element) {
+                    element.textContent = `- Retournement de véhicule : ${prices.remorquage.remorquage_flip} $`;
+                  }
+                }
+              }
+            }
+          })
+          .catch((error) => {
+            console.error("Erreur de chargement des prix:", error);
+          });
+      }
     </script>
   </body>
 </html>
