@@ -794,6 +794,9 @@
       </div>
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script>
       const GOOGLE_SHEET_URL =
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRvRGjVrvHMi7r5eKwrrLG7a-6vVnuVjGWerN4VAYz7JNbLpNZTJl0LUjHS0vOo7-wSyZTXlZsMBe4/pub?gid=1185778982&single=true&output=csv";
@@ -803,6 +806,22 @@
       const DISCORD_WEBHOOK_URL =
         "https://discord.com/api/webhooks/1460302239267815719/g7Yo98osgz4Aqf-U7XLtVZp0_xvL-zcrgD3PkAwnqHMsjtkM4H_cbSqM33cDHJbeECDL";
       const DISCORD_ROLE_ID = "1463942045977804880";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyD1BQIb2nkGyr4m-elfZlcE88YvGG5pLaE",
+        authDomain: "src-admin-e9b49.firebaseapp.com",
+        databaseURL:
+          "https://src-admin-e9b49-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "src-admin-e9b49",
+        storageBucket: "src-admin-e9b49.firebasestorage.app",
+        messagingSenderId: "42898128978",
+        appId: "1:42898128978:web:c899eccb8b9aeb465d5f8b",
+      };
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      const database = firebase.database();
 
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
@@ -906,57 +925,69 @@
           }
 
           const csvText = await response.text();
-          const reviews = parseCSV(csvText);
+          const allReviews = parseCSV(csvText);
 
-          reviews.sort((a, b) => {
-            if (a.timestamp && b.timestamp) {
-              return new Date(b.rawDate) - new Date(a.rawDate);
+          const validationSnapshot = await database
+            .ref("review_validations")
+            .once("value");
+          const validations = validationSnapshot.val() || {};
+
+          const validatedReviews = [];
+
+          allReviews.forEach((review) => {
+            const reviewHash = btoa(
+              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
+            );
+            const isValidated = validations[reviewHash] === true;
+
+            if (isValidated) {
+              validatedReviews.push(review);
             }
-            return 0;
           });
 
-          if (reviews.length > 0) {
-            reviews.forEach((review) => {
+          if (validatedReviews.length > 0) {
+            validatedReviews.sort(
+              (a, b) => new Date(b.rawDate) - new Date(a.rawDate),
+            );
+            validatedReviews.forEach((review) => {
               const reviewCard = createReviewCard(review);
               reviewsGrid.appendChild(reviewCard);
             });
             loadingMessage.style.display = "none";
-
-            const currentHashes = reviews.map((review) =>
-              btoa(
-                `${review.user}|${review.timestamp}|${review.comment.substring(0, 100)}`,
-              ),
-            );
-
-            const newReviews = reviews.filter((review, index) => {
-              const reviewHash = currentHashes[index];
-              return !knownReviewsHashes.includes(reviewHash);
-            });
-
-            if (newReviews.length > 0 && !isFirstLoad) {
-              newReviews.sort(
-                (a, b) => new Date(a.rawDate) - new Date(b.rawDate),
-              );
-
-              newReviews.forEach((review) => {
-                sendDiscordNotification(review);
-              });
-
-              console.log(`${newReviews.length} nouveau(x) avis notifié(s)`);
-            }
-
-            knownReviewsHashes = currentHashes;
-            localStorage.setItem(
-              "flywheels_known_reviews",
-              JSON.stringify(knownReviewsHashes),
-            );
-
-            if (isFirstLoad) {
-              isFirstLoad = false;
-            }
           } else {
             loadingMessage.style.display = "none";
             noReviewsMessage.style.display = "block";
+          }
+
+          const currentHashes = allReviews.map((review) =>
+            btoa(
+              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
+            ),
+          );
+
+          const newReviews = allReviews.filter((review, index) => {
+            const reviewHash = currentHashes[index];
+            return !knownReviewsHashes.includes(reviewHash);
+          });
+
+          if (newReviews.length > 0 && !isFirstLoad) {
+            newReviews.sort(
+              (a, b) => new Date(a.rawDate) - new Date(b.rawDate),
+            );
+            newReviews.forEach((review) => {
+              sendDiscordNotification(review);
+            });
+            console.log(`${newReviews.length} nouveau(x) avis notifié(s)`);
+          }
+
+          knownReviewsHashes = currentHashes;
+          localStorage.setItem(
+            "flywheels_known_reviews",
+            JSON.stringify(knownReviewsHashes),
+          );
+
+          if (isFirstLoad) {
+            isFirstLoad = false;
           }
         } catch (error) {
           console.error("Erreur lors du chargement des avis:", error);
