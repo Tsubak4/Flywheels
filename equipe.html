@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fly Wheels - FlashFA</title>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
@@ -322,6 +325,19 @@
         margin: 0 auto;
         padding: 0 20px;
         width: 100%;
+      }
+
+      @media (min-width: 769px) {
+        .team-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .team-grid {
+          grid-template-columns: 1fr;
+          max-width: 500px;
+        }
       }
 
       .team-card {
@@ -830,57 +846,81 @@
       <div class="title-bar"></div>
 
       <div class="team-grid">
-        <div class="team-card">
+        <div class="team-card" data-member="patron">
           <div class="team-image">
-            <img src="assets/Patron.png" alt="Patron" />
+            <img src="assets/Patron.png" alt="Patron" id="patronImage" />
           </div>
           <div class="team-info">
-            <h2 class="team-name">Gabriel Griffin</h2>
-            <div class="team-grade">Patron</div>
-            <p class="team-description">
+            <h2 class="team-name" id="patronName">Gabriel Griffin</h2>
+            <div class="team-grade" id="patronGrade">Patron</div>
+            <p class="team-description" id="patronDesc">
               Dirige le garage, prend les décisions stratégiques et assure sa
               rentabilité.
             </p>
           </div>
         </div>
 
-        <div class="team-card">
+        <div class="team-card" data-member="copatron">
           <div class="team-image">
-            <img src="assets/co-patron.png" alt="Co-Patron" />
+            <img
+              src="assets/co-patron.png"
+              alt="Co-Patron"
+              id="copatronImage"
+            />
           </div>
           <div class="team-info">
-            <h2 class="team-name">Luna Lozano</h2>
-            <div class="team-grade">Co-Patronne</div>
-            <p class="team-description">
+            <h2 class="team-name" id="copatronName">Luna Lozano</h2>
+            <div class="team-grade" id="copatronGrade">Co-Patronne</div>
+            <p class="team-description" id="copatronDesc">
               Assiste le patron dans la gestion globale et le remplace en cas
               d'absence.
             </p>
           </div>
         </div>
 
-        <div class="team-card">
+        <div class="team-card" data-member="drh">
           <div class="team-image">
-            <img src="assets/DRH.png" alt="DRH" />
+            <img src="assets/DRH.png" alt="DRH" id="drhImage" />
           </div>
           <div class="team-info">
-            <h2 class="team-name">Ariane Payne</h2>
-            <div class="team-grade">Directrice Ressources Humaines</div>
-            <p class="team-description">
+            <h2 class="team-name" id="drhName">Ariane Payne</h2>
+            <div class="team-grade" id="drhGrade">
+              Directrice Ressources Humaines
+            </div>
+            <p class="team-description" id="drhDesc">
               Définit et pilote la politique des ressources humaines du garage.
             </p>
           </div>
         </div>
 
-        <div class="team-card">
+        <div class="team-card" data-member="rh1">
           <div class="team-image">
-            <img src="assets/RH.png" alt="RH" />
+            <img src="assets/RH.png" alt="RH" id="rh1Image" />
           </div>
           <div class="team-info">
-            <h2 class="team-name">Calista Winslow</h2>
-            <div class="team-grade">Ressources Humaines</div>
-            <p class="team-description">
+            <h2 class="team-name" id="rh1Name">Calista Winslow</h2>
+            <div class="team-grade" id="rh1Grade">Ressources Humaines</div>
+            <p class="team-description" id="rh1Desc">
               Gère au quotidien l'administration du personnel et applique la
               politique RH.
+            </p>
+          </div>
+        </div>
+
+        <div class="team-card" data-member="rh2">
+          <div class="team-image">
+            <img
+              src="https://via.placeholder.com/300/333333/d4af37?text=RH+2"
+              alt="RH 2"
+              id="rh2Image"
+            />
+          </div>
+          <div class="team-info">
+            <h2 class="team-name" id="rh2Name">Marcus Thorne</h2>
+            <div class="team-grade" id="rh2Grade">Ressources Humaines</div>
+            <p class="team-description" id="rh2Desc">
+              Assiste dans la gestion des dossiers du personnel et le suivi
+              administratif.
             </p>
           </div>
         </div>
@@ -899,6 +939,108 @@
     </footer>
 
     <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyD1BQIb2nkGyr4m-elfZlcE88YvGG5pLaE",
+        authDomain: "src-admin-e9b49.firebaseapp.com",
+        databaseURL:
+          "https://src-admin-e9b49-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "src-admin-e9b49",
+        storageBucket: "src-admin-e9b49.firebasestorage.app",
+        messagingSenderId: "42898128978",
+        appId: "1:42898128978:web:c899eccb8b9aeb465d5f8b",
+      };
+
+      let app;
+      if (typeof firebase !== "undefined") {
+        if (!firebase.apps.length) {
+          app = firebase.initializeApp(firebaseConfig);
+          console.log("✅ Equipe: Firebase initialisé");
+        } else {
+          app = firebase.app();
+          console.log("✅ Equipe: Firebase déjà initialisé");
+        }
+      } else {
+        console.error("❌ Equipe: Firebase SDK non chargé");
+      }
+
+      const database = firebase.database();
+
+      function loadTeamData() {
+        database
+          .ref("team")
+          .once("value")
+          .then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              updateTeamMember("patron", data.patron);
+              updateTeamMember("copatron", data.copatron);
+              updateTeamMember("drh", data.drh);
+              updateTeamMember("rh1", data.rh1);
+              updateTeamMember("rh2", data.rh2);
+            }
+          })
+          .catch((error) => {
+            console.error("❌ Erreur chargement données:", error);
+          });
+      }
+
+      function updateTeamMember(memberId, data) {
+        if (!data) return;
+
+        const nameElement = document.getElementById(`${memberId}Name`);
+        if (nameElement && data.name) {
+          nameElement.textContent = data.name;
+        }
+
+        const gradeElement = document.getElementById(`${memberId}Grade`);
+        if (gradeElement && data.role) {
+          gradeElement.textContent = data.role;
+        }
+
+        const descElement = document.getElementById(`${memberId}Desc`);
+        if (descElement && data.description) {
+          descElement.textContent = data.description;
+        }
+
+        const imgElement = document.getElementById(`${memberId}Image`);
+        if (imgElement && data.photo) {
+          imgElement.src = data.photo;
+          imgElement.onerror = function () {
+            if (memberId === "rh2") {
+              this.src =
+                "https://via.placeholder.com/300/333333/d4af37?text=RH+2";
+            } else if (memberId === "patron") {
+              this.src = "assets/Patron.png";
+            } else if (memberId === "copatron") {
+              this.src = "assets/co-patron.png";
+            } else if (memberId === "drh") {
+              this.src = "assets/DRH.png";
+            } else if (memberId === "rh1") {
+              this.src = "assets/RH.png";
+            }
+          };
+        }
+      }
+
+      function setupRealtimeListener() {
+        database.ref("team").on(
+          "value",
+          (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              updateTeamMember("patron", data.patron);
+              updateTeamMember("copatron", data.copatron);
+              updateTeamMember("drh", data.drh);
+              updateTeamMember("rh1", data.rh1);
+              updateTeamMember("rh2", data.rh2);
+            }
+          },
+          (error) => {
+            console.error("❌ Erreur écoute temps réel:", error);
+          },
+        );
+      }
+
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
 
@@ -928,6 +1070,10 @@
       });
 
       document.addEventListener("DOMContentLoaded", () => {
+        loadTeamData();
+
+        setupRealtimeListener();
+
         const teamHeader = document.querySelector(".team-header");
         if (teamHeader) {
           teamHeader.style.opacity = "0";
@@ -957,6 +1103,14 @@
             600 + index * 200,
           );
         });
+      });
+
+      window.addEventListener("load", () => {
+        console.log("🌐 Page équipe chargée");
+        console.log("Firebase disponible:", typeof firebase !== "undefined");
+        if (typeof firebase !== "undefined") {
+          console.log("Firebase apps:", firebase.apps.length);
+        }
       });
     </script>
   </body>
