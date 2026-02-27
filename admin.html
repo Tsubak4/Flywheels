@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Fly Wheels</title>
+
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+    ></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+        --fw-error: #ff4444;
+        --fw-success: #4caf50;
+        --fw-warning: #ffc107;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--fw-darker) 0%,
+          var(--fw-dark) 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 20px;
+      }
+
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .particle {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        opacity: 0.9;
+        box-shadow:
+          0 0 20px var(--fw-gold),
+          0 0 40px rgba(212, 175, 55, 0.6);
+        animation: float 20s infinite linear;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.9;
+        }
+        90% {
+          opacity: 0.9;
+        }
+        100% {
+          transform: translateY(-100px) translateX(100px);
+          opacity: 0;
+        }
+      }
+
+      .login-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 420px;
+      }
+
+      .back-arrow {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        width: 50px;
+        height: 50px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        z-index: 100;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+        }
+      }
+
+      .back-arrow:hover {
+        transform: translateX(-5px);
+        background: rgba(212, 175, 55, 0.2);
+      }
+
+      .back-arrow i {
+        color: var(--fw-gold);
+        font-size: 1.2rem;
+      }
+
+      .login-card {
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 20px;
+        padding: 35px 30px;
+        position: relative;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      }
+
+      .login-card::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        border-radius: 22px;
+        z-index: -1;
+        opacity: 0.5;
+        animation: borderGlow 3s infinite alternate;
+      }
+
+      @keyframes borderGlow {
+        0% {
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 0.7;
+        }
+      }
+
+      .login-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.2rem;
+        text-align: center;
+        margin-bottom: 30px;
+        background: linear-gradient(
+          to bottom,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: relative;
+      }
+
+      .login-title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 25%;
+        width: 50%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+        position: relative;
+        height: 70px;
+      }
+
+      .input-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      .input-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--fw-gold);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        z-index: 2;
+      }
+
+      .input-wrapper input {
+        width: 100%;
+        height: 100%;
+        padding: 0 14px 0 45px;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-beige);
+        border-radius: 10px;
+        color: var(--fw-beige-light);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      .input-wrapper input:focus {
+        border-color: var(--fw-gold);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .input-wrapper input:focus + i {
+        color: var(--fw-gold-light);
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      .floating-label {
+        position: absolute;
+        left: 45px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: "Orbitron", sans-serif;
+        color: var(--fw-beige);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        background: var(--fw-darker);
+        padding: 0 5px;
+        z-index: 1;
+        opacity: 0.8;
+      }
+
+      .input-wrapper input:focus ~ .floating-label,
+      .input-wrapper input:not(:placeholder-shown) ~ .floating-label {
+        top: 0;
+        transform: translateY(-50%) scale(0.85);
+        color: var(--fw-gold);
+        opacity: 1;
+        text-shadow: 0 0 5px var(--fw-gold);
+      }
+
+      .input-wrapper input::placeholder {
+        color: transparent;
+      }
+
+      .login-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold),
+          var(--fw-gold-dark)
+        );
+        border: none;
+        border-radius: 10px;
+        color: var(--fw-darker);
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        margin-top: 10px;
+      }
+
+      .login-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+      }
+
+      .login-btn:hover::before {
+        left: 100%;
+      }
+
+      .login-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .message-container {
+        min-height: 50px;
+        margin-top: 20px;
+      }
+
+      .message {
+        padding: 12px 15px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        animation: slideIn 0.3s ease;
+      }
+
+      .message i {
+        font-size: 1.1rem;
+      }
+
+      .message.error {
+        background: rgba(255, 68, 68, 0.1);
+        border: 2px solid var(--fw-error);
+        color: #ff9999;
+      }
+
+      .message.success {
+        background: rgba(76, 175, 80, 0.1);
+        border: 2px solid var(--fw-success);
+        color: #a5d6a7;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--fw-darker);
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .login-footer {
+        text-align: center;
+        margin-top: 25px;
+        color: rgba(245, 232, 200, 0.5);
+        font-size: 0.8rem;
+      }
+
+      @media (max-width: 768px) {
+        .back-arrow {
+          top: 20px;
+          left: 20px;
+          width: 40px;
+          height: 40px;
+        }
+
+        .login-card {
+          padding: 25px 20px;
+        }
+
+        .login-title {
+          font-size: 1.8rem;
+        }
+
+        .form-group {
+          height: 65px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .login-card {
+          padding: 20px 15px;
+        }
+
+        .form-group {
+          height: 60px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="particles" id="particles"></div>
+
+    <a href="index.html" class="back-arrow" title="Retour à l'accueil">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="login-wrapper">
+      <div class="login-card">
+        <h1 class="login-title">ADMIN Fly</h1>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder=" "
+                autocomplete="off"
+                required
+              />
+              <label for="email" class="floating-label">Email</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder=" "
+                autocomplete="off"
+                required
+              />
+              <label for="password" class="floating-label">Mot de passe</label>
+            </div>
+          </div>
+
+          <button type="submit" class="login-btn" id="loginBtn">
+            <span class="btn-text">Connexion</span>
+          </button>
+
+          <div class="message-container" id="messageContainer"></div>
+        </form>
+
+        <div class="login-footer">
+          <p>© 2024 Fly Wheels - Admin V.2</p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcIopLaEJQGqSx6S6t-IoXAmT4ghRoYo8",
+        authDomain: "flywheels-eb854.firebaseapp.com",
+        projectId: "flywheels-eb854",
+        storageBucket: "flywheels-eb854.firebasestorage.app",
+        messagingSenderId: "644938564681",
+        appId: "1:644938564681:web:03f18ec31ee5d87a2feb98",
+        measurementId: "G-BM6XVDGNY0",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      const loginForm = document.getElementById("loginForm");
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const loginBtn = document.getElementById("loginBtn");
+      const messageContainer = document.getElementById("messageContainer");
+
+      function createParticles() {
+        const particlesContainer = document.getElementById("particles");
+        particlesContainer.innerHTML = "";
+
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 20 + "s";
+          particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+          particlesContainer.appendChild(particle);
+        }
+      }
+      createParticles();
+
+      function showMessage(text, type = "error") {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${type}`;
+
+        let icon = "fa-circle-exclamation";
+        if (type === "success") icon = "fa-check-circle";
+
+        messageDiv.innerHTML = `
+          <i class="fas ${icon}"></i>
+          <span>${text}</span>
+        `;
+
+        messageContainer.innerHTML = "";
+        messageContainer.appendChild(messageDiv);
+
+        if (type === "success") {
+          setTimeout(() => {
+            messageDiv.style.animation = "slideOut 0.3s ease";
+            setTimeout(() => messageDiv.remove(), 300);
+          }, 3000);
+        }
+      }
+
+      function setLoading(isLoading) {
+        if (isLoading) {
+          loginBtn.disabled = true;
+          loginBtn.innerHTML =
+            '<span class="loading-spinner"></span> Connexion...';
+        } else {
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = '<span class="btn-text">Connexion</span>';
+        }
+      }
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+          showMessage("Veuillez remplir tous les champs", "error");
+          return;
+        }
+
+        setLoading(true);
+        showMessage("");
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+
+          showMessage("Connexion réussie ! Redirection...", "success");
+
+          setTimeout(() => {
+            window.location.href = "auth-terminal.html";
+          }, 1500);
+        } catch (error) {
+          console.error("Erreur de connexion:", error);
+
+          let errorMessage = "Email ou mot de passe incorrect";
+          if (error.code === "auth/user-not-found") {
+            errorMessage = "Utilisateur non trouvé";
+          } else if (error.code === "auth/wrong-password") {
+            errorMessage = "Mot de passe incorrect";
+          } else if (error.code === "auth/invalid-email") {
+            errorMessage = "Format d'email invalide";
+          } else if (error.code === "auth/too-many-requests") {
+            errorMessage = "Trop de tentatives. Réessayez plus tard";
+          }
+
+          showMessage(errorMessage, "error");
+          passwordInput.value = "";
+          passwordInput.focus();
+          setLoading(false);
+        }
+      });
+
+      window.addEventListener("load", () => {
+        emailInput.value = "";
+        passwordInput.value = "";
+        emailInput.focus();
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const loginCard = document.querySelector(".login-card");
+        loginCard.style.opacity = "0";
+        loginCard.style.transform = "translateY(30px)";
+        loginCard.style.transition = "all 0.6s ease";
+
+        setTimeout(() => {
+          loginCard.style.opacity = "1";
+          loginCard.style.transform = "translateY(0)";
+        }, 200);
+      });
+    </script>
+  </body>
+</html>
