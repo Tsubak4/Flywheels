@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth Terminal - Fly Wheels</title>
+
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+    ></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+        --fw-success-dark: #2e5e2e;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background: linear-gradient(
+          135deg,
+          var(--fw-darker) 0%,
+          var(--fw-dark) 100%
+        );
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 20px;
+      }
+
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float 20s infinite linear;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.3;
+        }
+        90% {
+          opacity: 0.3;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(100px);
+          opacity: 0;
+        }
+      }
+
+      .loader-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 10, 10, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 20000;
+        transition: opacity 0.5s ease;
+      }
+
+      .loader-container.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .loader-content {
+        text-align: center;
+      }
+
+      .loader-spinner {
+        width: 80px;
+        height: 80px;
+        border: 5px solid rgba(212, 175, 55, 0.2);
+        border-top: 5px solid var(--fw-gold);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 30px;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .loader-text {
+        font-family: "Orbitron", sans-serif;
+        color: var(--fw-beige);
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        animation: pulse 1.5s infinite;
+      }
+
+      .loader-text span {
+        color: var(--fw-gold);
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.8;
+        }
+        50% {
+          opacity: 1;
+          text-shadow: 0 0 10px var(--fw-gold);
+        }
+      }
+
+      .fw-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .fw-window {
+        width: 900px;
+        max-width: 95%;
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 15px;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.7),
+          0 0 30px rgba(212, 175, 55, 0.4);
+        animation: slideIn 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .fw-window::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        border-radius: 17px;
+        z-index: -1;
+        opacity: 0.5;
+        animation: borderGlow 3s infinite alternate;
+      }
+
+      @keyframes borderGlow {
+        0% {
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 0.7;
+        }
+      }
+
+      .fw-title-bar {
+        background: linear-gradient(135deg, var(--fw-dark), var(--fw-gray));
+        padding: 12px 20px;
+        border-bottom: 2px solid var(--fw-gold);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--fw-beige-light);
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .fw-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .fw-title i {
+        color: var(--fw-gold);
+        font-size: 1.1rem;
+      }
+
+      .fw-controls {
+        display: flex;
+        gap: 5px;
+      }
+
+      .fw-btn {
+        width: 30px;
+        height: 30px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--fw-gold);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .fw-btn:hover {
+        background: rgba(212, 175, 55, 0.2);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .fw-content {
+        padding: 25px;
+      }
+
+      .fw-terminal {
+        background: var(--fw-darker);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        font-family: "Consolas", "Courier New", monospace;
+        color: var(--fw-beige);
+        overflow: hidden;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .terminal-header {
+        background: linear-gradient(135deg, var(--fw-dark), var(--fw-gray));
+        color: var(--fw-beige);
+        padding: 10px 15px;
+        font-size: 0.85rem;
+        border-bottom: 2px solid var(--fw-gold);
+        display: flex;
+        gap: 15px;
+        font-family: "Orbitron", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .terminal-tab {
+        color: var(--fw-beige);
+        padding: 4px 12px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid var(--fw-gold);
+        border-radius: 5px;
+        cursor: default;
+        transition: all 0.3s ease;
+      }
+
+      .terminal-tab.active {
+        background: rgba(212, 175, 55, 0.3);
+        border-color: var(--fw-gold-light);
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+      }
+
+      .terminal-content {
+        height: 400px;
+        padding: 20px;
+        overflow-y: auto;
+        font-size: 14px;
+        line-height: 1.6;
+        background: var(--fw-black);
+      }
+
+      .code-line {
+        margin: 4px 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: "Consolas", monospace;
+        color: var(--fw-beige);
+      }
+
+      .comment {
+        color: var(--fw-gold);
+        opacity: 0.7;
+      }
+
+      .keyword {
+        color: var(--fw-gold-light);
+        font-weight: bold;
+      }
+
+      .string {
+        color: var(--fw-gold);
+      }
+
+      .function {
+        color: var(--fw-beige-light);
+      }
+
+      .variable {
+        color: var(--fw-beige);
+      }
+
+      .number {
+        color: var(--fw-gold-light);
+      }
+
+      .prompt {
+        color: var(--fw-gold);
+        font-weight: bold;
+      }
+
+      .typing-cursor {
+        animation: blink 1s infinite;
+        background: var(--fw-gold);
+        width: 8px;
+        height: 18px;
+        display: inline-block;
+        margin-left: 2px;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .line-number {
+        color: var(--fw-gold);
+        opacity: 0.5;
+        margin-right: 15px;
+        display: inline-block;
+        width: 35px;
+        text-align: right;
+        user-select: none;
+        font-size: 12px;
+      }
+
+      .fw-status-bar {
+        margin-top: 20px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        color: var(--fw-beige);
+        font-family: "Orbitron", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-item i {
+        color: var(--fw-gold);
+        font-size: 1rem;
+      }
+
+      #lockStatus {
+        font-weight: bold;
+        padding: 5px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 8px;
+        color: var(--fw-beige);
+        font-size: 0.9rem;
+      }
+
+      .success-popup-fw {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: transparent;
+        z-index: 10000;
+        text-align: center;
+        animation: popIn 0.5s ease;
+        font-family: "Orbitron", sans-serif;
+        width: 100%;
+        max-width: 600px;
+        padding: 20px;
+      }
+
+      .popup-line {
+        color: #2e5e2e;
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: 10px;
+        line-height: 1.2;
+        text-shadow: 0 0 20px rgba(46, 94, 46, 0.5);
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .popup-line.middle {
+        font-size: 2.5rem;
+        letter-spacing: 5px;
+        color: #2e5e2e;
+        text-transform: uppercase;
+        margin: 10px 0;
+      }
+
+      .popup-line.middle span {
+        display: inline-block;
+        background: #2e5e2e;
+        color: var(--fw-beige-light);
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+        box-shadow: 0 0 30px rgba(46, 94, 46, 0.8);
+        border: 2px solid var(--fw-gold);
+      }
+
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.5);
+        }
+        100% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .terminal-content::-webkit-scrollbar {
+        width: 10px;
+        background: var(--fw-darker);
+      }
+
+      .terminal-content::-webkit-scrollbar-thumb {
+        background: var(--fw-gold);
+        border-radius: 5px;
+        border: 2px solid var(--fw-darker);
+      }
+
+      .terminal-content::-webkit-scrollbar-thumb:hover {
+        background: var(--fw-gold-light);
+      }
+
+      @media (max-width: 768px) {
+        .fw-window {
+          width: 100%;
+        }
+        .fw-content {
+          padding: 15px;
+        }
+        .terminal-content {
+          height: 350px;
+          font-size: 12px;
+        }
+        .popup-line {
+          font-size: 2rem;
+        }
+        .popup-line.middle {
+          font-size: 1.8rem;
+        }
+        .popup-line.middle span {
+          font-size: 1.4rem;
+          padding: 8px 20px;
+        }
+        .loader-spinner {
+          width: 60px;
+          height: 60px;
+        }
+        .loader-text {
+          font-size: 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .fw-title-bar {
+          padding: 10px 15px;
+          font-size: 0.8rem;
+        }
+        .fw-btn {
+          width: 25px;
+          height: 25px;
+        }
+        .terminal-header {
+          font-size: 0.75rem;
+          gap: 8px;
+        }
+        .popup-line {
+          font-size: 1.5rem;
+          letter-spacing: 5px;
+        }
+        .popup-line.middle {
+          font-size: 1.3rem;
+        }
+        .popup-line.middle span {
+          font-size: 1.1rem;
+          padding: 6px 15px;
+        }
+        .loader-spinner {
+          width: 50px;
+          height: 50px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="particles" id="particles"></div>
+
+    <div class="loader-container" id="loader">
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">
+          <span>🔒</span> VÉRIFICATION SESSION <span>🔒</span>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcIopLaEJQGqSx6S6t-IoXAmT4ghRoYo8",
+        authDomain: "flywheels-eb854.firebaseapp.com",
+        projectId: "flywheels-eb854",
+        storageBucket: "flywheels-eb854.firebasestorage.app",
+        messagingSenderId: "644938564681",
+        appId: "1:644938564681:web:03f18ec31ee5d87a2feb98",
+        measurementId: "G-BM6XVDGNY0",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      const loader = document.getElementById("loader");
+
+      window.createParticles = function () {
+        const particlesContainer = document.getElementById("particles");
+        if (!particlesContainer) return;
+        particlesContainer.innerHTML = "";
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 20 + "s";
+          particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+          particlesContainer.appendChild(particle);
+        }
+      };
+
+      window.startTerminalAnimation = function () {
+        if (loader) {
+          loader.classList.add("hidden");
+        }
+        if (window.DevTerminalFW) {
+          new window.DevTerminalFW();
+        }
+      };
+
+      let timeoutId = setTimeout(() => {
+        console.warn("⚠️ Timeout Firebase - Démarrage quand même");
+        window.createParticles();
+        window.startTerminalAnimation();
+      }, 5000);
+
+      onAuthStateChanged(auth, (user) => {
+        clearTimeout(timeoutId);
+
+        if (!user) {
+          window.location.href = "admin.html";
+        } else {
+          console.log("✅ Utilisateur connecté:", user.email);
+
+          window.createParticles();
+
+          setTimeout(() => {
+            window.startTerminalAnimation();
+          }, 800);
+        }
+      });
+
+      window.auth = auth;
+    </script>
+
+    <script>
+      (function () {
+        class DevTerminalFW {
+          constructor() {
+            this.window = null;
+            this.terminalContent = null;
+            this.lockStatus = null;
+            this.lineCount = 1;
+            this.init();
+          }
+
+          init() {
+            this.createWindow();
+            setTimeout(() => this.startCodingAnimation(), 500);
+          }
+
+          createWindow() {
+            const overlay = document.createElement("div");
+            overlay.className = "fw-overlay";
+
+            this.window = document.createElement("div");
+            this.window.className = "fw-window";
+            this.window.innerHTML = `
+              <div class="fw-title-bar">
+                <div class="fw-title">
+                  <i class="fas fa-terminal"></i>
+                  <span>AUTH TERMINAL - login.js</span>
+                </div>
+                <div class="fw-controls">
+                  <span class="fw-btn minimize">−</span>
+                  <span class="fw-btn maximize">□</span>
+                  <span class="fw-btn close">×</span>
+                </div>
+              </div>
+              <div class="fw-content">
+                <div class="fw-terminal">
+                  <div class="terminal-header">
+                    <span class="terminal-tab active">login.js</span>
+                    <span class="terminal-tab">auth.log</span>
+                    <span class="terminal-tab">session</span>
+                  </div>
+                  <div class="terminal-content" id="terminalContent"></div>
+                </div>
+                <div class="fw-status-bar">
+                  <div class="status-item">
+                    <i class="fas fa-file-code"></i>
+                    <span>login.js</span>
+                  </div>
+                  <div class="status-item">
+                    <i class="fas fa-code"></i>
+                    <span>Authentification...</span>
+                  </div>
+                  <div class="status-item" id="lockStatus">
+                    <i class="fas fa-lock"></i>
+                    <span>Session sécurisée</span>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            overlay.appendChild(this.window);
+            document.body.appendChild(overlay);
+
+            this.terminalContent = document.getElementById("terminalContent");
+            this.lockStatus = document.getElementById("lockStatus");
+
+            this.addWindowEvents(overlay);
+          }
+
+          addWindowEvents(overlay) {
+            const closeBtn = this.window.querySelector(".close");
+            const minimizeBtn = this.window.querySelector(".minimize");
+            const maximizeBtn = this.window.querySelector(".maximize");
+
+            closeBtn.addEventListener("click", () => {
+              window.location.href = "admin.html";
+            });
+
+            minimizeBtn.addEventListener("click", () => {
+              this.window.style.display = "none";
+              setTimeout(() => (this.window.style.display = "block"), 1000);
+            });
+
+            maximizeBtn.addEventListener("click", () => {
+              this.window.style.width =
+                this.window.style.width === "90%" ? "900px" : "90%";
+            });
+          }
+
+          async startCodingAnimation() {
+            const codeLines = [
+              {
+                type: "comment",
+                text: "// Système d'authentification Fly Wheels",
+              },
+              { type: "comment", text: "// Vérification des identifiants" },
+              { type: "empty", text: "" },
+              { type: "keyword", text: "class", highlight: "keyword" },
+              { type: "text", text: " AuthSystem {" },
+              { type: "code", text: "  constructor() {" },
+              { type: "code", text: "    this.isAuthenticated = false;" },
+              { type: "code", text: "    this.sessionId = null;" },
+              { type: "code", text: "  }" },
+              { type: "empty", text: "" },
+              {
+                type: "code",
+                text: "  async verifyCredentials(email, password) {",
+              },
+              { type: "comment", text: "    // Vérification Firebase" },
+              {
+                type: "code",
+                text: '    console.log("🔐 Vérification en cours...");',
+              },
+              { type: "empty", text: "" },
+              { type: "comment", text: "    // Connexion réussie" },
+              {
+                type: "string",
+                text: '    return "✅ Accès autorisé - Bienvenue Admin";',
+                highlight: "string",
+              },
+              { type: "code", text: "  }" },
+              { type: "empty", text: "" },
+              { type: "code", text: "  getSessionInfo() {" },
+              { type: "code", text: "    return {" },
+              { type: "code", text: "      user: 'admin@flywheels.com'," },
+              { type: "code", text: "      role: 'administrateur'," },
+              {
+                type: "code",
+                text: "      timestamp: new Date().toISOString()",
+              },
+              { type: "code", text: "    };" },
+              { type: "code", text: "  }" },
+              { type: "empty", text: "" },
+              { type: "comment", text: "// Initialisation de la session" },
+              { type: "keyword", text: "const", highlight: "keyword" },
+              { type: "text", text: " auth = " },
+              { type: "keyword", text: "new", highlight: "keyword" },
+              { type: "text", text: " AuthSystem();" },
+            ];
+
+            for (let i = 0; i < codeLines.length; i++) {
+              await this.typeCodeLine(codeLines[i], i === 0 ? 0 : 100);
+            }
+
+            await this.typeCodeLine(
+              {
+                type: "code",
+                text: 'auth.verifyCredentials("admin@flywheels.com", "********").then(result => {',
+              },
+              500,
+            );
+            await this.typeCodeLine(
+              { type: "code", text: "  console.log(result);" },
+              300,
+            );
+
+            this.updateStatus("🔐 Vérification en cours...", "lock");
+
+            await this.wait(2000);
+
+            const resultLine = document.createElement("div");
+            resultLine.className = "code-line";
+            resultLine.innerHTML = `
+              <span class="line-number">${String(this.lineCount++).padStart(2, "0")}</span>
+              <span class="string">  "✅ Accès autorisé - Bienvenue Admin"</span>
+            `;
+            this.terminalContent.appendChild(resultLine);
+
+            await this.wait(1000);
+
+            await this.typeCodeLine(
+              {
+                type: "code",
+                text: '  window.location.href = "dashboard.html";',
+              },
+              500,
+            );
+            await this.typeCodeLine({ type: "code", text: "});" }, 300);
+
+            await this.wait(1500);
+
+            this.showSuccessPopup();
+          }
+
+          showSuccessPopup() {
+            this.updateStatus("🔓 Session ouverte", "unlock");
+
+            const popup = document.createElement("div");
+            popup.className = "success-popup-fw";
+            popup.innerHTML = `
+              <div class="popup-line">####################</div>
+              <div class="popup-line middle">
+                <span>CONNEXION RÉUSSIE</span>
+              </div>
+              <div class="popup-line">####################</div>
+            `;
+
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+              document.querySelector(".fw-overlay").remove();
+              popup.remove();
+              window.location.href = "dashboard.html";
+            }, 2000);
+          }
+
+          updateStatus(text, icon) {
+            if (this.lockStatus) {
+              this.lockStatus.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${text}</span>
+              `;
+            }
+          }
+
+          async typeCodeLine(line, delay) {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                const codeLine = document.createElement("div");
+                codeLine.className = "code-line";
+
+                let lineNumber = document.createElement("span");
+                lineNumber.className = "line-number";
+                lineNumber.textContent = String(this.lineCount++).padStart(
+                  2,
+                  "0",
+                );
+
+                codeLine.appendChild(lineNumber);
+
+                if (line.type === "empty") {
+                  codeLine.innerHTML += " ";
+                } else if (line.type === "comment") {
+                  codeLine.innerHTML += `<span class="comment">${line.text}</span>`;
+                } else if (line.type === "keyword") {
+                  codeLine.innerHTML += `<span class="keyword">${line.text}</span>`;
+                } else if (line.type === "string") {
+                  codeLine.innerHTML += `<span class="string">${line.text}</span>`;
+                } else {
+                  codeLine.innerHTML += line.text;
+                }
+
+                this.terminalContent.appendChild(codeLine);
+                this.terminalContent.scrollTop =
+                  this.terminalContent.scrollHeight;
+                resolve();
+              }, delay);
+            });
+          }
+
+          wait(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+          }
+        }
+
+        window.DevTerminalFW = DevTerminalFW;
+      })();
+    </script>
+  </body>
+</html>
