@@ -1,0 +1,1477 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fly Wheels - FlashFA</title>
+
+    <!-- Firebase SDK -->
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    ></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        color: #333;
+        background-color: #1a1a1a;
+        overflow-x: hidden;
+      }
+
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        opacity: 0.5;
+        box-shadow: 0 0 10px var(--fw-gold);
+        animation: floatUp 20s infinite linear;
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(100vh) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.5;
+        }
+        90% {
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(100px);
+          opacity: 0;
+        }
+      }
+
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        padding: 1rem 0;
+        border-bottom: 3px solid var(--fw-gold);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      header.scrolled {
+        background: linear-gradient(
+          135deg,
+          rgba(26, 26, 26, 0.98) 0%,
+          rgba(51, 51, 51, 0.98) 100%
+        );
+        box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        padding: 8px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        animation: logoGlow 2s infinite alternate;
+        transition: all 0.3s ease;
+      }
+
+      @keyframes logoGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .logo-container:hover {
+        transform: translateY(-2px);
+        border-color: var(--fw-gold-light);
+      }
+
+      .logo-container img {
+        height: 60px;
+        width: auto;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        transition: transform 0.3s ease;
+      }
+
+      .logo-container:hover img {
+        transform: scale(1.05);
+      }
+
+      .logo-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 15px;
+      }
+
+      .logo-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+      }
+
+      .logo-subtitle {
+        font-family: "Roboto", sans-serif;
+        font-size: 0.9rem;
+        color: var(--fw-beige);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+        width: 100%;
+        margin-top: 2px;
+        text-transform: uppercase;
+        opacity: 0.9;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 5px;
+      }
+
+      nav a {
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 12px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: 2px solid var(--fw-beige);
+        position: relative;
+        overflow: hidden;
+        background: rgba(245, 232, 200, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 90px;
+      }
+
+      .nav-icon {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        color: var(--fw-gold);
+        display: block;
+        filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
+      }
+
+      .nav-text {
+        font-size: 0.9rem;
+        display: block;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      nav a:hover {
+        border: 2px solid var(--fw-gold);
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        transform: translateY(-2px);
+      }
+
+      nav a::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+      }
+
+      nav a:hover::before {
+        opacity: 0.4;
+      }
+
+      .burger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid var(--fw-gold);
+        margin-left: 15px;
+        animation: burgerGlow 2s infinite alternate;
+      }
+
+      @keyframes burgerGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 10px var(--fw-gold),
+            0 0 20px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .burger span {
+        width: 25px;
+        height: 3px;
+        background: var(--fw-gold);
+        margin: 3px 0;
+        transition: 0.3s;
+        border-radius: 2px;
+      }
+
+      .burger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .burger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .burger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+      }
+
+      .main-content {
+        min-height: calc(100vh - 100px);
+        padding-top: 150px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        position: relative;
+        z-index: 2;
+      }
+
+      .main-content::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 30%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          );
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .main-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 3.5rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        position: relative;
+        letter-spacing: 3px;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.8),
+          0 0 20px rgba(212, 175, 55, 0.5);
+        background: linear-gradient(
+          to bottom,
+          var(--fw-beige-light) 0%,
+          var(--fw-beige) 50%,
+          var(--fw-beige-dark) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        padding: 10px 0;
+        animation: titleGlow 2s infinite alternate;
+      }
+
+      @keyframes titleGlow {
+        0% {
+          text-shadow:
+            0 0 10px rgba(212, 175, 55, 0.8),
+            0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        100% {
+          text-shadow:
+            0 0 15px rgba(212, 175, 55, 0.9),
+            0 0 25px rgba(212, 175, 55, 0.6);
+        }
+      }
+
+      .main-title::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        border-radius: 2px;
+      }
+
+      .title-bar {
+        width: 50%;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        margin: 10px auto 30px auto;
+        border-radius: 2px;
+        animation: titleBarGlow 2s infinite alternate;
+      }
+
+      @keyframes titleBarGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .main-content > p {
+        font-size: 1.2rem;
+        color: var(--fw-beige);
+        max-width: 600px;
+        margin: 0 auto 30px;
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+
+      .image-column {
+        position: relative;
+        height: 450px;
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 30px auto;
+      }
+
+      .deformed-rectangle {
+        width: 90%;
+        height: 90%;
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        position: relative;
+        transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+        transform-style: preserve-3d;
+        overflow: hidden;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.7),
+          0 0 30px rgba(212, 175, 55, 0.3);
+        transition: all 0.5s ease;
+      }
+
+      .deformed-rectangle:hover {
+        transform: perspective(1000px) rotateY(-5deg) rotateX(3deg) scale(1.02);
+        box-shadow:
+          0 30px 50px rgba(0, 0, 0, 0.8),
+          0 0 50px rgba(212, 175, 55, 0.4);
+      }
+
+      .deformed-rectangle::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          circle at 30% 40%,
+          rgba(212, 175, 55, 0.1),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .deformed-rectangle img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+        transition: transform 0.5s ease;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+      }
+
+      .deformed-rectangle:hover img {
+        transform: scale(1.05);
+      }
+
+      .image-overlay {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: rgba(10, 10, 10, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        z-index: 2;
+        text-align: center;
+        max-width: 90%;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+      }
+
+      .deformed-rectangle:hover .image-overlay {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+      }
+
+      .image-overlay h3 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .services {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        max-width: 1200px;
+        margin: 50px auto;
+        padding: 0 20px;
+      }
+
+      .service-card {
+        background: linear-gradient(135deg, var(--fw-dark), var(--fw-gray));
+        border: 2px solid var(--fw-beige);
+        border-radius: 10px;
+        padding: 30px;
+        width: 300px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .service-card:hover {
+        border-color: var(--fw-gold);
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+      }
+
+      .service-card i {
+        font-size: 3rem;
+        color: var(--fw-gold);
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+      }
+
+      .service-card:hover i {
+        transform: scale(1.1);
+        color: var(--fw-gold-light);
+        filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
+      }
+
+      .service-card h3 {
+        font-family: "Orbitron", sans-serif;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        font-size: 1.3rem;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .service-card p {
+        color: var(--fw-beige);
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+
+      .cards-divider {
+        width: 80%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        margin: 40px auto 30px;
+        border-radius: 2px;
+      }
+
+      .main-description {
+        font-size: 1.1rem;
+        color: var(--fw-beige);
+        max-width: 800px;
+        margin: 0 auto 50px;
+        line-height: 1.7;
+        text-align: center;
+        padding: 0 20px;
+        opacity: 0.9;
+      }
+
+      .main-description:first-of-type {
+        font-size: 1.1rem;
+        border-left: none;
+        border-right: none;
+        padding: 0 20px;
+        background: transparent;
+        border-radius: 0;
+      }
+
+      .text-divider {
+        width: 50%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        margin: 40px auto 40px;
+        border-radius: 2px;
+      }
+
+      .localisation-section {
+        width: 100%;
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 0 20px;
+        text-align: center;
+      }
+
+      .localisation-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        text-align: center;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        width: 100%;
+      }
+
+      .localisation-images {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .localisation-card {
+        flex: 1;
+        min-width: 300px;
+        max-width: 450px;
+        background: linear-gradient(135deg, var(--fw-dark), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        transition: all 0.3s ease;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.5),
+          0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .localisation-card:hover {
+        transform: translateY(-8px);
+        box-shadow:
+          0 15px 40px rgba(0, 0, 0, 0.6),
+          0 0 30px rgba(212, 175, 55, 0.4);
+        border-color: var(--fw-gold-light);
+      }
+
+      .localisation-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s ease;
+      }
+
+      .localisation-card:hover img {
+        transform: scale(1.05);
+      }
+
+      .localisation-info {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .localisation-info h4 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .localisation-info p {
+        color: var(--fw-beige);
+        font-size: 0.95rem;
+        opacity: 0.9;
+        line-height: 1.5;
+      }
+
+      .recruitment-section {
+        width: 100%;
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 0 20px;
+        text-align: center;
+      }
+
+      .recruitment-bar {
+        width: 50%;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        margin: 10px auto 30px auto;
+        border-radius: 2px;
+        animation: titleBarGlow 2s infinite alternate;
+      }
+
+      .recruitment-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.2rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        text-align: center;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .recruitment-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 35px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold),
+          var(--fw-gold-dark)
+        );
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        color: var(--fw-dark);
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .recruitment-btn:hover {
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold-light),
+          var(--fw-gold)
+        );
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.6);
+        color: var(--fw-darker);
+      }
+
+      .recruitment-btn i {
+        font-size: 1.4rem;
+        transition: transform 0.3s ease;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+      }
+
+      .recruitment-btn:hover i {
+        transform: translateX(5px);
+      }
+
+      footer {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        padding: 30px 0;
+        border-top: 3px solid var(--fw-gold);
+        text-align: center;
+        position: relative;
+        margin-top: 50px;
+        z-index: 2;
+      }
+
+      footer::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--fw-gold);
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .footer-bottom {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+        flex: 1;
+        opacity: 0.9;
+      }
+
+      .footer-bottom a {
+        color: var(--fw-gold);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .footer-bottom a::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--fw-gold);
+        transition: width 0.3s ease;
+      }
+
+      .footer-bottom a:hover {
+        color: var(--fw-beige-light);
+      }
+
+      .footer-bottom a:hover::after {
+        width: 100%;
+      }
+
+      .admin-btn {
+        padding: 10px 20px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 8px;
+        color: var(--fw-gold);
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 1px;
+      }
+
+      .admin-btn:hover {
+        background: rgba(212, 175, 55, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        border-color: var(--fw-gold-light);
+        color: var(--fw-beige-light);
+      }
+
+      .admin-btn i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+      }
+
+      .admin-btn:hover i {
+        transform: rotate(10deg);
+      }
+
+      @media (max-width: 1200px) {
+        .container {
+          padding: 0 20px;
+        }
+        nav a {
+          padding: 12px 15px;
+          min-width: 80px;
+        }
+        .nav-icon {
+          font-size: 1.1rem;
+        }
+        .nav-text {
+          font-size: 0.85rem;
+        }
+        .main-title {
+          font-size: 3rem;
+        }
+        .localisation-title,
+        .recruitment-title {
+          font-size: 2rem;
+        }
+      }
+
+      @media (max-width: 992px) {
+        nav ul {
+          gap: 3px;
+        }
+        nav a {
+          padding: 10px 12px;
+          min-width: 75px;
+        }
+        .nav-icon {
+          font-size: 1rem;
+        }
+        .nav-text {
+          font-size: 0.8rem;
+        }
+        .main-title {
+          font-size: 2.5rem;
+        }
+        .image-column {
+          height: 400px;
+          max-width: 700px;
+        }
+        .localisation-title,
+        .recruitment-title {
+          font-size: 1.8rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        nav ul {
+          display: none;
+          position: fixed;
+          top: 100px;
+          left: 0;
+          width: 100%;
+          background: linear-gradient(
+            135deg,
+            var(--fw-dark) 0%,
+            var(--fw-gray) 100%
+          );
+          flex-direction: column;
+          padding: 20px;
+          text-align: center;
+          gap: 10px;
+          border-top: 2px solid var(--fw-gold);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+
+        nav ul.active {
+          display: flex;
+        }
+
+        nav a {
+          padding: 15px;
+          min-width: auto;
+          width: 100%;
+          max-width: 300px;
+          margin: 0 auto;
+          flex-direction: row;
+          justify-content: center;
+          gap: 10px;
+          border-radius: 8px;
+        }
+
+        .nav-icon {
+          margin-bottom: 0;
+          font-size: 1.1rem;
+        }
+        .nav-text {
+          font-size: 0.95rem;
+        }
+        .burger {
+          display: flex;
+        }
+        .logo-text {
+          font-size: 1.5rem;
+        }
+        .logo-container img {
+          height: 50px;
+        }
+        .main-content {
+          padding-top: 120px;
+        }
+        .main-title {
+          font-size: 2.2rem;
+        }
+        .image-column {
+          height: 350px;
+          max-width: 600px;
+        }
+        .deformed-rectangle {
+          transform: perspective(800px) rotateY(0deg) rotateX(8deg);
+        }
+        .services {
+          flex-direction: column;
+          align-items: center;
+        }
+        .service-card {
+          width: 100%;
+          max-width: 400px;
+        }
+        .localisation-images,
+        .recruitment-container {
+          gap: 20px;
+        }
+        .localisation-card,
+        .recruitment-status {
+          min-width: 100%;
+          max-width: 500px;
+        }
+        .footer-content {
+          flex-direction: column;
+        }
+        .footer-bottom {
+          order: 1;
+        }
+        .admin-btn {
+          order: 2;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .logo-text {
+          font-size: 1.2rem;
+        }
+        .logo-container img {
+          height: 40px;
+        }
+        .main-title {
+          font-size: 1.8rem;
+        }
+        .main-content > p {
+          font-size: 1rem;
+        }
+        .image-column {
+          height: 300px;
+        }
+        .localisation-title,
+        .recruitment-title {
+          font-size: 1.6rem;
+        }
+        .recruitment-btn {
+          padding: 12px 25px;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ========== PARTICULES ========== -->
+    <div class="particles" id="particles"></div>
+
+    <header id="header">
+      <div class="container">
+        <div class="nav-container">
+          <div class="logo-container">
+            <img
+              src="assets/logo/logo.png"
+              alt="Fly Wheels Logo"
+              id="headerLogo"
+            />
+            <div class="logo-text-container">
+              <div class="logo-text">FLY WHEELS</div>
+              <div class="logo-subtitle">GARAGE AUTOMOBILE</div>
+            </div>
+          </div>
+
+          <nav>
+            <ul id="nav-menu">
+              <li>
+                <a href="index.html"
+                  ><span class="nav-icon"><i class="fas fa-home"></i></span
+                  ><span class="nav-text">Accueil</span></a
+                >
+              </li>
+              <li>
+                <a href="services.html"
+                  ><span class="nav-icon"><i class="fas fa-tools"></i></span
+                  ><span class="nav-text">Services</span></a
+                >
+              </li>
+              <li>
+                <a href="equipe.html"
+                  ><span class="nav-icon"><i class="fas fa-users"></i></span
+                  ><span class="nav-text">Équipe</span></a
+                >
+              </li>
+              <li>
+                <a href="avis.html"
+                  ><span class="nav-icon"><i class="fas fa-star"></i></span
+                  ><span class="nav-text">Avis</span></a
+                >
+              </li>
+              <li>
+                <a href="contact.html"
+                  ><span class="nav-icon"><i class="fas fa-phone"></i></span
+                  ><span class="nav-text">Contactez-nous</span></a
+                >
+              </li>
+            </ul>
+
+            <div class="burger" id="burger">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <h1 class="main-title">FLY WHEELS</h1>
+      <div class="title-bar"></div>
+      <p>Votre expert en mécanique automobile et préparation</p>
+
+      <div class="image-column">
+        <div class="deformed-rectangle">
+          <img src="assets/facade.png" alt="Garage automobile Fly Wheels" />
+          <div class="image-overlay">
+            <h3>EXPERTISE • PERFORMANCE • PASSION</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="services">
+        <div class="service-card">
+          <i class="fas fa-tools"></i>
+          <h3>Mécanique générale</h3>
+          <p>Entretien, réparation, diagnostic pour tous types de véhicules.</p>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-tachometer-alt"></i>
+          <h3>Préparation Custom</h3>
+          <p>
+            Augmentation des performances, changement visuel, conseil
+            personnalisée.
+          </p>
+        </div>
+        <div class="service-card">
+          <i class="fas fa-car-side"></i>
+          <h3>Dépannage</h3>
+          <p>
+            Dépannage rapide sur tous Los Santos, remorquage à la station
+            essence la plus proche.
+          </p>
+        </div>
+      </div>
+
+      <div class="cards-divider"></div>
+
+      <div class="main-description">
+        Situé sur la Route 68 à quelques minutes de Sandy Shores ou près du
+        célèbre Dinner Rex, Fly Wheels est votre partenaire de confiance pour
+        tous vos besoins automobiles. Nous sommes spécialisés dans la réparation
+        et la personnalisation de véhicules custom, et nous proposons également
+        un service de dépannage extérieur rapide et efficace pour que vous
+        puissiez reprendre la route sans stress. Chez Fly Wheels, nous allions
+        passion, savoir-faire et réactivité pour offrir à chaque client un
+        service sur mesure. Que vous ayez besoin d’une réparation mécanique,
+        d’une modification esthétique ou d’une assistance en urgence, notre
+        équipe est là pour vous accompagner.
+      </div>
+      <div class="main-description">
+        Fly Wheels – L’endroit où vos véhicules retrouvent puissance, style et
+        performance !
+      </div>
+
+      <div class="text-divider"></div>
+
+      <div class="localisation-section">
+        <h2 class="localisation-title">Nos Localisations</h2>
+        <div class="localisation-images">
+          <div class="localisation-card">
+            <img
+              src="assets/localisation1.png"
+              alt="Localisation 1 - Fly Wheels"
+            />
+            <div class="localisation-info">
+              <h4>Siège Principal</h4>
+              <p>Route 68, près de Sandy Shores, notre garage principal.</p>
+            </div>
+          </div>
+          <div class="localisation-card">
+            <img
+              src="assets/localisation2.png"
+              alt="Localisation 2 - Fly Wheels"
+            />
+            <div class="localisation-info">
+              <h4>Point de Service</h4>
+              <p>Près du Diner Rex, accès facile depuis la ville.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="recruitment-section">
+        <div class="recruitment-bar"></div>
+        <h2 class="recruitment-title">Recrutement</h2>
+        <a href="contact.html" class="recruitment-btn">
+          <i class="fas fa-briefcase"></i> Recrutement ici
+        </a>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-bottom">
+            © 2024 Fly Wheels Garage -
+            <strong><a href="droits.html">Mentions légales</a></strong>
+          </div>
+          <a href="admin.html" class="admin-btn">
+            <i class="fas fa-user-shield"></i> Admin
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      // Configuration Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcIopLaEJQGqSx6S6t-IoXAmT4ghRoYo8",
+        authDomain: "flywheels-eb854.firebaseapp.com",
+        projectId: "flywheels-eb854",
+        storageBucket: "flywheels-eb854.firebasestorage.app",
+        messagingSenderId: "644938564681",
+        appId: "1:644938564681:web:03f18ec31ee5d87a2feb98",
+        measurementId: "G-BM6XVDGNY0",
+      };
+
+      // Initialisation Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // ========== PARTICULES ==========
+      function createParticles() {
+        const particlesContainer = document.getElementById("particles");
+        if (!particlesContainer) return;
+
+        particlesContainer.innerHTML = "";
+
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 20 + "s";
+          particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      // ========== GESTION DU LOGO ==========
+      function initLogoListener() {
+        const siteRef = doc(db, "site", "config");
+
+        onSnapshot(
+          siteRef,
+          (doc) => {
+            if (doc.exists()) {
+              const data = doc.data();
+              const headerLogo = document.getElementById("headerLogo");
+
+              if (!headerLogo) return;
+
+              // CAS 1 : Logo personnalisé (priorité)
+              if (data.logo) {
+                headerLogo.src = data.logo;
+              }
+              // CAS 2 : Logo saisonnier
+              else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+                const logoMap = {
+                  saintvalentin: "logo2.png",
+                  poisson: "logo3.png",
+                  paques: "logo4.png",
+                  ete: "logo5.png",
+                  usa: "logo6.png",
+                  octobrerose: "logo7.png",
+                  halloween: "logo8.png",
+                  noel: "logo9.png",
+                };
+                const logoFile = logoMap[data.seasonalLogo] || "logo.png";
+                headerLogo.src = `assets/logo/${logoFile}`;
+              }
+              // CAS 3 : Logo par défaut
+              else {
+                headerLogo.src = "assets/logo/logo.png";
+              }
+            }
+          },
+          (error) => {
+            console.error("Erreur écoute logo:", error);
+          },
+        );
+      }
+
+      createParticles();
+
+      initLogoListener();
+
+      // ========== MENU BURGER ==========
+      const burger = document.getElementById("burger");
+      const navMenu = document.getElementById("nav-menu");
+
+      burger.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+        burger.classList.toggle("active");
+      });
+
+      document.querySelectorAll("#nav-menu a").forEach((link) => {
+        link.addEventListener("click", () => {
+          navMenu.classList.remove("active");
+          burger.classList.remove("active");
+        });
+      });
+
+      const header = document.getElementById("header");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const deformedRect = document.querySelector(".deformed-rectangle");
+        if (deformedRect) {
+          deformedRect.style.opacity = "0";
+          deformedRect.style.transform =
+            "perspective(1000px) rotateY(-20deg) rotateX(15deg) scale(0.95)";
+          deformedRect.style.transition =
+            "all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s";
+
+          setTimeout(() => {
+            deformedRect.style.opacity = "1";
+            deformedRect.style.transform =
+              "perspective(1000px) rotateY(-10deg) rotateX(5deg) scale(1)";
+          }, 400);
+        }
+
+        const localisationCards =
+          document.querySelectorAll(".localisation-card");
+        localisationCards.forEach((card, index) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(20px)";
+          card.style.transition = `all 0.6s ease ${0.3 + index * 0.2}s`;
+
+          setTimeout(
+            () => {
+              card.style.opacity = "1";
+              card.style.transform = "translateY(0)";
+            },
+            400 + index * 200,
+          );
+        });
+
+        const recruitmentSection = document.querySelector(
+          ".recruitment-section",
+        );
+        const recruitmentBtn = document.querySelector(".recruitment-btn");
+
+        if (recruitmentSection && recruitmentBtn) {
+          recruitmentSection.style.opacity = "0";
+          recruitmentSection.style.transform = "translateY(30px)";
+          recruitmentSection.style.transition = "all 0.8s ease 0.6s";
+
+          recruitmentBtn.style.opacity = "0";
+          recruitmentBtn.style.transform = "translateY(20px)";
+          recruitmentBtn.style.transition = "all 0.6s ease 0.8s";
+
+          setTimeout(() => {
+            recruitmentSection.style.opacity = "1";
+            recruitmentSection.style.transform = "translateY(0)";
+
+            setTimeout(() => {
+              recruitmentBtn.style.opacity = "1";
+              recruitmentBtn.style.transform = "translateY(0)";
+            }, 200);
+          }, 600);
+        }
+      });
+    </script>
+  </body>
+</html>
