@@ -1,0 +1,3115 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - FlyWheels</title>
+
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    ></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        color: var(--fw-beige);
+        background-color: var(--fw-dark);
+        min-height: 100vh;
+        background: linear-gradient(
+          135deg,
+          var(--fw-darker) 0%,
+          var(--fw-dark) 100%
+        );
+        position: relative;
+      }
+
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .particle {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        opacity: 0.9;
+        animation: float 20s infinite linear;
+      }
+
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.3;
+        }
+        90% {
+          opacity: 0.3;
+        }
+        100% {
+          transform: translateY(-100px) translateX(100px);
+          opacity: 0;
+        }
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 80%,
+            rgba(212, 175, 55, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 50%
+          );
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        padding: 1rem 0;
+        border-bottom: 3px solid var(--fw-gold);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        padding: 8px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        animation: logoGlow 2s infinite alternate;
+        text-decoration: none;
+      }
+
+      @keyframes logoGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .logo-container img {
+        height: 40px;
+        width: auto;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      }
+
+      .logo-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 15px;
+      }
+
+      .logo-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--fw-beige);
+        text-shadow: 0 0 10px rgba(245, 232, 200, 0.5);
+      }
+
+      .logo-subtitle {
+        font-family: "Roboto", sans-serif;
+        font-size: 0.8rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+        width: 100%;
+        margin-top: 2px;
+        text-transform: uppercase;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 5px;
+      }
+
+      nav a {
+        color: var(--fw-beige);
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 10px 15px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: 2px solid var(--fw-beige);
+        position: relative;
+        overflow: hidden;
+        background: rgba(245, 232, 200, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 70px;
+      }
+
+      .nav-icon {
+        font-size: 1rem;
+        margin-bottom: 3px;
+        color: var(--fw-beige);
+        display: block;
+        color: #d4af37;
+      }
+
+      .nav-text {
+        font-size: 0.8rem;
+        display: block;
+        color: #d4af37;
+      }
+
+      nav a:hover {
+        border: 2px solid var(--fw-gold);
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        transform: translateY(-2px);
+      }
+
+      nav a::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+      }
+
+      nav a:hover::before {
+        opacity: 0.4;
+      }
+
+      .main-content {
+        padding-top: 120px;
+        padding-bottom: 60px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .dashboard-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.5rem;
+        color: var(--fw-gold-dark);
+        margin-bottom: 40px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-align: center;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.8),
+          0 0 20px rgba(212, 175, 55, 0.5);
+        background: linear-gradient(
+          to bottom,
+          var(--fw-beige-light) 0%,
+          var(--fw-beige) 50%,
+          var(--fw-gold-dark) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+      }
+
+      .dashboard-title::after {
+        content: "";
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--fw-gold);
+      }
+
+      .tabs-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .tab-section {
+        background: linear-gradient(
+          135deg,
+          var(--fw-darker),
+          var(--fw-gold-dark)
+        );
+        border: 3px solid var(--fw-gold);
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .tab-header {
+        padding: 20px 30px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+      }
+
+      .tab-header:hover {
+        background: linear-gradient(135deg, var(--fw-gray), var(--fw-darker));
+      }
+
+      .tab-header.active {
+        border-bottom-color: var(--fw-gold);
+      }
+
+      .tab-header .tab-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.5rem;
+        color: var(--fw-beige-light);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin: 0;
+      }
+
+      .tab-header .tab-title i {
+        color: var(--fw-gold);
+        font-size: 1.3rem;
+        text-shadow: 0 0 10px var(--fw-gold);
+      }
+
+      .tab-arrow {
+        color: var(--fw-gold);
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+      }
+
+      .tab-arrow.rotated {
+        transform: rotate(90deg);
+      }
+
+      .tab-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
+        background: rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 2;
+      }
+
+      .tab-content.open {
+        max-height: 3000px;
+        transition: max-height 0.8s ease-in;
+      }
+
+      .tab-content-inner {
+        padding: 25px 30px;
+        border-top: 2px solid var(--fw-gold);
+      }
+
+      .form-select {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-gold);
+        border-radius: 8px;
+        color: var(--fw-beige);
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        background-size: 16px;
+      }
+
+      .form-select:focus {
+        outline: none;
+        border-color: var(--fw-gold-light);
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      }
+
+      .form-select option {
+        background: var(--fw-darker);
+        color: var(--fw-beige);
+        padding: 10px;
+      }
+
+      .seasonal-logo-preview {
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border-radius: 8px;
+        border: 2px solid var(--fw-gold);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .seasonal-logo-preview img {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        border: 3px solid var(--fw-gold);
+        object-fit: cover;
+      }
+
+      .seasonal-info {
+        flex: 1;
+      }
+
+      .seasonal-info h4 {
+        font-family: "Orbitron", sans-serif;
+        color: var(--fw-gold);
+        margin-bottom: 5px;
+      }
+
+      .section-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 40px;
+        margin-top: 40px;
+      }
+
+      .dashboard-card {
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 15px;
+        padding: 35px 30px;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.7),
+          0 0 30px rgba(212, 175, 55, 0.4),
+          0 0 50px rgba(212, 175, 55, 0.3);
+      }
+
+      .card-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .card-title i {
+        color: var(--fw-gold);
+        font-size: 1.5rem;
+        text-shadow: 0 0 10px var(--fw-gold);
+      }
+
+      .toggle-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-beige);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .toggle-label {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.2rem;
+        color: var(--fw-beige);
+        text-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
+      }
+
+      .toggle-description {
+        color: rgba(245, 232, 200, 0.7);
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 70px;
+        height: 34px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(51, 51, 51, 0.8);
+        border: 2px solid var(--fw-beige);
+        transition: 0.4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 2px;
+        background-color: var(--fw-beige);
+        transition: 0.4s;
+        box-shadow: 0 0 10px rgba(245, 232, 200, 0.5);
+      }
+
+      input:checked + .slider {
+        background-color: var(--fw-gold);
+        border-color: var(--fw-gold-light);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(34px);
+        background-color: var(--fw-beige-light);
+        box-shadow: 0 0 15px rgba(245, 232, 200, 0.8);
+      }
+
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+      .coming-soon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        text-align: center;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-beige);
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+
+      .coming-soon-icon {
+        font-size: 3rem;
+        color: var(--fw-gold);
+        margin-bottom: 20px;
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+      }
+
+      .coming-soon-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.5rem;
+        color: var(--fw-beige);
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      }
+
+      .status-indicator {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-left: 15px;
+      }
+
+      .status-active {
+        background: rgba(0, 100, 0, 0.3);
+        color: #4caf50;
+        border: 2px solid #4caf50;
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+      }
+
+      .status-inactive {
+        background: rgba(100, 0, 0, 0.3);
+        color: #f44336;
+        border: 2px solid #f44336;
+        box-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+      }
+
+      .current-status {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(26, 26, 26, 0.6);
+        border-radius: 10px;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        text-align: center;
+      }
+
+      .current-status-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.1rem;
+        color: var(--fw-gold);
+        margin-bottom: 8px;
+      }
+
+      .current-status-value {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--fw-beige);
+      }
+
+      .status-active-text {
+        color: #4caf50;
+        text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+      }
+
+      .status-inactive-text {
+        color: #f44336;
+        text-shadow: 0 0 10px rgba(244, 67, 54, 0.3);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-family: "Orbitron", sans-serif;
+        color: var(--fw-beige);
+        font-size: 1rem;
+      }
+
+      .form-input,
+      .form-textarea {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-beige);
+        border-radius: 8px;
+        color: var(--fw-beige);
+        font-family: "Roboto", sans-serif;
+        font-size: 1rem;
+        resize: vertical;
+      }
+
+      .form-input:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: var(--fw-gold);
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+      }
+
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .team-member-card {
+        background: rgba(26, 26, 26, 0.6);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      .member-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .member-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid var(--fw-gold);
+        object-fit: cover;
+        margin-right: 15px;
+      }
+
+      .member-info h3 {
+        color: var(--fw-gold);
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+      }
+
+      .save-btn {
+        padding: 12px 30px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold),
+          var(--fw-gold-dark)
+        );
+        color: var(--fw-beige);
+        border: 2px solid var(--fw-beige);
+        border-radius: 8px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 1rem;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .save-btn:hover {
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold-light),
+          var(--fw-gold)
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .file-label {
+        display: inline-block;
+        padding: 8px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 8px;
+        color: var(--fw-gold);
+        cursor: pointer;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .file-label:hover {
+        background: rgba(212, 175, 55, 0.2);
+      }
+
+      .url-input-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .url-input {
+        flex: 1;
+        padding: 12px 15px;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-gold);
+        border-radius: 8px;
+        color: var(--fw-beige);
+        font-family: "Roboto", sans-serif;
+        font-size: 0.95rem;
+      }
+
+      .url-input:focus {
+        outline: none;
+        border-color: var(--fw-gold-light);
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      }
+
+      .add-url-btn {
+        padding: 12px 20px;
+        background: rgba(76, 175, 80, 0.3);
+        border: 2px solid #4caf50;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      }
+
+      .add-url-btn:hover {
+        background: rgba(76, 175, 80, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+      }
+
+      .preview-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 15px;
+        background: rgba(26, 26, 26, 0.6);
+        border-radius: 10px;
+        border: 2px solid rgba(212, 175, 55, 0.3);
+      }
+
+      .preview-item {
+        position: relative;
+        border: 2px solid var(--fw-gold);
+        border-radius: 8px;
+        overflow: hidden;
+        aspect-ratio: 1;
+        cursor: move;
+        transition: all 0.3s ease;
+      }
+
+      .preview-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px var(--fw-gold);
+        z-index: 10;
+      }
+
+      .preview-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .preview-delete {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 25px;
+        height: 25px;
+        background: rgba(244, 67, 54, 0.9);
+        border: 2px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        z-index: 20;
+      }
+
+      .preview-delete:hover {
+        background: #f44336;
+        transform: scale(1.1);
+        box-shadow: 0 0 10px #f44336;
+      }
+
+      .drag-handle {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 25px;
+        height: 25px;
+        background: rgba(212, 175, 55, 0.9);
+        border: 2px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: move;
+        font-size: 0.8rem;
+        z-index: 20;
+      }
+
+      .preview-item.dragging {
+        opacity: 0.5;
+        transform: scale(0.95);
+      }
+
+      .preview-item.over {
+        border: 3px dashed var(--fw-gold);
+        transform: scale(1.02);
+      }
+
+      footer {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        padding: 20px 0;
+        border-top: 3px solid var(--fw-gold);
+        text-align: center;
+        position: relative;
+        margin-top: 60px;
+        z-index: 2;
+      }
+
+      footer::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--fw-gold);
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .footer-bottom {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      .burger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid var(--fw-gold);
+        margin-left: 15px;
+        animation: burgerGlow 2s infinite alternate;
+      }
+
+      @keyframes burgerGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 10px var(--fw-gold),
+            0 0 20px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .burger span {
+        width: 25px;
+        height: 3px;
+        background: var(--fw-gold);
+        margin: 3px 0;
+        transition: 0.3s;
+        border-radius: 2px;
+      }
+
+      .fw-notification {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        padding: 15px 25px;
+        color: white;
+        border-radius: 10px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        max-width: 300px;
+        word-wrap: break-word;
+      }
+
+      .fw-notification.success {
+        background: rgba(40, 167, 69, 0.95);
+        border: 2px solid #28a745;
+      }
+
+      .fw-notification.error {
+        background: rgba(220, 53, 69, 0.95);
+        border: 2px solid #dc3545;
+      }
+
+      .fw-notification.info {
+        background: rgba(13, 110, 253, 0.95);
+        border: 2px solid #0d6efd;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      @media (max-width: 1200px) {
+        .container {
+          padding: 0 20px;
+        }
+
+        nav a {
+          padding: 10px 12px;
+          min-width: 65px;
+        }
+
+        .nav-icon {
+          font-size: 0.9rem;
+        }
+
+        .nav-text {
+          font-size: 0.75rem;
+        }
+
+        .section-container {
+          grid-template-columns: 1fr;
+          max-width: 800px;
+          margin: 40px auto 0;
+        }
+      }
+
+      @media (max-width: 768px) {
+        nav ul {
+          display: none;
+          position: fixed;
+          top: 100px;
+          left: 0;
+          width: 100%;
+          background: linear-gradient(
+            135deg,
+            var(--fw-dark) 0%,
+            var(--fw-gray) 100%
+          );
+          flex-direction: column;
+          padding: 20px;
+          text-align: center;
+          gap: 10px;
+          border-top: 2px solid var(--fw-gold);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+
+        nav ul.active {
+          display: flex;
+        }
+
+        nav a {
+          padding: 12px;
+          min-width: auto;
+          width: 100%;
+          max-width: 300px;
+          margin: 0 auto;
+          flex-direction: row;
+          justify-content: center;
+          gap: 10px;
+          border-radius: 8px;
+        }
+
+        .nav-icon {
+          margin-bottom: 0;
+          font-size: 1rem;
+        }
+
+        .nav-text {
+          font-size: 0.85rem;
+        }
+
+        .burger {
+          display: flex;
+        }
+
+        .logo-text {
+          font-size: 1.2rem;
+        }
+
+        .logo-container img {
+          height: 35px;
+        }
+
+        .main-content {
+          padding-top: 100px;
+        }
+
+        .dashboard-title {
+          font-size: 2rem;
+        }
+
+        .section-container {
+          padding: 0 15px;
+        }
+
+        .dashboard-card {
+          padding: 25px 20px;
+        }
+
+        .card-title {
+          font-size: 1.5rem;
+        }
+
+        .tab-header .tab-title {
+          font-size: 1.3rem;
+        }
+
+        .team-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .preview-container {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+      }
+
+      @media (max-width: 576px) {
+        .logo-text {
+          font-size: 1rem;
+        }
+
+        .logo-container img {
+          height: 30px;
+        }
+
+        .dashboard-title {
+          font-size: 1.8rem;
+        }
+
+        .container {
+          padding: 0 15px;
+        }
+
+        .section-container {
+          grid-template-columns: 1fr;
+        }
+
+        .dashboard-card {
+          padding: 20px 15px;
+        }
+
+        .card-title {
+          font-size: 1.3rem;
+        }
+
+        .tab-header .tab-title {
+          font-size: 1.2rem;
+        }
+
+        .tab-header {
+          padding: 15px 20px;
+        }
+
+        .toggle-container {
+          flex-direction: column;
+          gap: 15px;
+          text-align: center;
+        }
+
+        footer {
+          margin-top: 40px;
+          padding: 15px 0;
+        }
+
+        .footer-bottom {
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="particles" id="particles"></div>
+
+    <header>
+      <div class="container">
+        <div class="nav-container">
+          <div class="logo-container">
+            <img
+              src="assets/logo/logo.png"
+              alt="Fly Wheels Logo"
+              id="headerLogo"
+            />
+            <div class="logo-text-container">
+              <div class="logo-text">FLYWHEELS</div>
+              <div class="logo-subtitle">ADMIN PANEL V.2</div>
+            </div>
+          </div>
+
+          <nav>
+            <ul id="nav-menu">
+              <li>
+                <a href="dashboard.html" class="active">
+                  <span class="nav-icon"
+                    ><i class="fas fa-tachometer-alt"></i
+                  ></span>
+                  <span class="nav-text">Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a href="recrut.html">
+                  <span class="nav-icon"
+                    ><i class="fas fa-clipboard-list"></i
+                  ></span>
+                  <span class="nav-text">Questionnaire</span>
+                </a>
+              </li>
+              <li>
+                <a href="planning.html">
+                  <span class="nav-icon"
+                    ><i class="fas fa-calendar-alt"></i
+                  ></span>
+                  <span class="nav-text">Planning</span>
+                </a>
+              </li>
+              <li>
+                <a href="#" id="logoutBtn">
+                  <span class="nav-icon"
+                    ><i class="fas fa-sign-out-alt"></i
+                  ></span>
+                  <span class="nav-text">Log out</span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="burger" id="burger">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="dashboard-container">
+        <h1 class="dashboard-title">TABLEAU DE BORD ADMIN</h1>
+
+        <div class="tabs-container" id="accordionContainer">
+          <!-- SECTION 1: Gestion logo -->
+          <div class="tab-section">
+            <div class="tab-header" data-tab="logo">
+              <div class="tab-title">
+                <i class="fas fa-image"></i>
+                Gestion Logo
+              </div>
+              <i class="fas fa-chevron-right tab-arrow"></i>
+            </div>
+            <div class="tab-content" id="tab-logo">
+              <div class="tab-content-inner">
+                <div class="dashboard-card">
+                  <div class="card-title">
+                    <i class="fas fa-paint-brush"></i>
+                    Modification du Logo
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Logo saisonnier</label>
+                    <select class="form-select" id="seasonalLogo">
+                      <option value="default">⭐ Logo par défaut</option>
+                      <option value="saintvalentin">
+                        ❤️ Saint-Valentin – 14 février
+                      </option>
+                      <option value="poisson">
+                        🐟 Poisson d'avril – 1 avril
+                      </option>
+                      <option value="paques">🐣 Pâques</option>
+                      <option value="ete">☀️ Été – 21 juin</option>
+                      <option value="usa">
+                        🇺🇸 Independence Day – 4 juillet
+                      </option>
+                      <option value="octobrerose">🎀 Octobre Rose</option>
+                      <option value="halloween">
+                        🎃 Halloween – 31 octobre
+                      </option>
+                      <option value="noel">🎄 Noël – 25 décembre</option>
+                    </select>
+
+                    <!-- APERÇU SAISONNIER -->
+                    <div class="seasonal-logo-preview" id="seasonalPreview">
+                      <img
+                        src="assets/logo/logo.png"
+                        alt="Aperçu saisonnier"
+                        id="seasonalLogoPreview"
+                      />
+                      <div class="seasonal-info">
+                        <h4>Logo actuellement sélectionné</h4>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label"
+                      >Lien direct Postimage du nouveau logo</label
+                    >
+                    <div class="url-input-container">
+                      <input
+                        type="url"
+                        id="logoUrl"
+                        class="url-input"
+                        placeholder="https://i.postimg.cc/xxx/logo.png"
+                      />
+                      <button class="add-url-btn" onclick="window.updateLogo()">
+                        <i class="fas fa-sync-alt"></i> Mettre à jour
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    style="
+                      margin-top: 20px;
+                      padding: 15px;
+                      background: rgba(212, 175, 55, 0.1);
+                      border-radius: 8px;
+                      border: 2px solid var(--fw-gold);
+                    "
+                  >
+                    <p style="color: var(--fw-beige)">
+                      <i
+                        class="fas fa-info-circle"
+                        style="color: var(--fw-gold); margin-right: 10px"
+                      ></i>
+                      Entrez le lien direct de votre image Postimage. Le logo
+                      sera immédiatement mis à jour sur toutes les pages du
+                      site.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Gestion Tarif -->
+          <div class="tab-section">
+            <div class="tab-header" data-tab="pricing">
+              <div class="tab-title">
+                <i class="fas fa-tags"></i>
+                Gestion Tarif
+              </div>
+              <i class="fas fa-chevron-right tab-arrow"></i>
+            </div>
+            <div class="tab-content" id="tab-pricing">
+              <div class="tab-content-inner">
+                <div class="dashboard-card">
+                  <div class="card-title">
+                    <i class="fas fa-money-bill-wave"></i>
+                    Gestion des Prix des Services
+                  </div>
+
+                  <div id="pricing-management-form"></div>
+
+                  <div
+                    style="
+                      margin-top: 30px;
+                      padding: 20px;
+                      background: rgba(26, 26, 26, 0.6);
+                      border-radius: 10px;
+                      border: 1px solid rgba(212, 175, 55, 0.3);
+                    "
+                  >
+                    <h3
+                      style="
+                        font-family: &quot;Orbitron&quot;, sans-serif;
+                        color: var(--fw-gold);
+                        margin-bottom: 15px;
+                        font-size: 1.2rem;
+                      "
+                    >
+                      <i class="fas fa-info-circle"></i> Information
+                    </h3>
+                    <p
+                      style="
+                        color: rgba(245, 232, 200, 0.8);
+                        line-height: 1.6;
+                        font-size: 0.95rem;
+                      "
+                    >
+                      Les modifications de tarifs seront immédiatement visibles
+                      sur le site public. Assurez-vous de sauvegarder chaque
+                      changement.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: Gestion Equipe -->
+          <div class="tab-section">
+            <div class="tab-header" data-tab="team">
+              <div class="tab-title">
+                <i class="fas fa-users"></i>
+                Gestion Equipe
+              </div>
+              <i class="fas fa-chevron-right tab-arrow"></i>
+            </div>
+            <div class="tab-content" id="tab-team">
+              <div class="tab-content-inner">
+                <div class="dashboard-card">
+                  <div class="card-title">
+                    <i class="fas fa-user-edit"></i>
+                    Modification de l'Équipe
+                  </div>
+
+                  <div id="team-management-form"></div>
+
+                  <div
+                    style="
+                      margin-top: 30px;
+                      padding: 20px;
+                      background: rgba(26, 26, 26, 0.6);
+                      border-radius: 10px;
+                      border: 1px solid rgba(212, 175, 55, 0.3);
+                    "
+                  >
+                    <h3
+                      style="
+                        font-family: &quot;Orbitron&quot;, sans-serif;
+                        color: var(--fw-gold);
+                        margin-bottom: 15px;
+                        font-size: 1.2rem;
+                      "
+                    >
+                      <i class="fas fa-info-circle"></i> Instructions
+                    </h3>
+                    <p
+                      style="
+                        color: rgba(245, 232, 200, 0.8);
+                        line-height: 1.6;
+                        font-size: 0.95rem;
+                      "
+                    >
+                      Modifiez les informations des membres de l'équipe qui
+                      apparaîtront sur la page publique. Utilisez des liens
+                      Postimage pour les photos.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: Gestion Galerie -->
+          <div class="tab-section">
+            <div class="tab-header" data-tab="gallery">
+              <div class="tab-title">
+                <i class="fas fa-images"></i>
+                Gestion Galerie
+              </div>
+              <i class="fas fa-chevron-right tab-arrow"></i>
+            </div>
+            <div class="tab-content" id="tab-gallery">
+              <div class="tab-content-inner">
+                <div class="dashboard-card">
+                  <div class="card-title">
+                    <i class="fas fa-camera-retro"></i>
+                    Photos de la Galerie "Souvenirs"
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label"
+                      >Ajouter une photo (lien Postimage)</label
+                    >
+                    <div class="url-input-container">
+                      <input
+                        type="url"
+                        id="newGalleryUrl"
+                        class="url-input"
+                        placeholder="https://i.postimg.cc/xxx/photo.jpg"
+                      />
+                      <button
+                        class="add-url-btn"
+                        onclick="window.addGalleryImage()"
+                      >
+                        <i class="fas fa-plus"></i> Ajouter
+                      </button>
+                    </div>
+                  </div>
+
+                  <h3 style="color: var(--fw-gold); margin: 20px 0 10px">
+                    Aperçu des photos (glisser-déposer pour réordonner)
+                  </h3>
+                  <div id="galleryPreview" class="preview-container">
+                    <div
+                      style="
+                        text-align: center;
+                        padding: 30px;
+                        color: var(--fw-beige);
+                        opacity: 0.7;
+                      "
+                    >
+                      <i
+                        class="fas fa-spinner fa-spin"
+                        style="font-size: 2rem; margin-bottom: 15px"
+                      ></i>
+                      <p>Chargement de la galerie...</p>
+                    </div>
+                  </div>
+
+                  <button
+                    class="save-btn"
+                    onclick="window.saveGalleryOrder()"
+                    style="margin-top: 20px"
+                  >
+                    <i class="fas fa-save"></i> Sauvegarder l'ordre
+                  </button>
+
+                  <div
+                    style="
+                      margin-top: 20px;
+                      padding: 15px;
+                      background: rgba(212, 175, 55, 0.1);
+                      border-radius: 8px;
+                    "
+                  >
+                    <p style="color: var(--fw-beige)">
+                      <i
+                        class="fas fa-info-circle"
+                        style="color: var(--fw-gold); margin-right: 10px"
+                      ></i>
+                      Les photos apparaîtront dans cet ordre sur la page Équipe.
+                      Glissez-déposez pour réorganiser.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 5: Gestion Avis -->
+          <div class="tab-section">
+            <div class="tab-header" data-tab="reviews">
+              <div class="tab-title">
+                <i class="fas fa-star"></i>
+                Gestion Avis
+              </div>
+              <i class="fas fa-chevron-right tab-arrow"></i>
+            </div>
+            <div class="tab-content" id="tab-reviews">
+              <div class="tab-content-inner">
+                <div class="dashboard-card">
+                  <div class="card-title">
+                    <i class="fas fa-comments"></i>
+                    Modération des Avis Clients
+                  </div>
+
+                  <div style="margin-bottom: 30px">
+                    <div
+                      style="
+                        display: flex;
+                        gap: 15px;
+                        flex-wrap: wrap;
+                        margin-bottom: 20px;
+                      "
+                    >
+                      <button
+                        class="save-btn"
+                        id="refreshReviewsBtn"
+                        style="
+                          background: linear-gradient(
+                            135deg,
+                            var(--fw-gold),
+                            var(--fw-gold-dark)
+                          );
+                          width: auto;
+                          padding: 12px 25px;
+                        "
+                      >
+                        <i class="fas fa-sync-alt"></i> Actualiser la liste
+                      </button>
+
+                      <a
+                        href="https://docs.google.com/spreadsheets/d/1aGFR4lRxXTBKDQH4LrNq07Cj0bV8t8I_rE6lMbY-WOQ/edit?usp=sharing"
+                        target="_blank"
+                        class="save-btn"
+                        style="
+                          background: linear-gradient(135deg, #4285f4, #0d47a1);
+                          width: auto;
+                          padding: 12px 25px;
+                          text-decoration: none;
+                          display: inline-flex;
+                          align-items: center;
+                          justify-content: center;
+                          gap: 10px;
+                        "
+                      >
+                        <i class="fas fa-external-link-alt"></i> Ouvrir le
+                        Google Sheet
+                      </a>
+                    </div>
+
+                    <div
+                      style="
+                        background: rgba(212, 175, 55, 0.1);
+                        padding: 15px;
+                        border-radius: 10px;
+                        border: 2px solid var(--fw-gold);
+                      "
+                    >
+                      <h3
+                        style="
+                          font-family: &quot;Orbitron&quot;, sans-serif;
+                          color: var(--fw-beige-light);
+                          margin-bottom: 10px;
+                          font-size: 1.2rem;
+                        "
+                      >
+                        <i class="fas fa-info-circle"></i> Instructions
+                      </h3>
+                      <p
+                        style="
+                          color: var(--fw-beige);
+                          opacity: 0.9;
+                          line-height: 1.5;
+                        "
+                      >
+                        1. Les nouveaux avis arrivent automatiquement depuis le
+                        Google Sheet<br />
+                        2. Approuvez les avis pour qu'ils apparaissent sur le
+                        site public<br />
+                        3. Rejetez les avis inappropriés<br />
+                        4. Cliquez sur "Ouvrir le Google Sheet" pour voir tous
+                        les avis
+                      </p>
+                    </div>
+                  </div>
+
+                  <div id="reviews-management-list">
+                    <div
+                      class="loading-reviews"
+                      style="text-align: center; padding: 40px"
+                    >
+                      <i
+                        class="fas fa-spinner fa-spin"
+                        style="
+                          color: var(--fw-gold);
+                          font-size: 2rem;
+                          margin-bottom: 15px;
+                        "
+                      ></i>
+                      <p style="color: var(--fw-beige)">
+                        Chargement des avis en attente...
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="current-status" style="margin-top: 30px">
+                    <div class="current-status-title">
+                      STATISTIQUES DES AVIS :
+                    </div>
+                    <div
+                      class="current-status-value"
+                      id="reviewStats"
+                      style="color: var(--fw-beige-light)"
+                    >
+                      Chargement...
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 6: Gestion Recrutement -->
+          <div class="tab-section">
+            <div class="tab-header" data-tab="recruitment">
+              <div class="tab-title">
+                <i class="fas fa-user-plus"></i>
+                Gestion Recrutement
+              </div>
+              <i class="fas fa-chevron-right tab-arrow"></i>
+            </div>
+            <div class="tab-content" id="tab-recruitment">
+              <div class="tab-content-inner">
+                <div class="dashboard-card">
+                  <div class="toggle-container">
+                    <div>
+                      <div class="toggle-label">Gestion du recrutement</div>
+                      <div class="toggle-description">
+                        Activer/Désactiver le système de recrutement
+                      </div>
+                    </div>
+
+                    <label class="switch">
+                      <input type="checkbox" id="recruitmentToggle" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+
+                  <div class="current-status" id="currentStatusDisplay">
+                    <div class="current-status-title">
+                      ÉTAT ACTUEL DU RECRUTEMENT :
+                    </div>
+                    <div
+                      class="current-status-value status-inactive-text"
+                      id="statusText"
+                    >
+                      INACTIF
+                    </div>
+                  </div>
+
+                  <div
+                    style="
+                      margin-top: 30px;
+                      padding: 20px;
+                      background: rgba(26, 26, 26, 0.6);
+                      border-radius: 10px;
+                      border: 1px solid rgba(212, 175, 55, 0.3);
+                    "
+                  >
+                    <h3
+                      style="
+                        font-family: &quot;Orbitron&quot;, sans-serif;
+                        color: var(--fw-gold);
+                        margin-bottom: 15px;
+                        font-size: 1.2rem;
+                      "
+                    >
+                      <i class="fas fa-info-circle"></i> Informations
+                    </h3>
+                    <p
+                      style="
+                        color: rgba(245, 232, 200, 0.8);
+                        line-height: 1.6;
+                        font-size: 0.95rem;
+                      "
+                    >
+                      Lorsque le recrutement est <strong>ACTIF</strong>, les
+                      candidats peuvent soumettre leurs demandes via la page
+                      publique <strong>Contactez-nous.</strong> <br /><br />
+                      Lorsque le recrutement est <strong>INACTIF</strong>, la
+                      page publique affiche un message indiquant que les
+                      recrutements sont fermés.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-bottom">
+            © 2024 Fly Wheels Garage - Dashboard Admin V2
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      // CONFIGURATION FIREBASE
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        collection,
+        getDocs,
+        serverTimestamp,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcIopLaEJQGqSx6S6t-IoXAmT4ghRoYo8",
+        authDomain: "flywheels-eb854.firebaseapp.com",
+        projectId: "flywheels-eb854",
+        storageBucket: "flywheels-eb854.firebasestorage.app",
+        messagingSenderId: "644938564681",
+        appId: "1:644938564681:web:03f18ec31ee5d87a2feb98",
+        measurementId: "G-BM6XVDGNY0",
+      };
+
+      // Initialisation Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // Variables globales
+      let draggedItem = null;
+      let galleryImages = [];
+
+      // Éléments DOM
+      const burger = document.getElementById("burger");
+      const navMenu = document.getElementById("nav-menu");
+      const recruitmentToggle = document.getElementById("recruitmentToggle");
+      const statusText = document.getElementById("statusText");
+      const currentStatusDisplay = document.getElementById(
+        "currentStatusDisplay",
+      );
+      const logoutBtn = document.getElementById("logoutBtn");
+
+      // Exposer les fonctions nécessaires au scope global pour les attributs onclick
+      window.updateLogo = updateLogo;
+      window.addGalleryImage = addGalleryImage;
+      window.saveGalleryOrder = saveGalleryOrder;
+      window.deleteGalleryImage = deleteGalleryImage;
+      window.updateTeamPhotoUrl = updateTeamPhotoUrl;
+      window.saveTeamMember = saveTeamMember;
+      window.saveServicePrice = saveServicePrice;
+      window.approveReview = approveReview;
+      window.rejectReview = rejectReview;
+
+      // ==================== CRÉATION DES PARTICULES ====================
+      function createParticles() {
+        const particlesContainer = document.getElementById("particles");
+        if (!particlesContainer) return;
+
+        // Vider le conteneur au cas où
+        particlesContainer.innerHTML = "";
+
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 20 + "s";
+          particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      // ==================== NOTIFICATION ====================
+      function showNotification(message, type = "info") {
+        // Supprimer les anciennes notifications
+        const oldNotifications = document.querySelectorAll(".fw-notification");
+        oldNotifications.forEach((n) => n.remove());
+
+        // Créer la notification
+        const notification = document.createElement("div");
+        notification.className = `fw-notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        // Disparition après 3 secondes
+        setTimeout(() => {
+          notification.style.animation = "slideOut 0.3s ease";
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+
+      // Vérification authentification
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          console.log("❌ Non authentifié, redirection...");
+          showNotification("❌ Non authentifié - Redirection...", "error");
+          setTimeout(() => {
+            window.location.href = "admin.html";
+          }, 2000);
+        } else {
+          console.log("✅ Utilisateur authentifié:", user.email);
+          showNotification("✅ Connecté en tant que " + user.email, "success");
+          // Créer les particules
+          createParticles();
+          initDashboard();
+        }
+      });
+
+      // Initialisation du dashboard
+      function initDashboard() {
+        console.log("🚀 Initialisation du dashboard V2...");
+
+        // Menu burger
+        burger.addEventListener("click", () => {
+          navMenu.classList.toggle("active");
+          burger.classList.toggle("active");
+        });
+
+        // Fermer le menu au clic sur un lien
+        document.querySelectorAll("#nav-menu a").forEach((link) => {
+          link.addEventListener("click", () => {
+            navMenu.classList.remove("active");
+            burger.classList.remove("active");
+          });
+        });
+
+        // Initialisation de l'accordéon
+        initAccordion();
+
+        // Charger les données
+        loadLogo();
+        loadSeasonalLogo();
+        checkInitialStatus();
+        setupRealtimeListener();
+        recruitmentToggle.addEventListener("change", handleToggleChange);
+        loadTeamManagement();
+        loadServicePricing();
+        initReviewsManagement();
+        loadGallery();
+
+        // Logout
+        logoutBtn.addEventListener("click", handleLogout);
+      }
+
+      // FONCTION ACCORDÉON
+      function initAccordion() {
+        const headers = document.querySelectorAll(".tab-header");
+
+        headers.forEach((header) => {
+          header.addEventListener("click", () => {
+            const tabId = header.dataset.tab;
+            const content = document.getElementById(`tab-${tabId}`);
+            const arrow = header.querySelector(".tab-arrow");
+
+            // Fermer les autres sections
+            document.querySelectorAll(".tab-content").forEach((c) => {
+              if (c.id !== `tab-${tabId}`) {
+                c.classList.remove("open");
+              }
+            });
+
+            document.querySelectorAll(".tab-header").forEach((h) => {
+              if (h !== header) {
+                h.classList.remove("active");
+                const otherArrow = h.querySelector(".tab-arrow");
+                if (otherArrow) otherArrow.classList.remove("rotated");
+              }
+            });
+
+            // Ouvrir/fermer la section cliquée
+            content.classList.toggle("open");
+            header.classList.toggle("active");
+            arrow.classList.toggle("rotated");
+          });
+        });
+      }
+
+      // ==================== GESTION LOGO ====================
+      async function loadLogo() {
+        try {
+          const siteRef = doc(db, "site", "config");
+          const siteDoc = await getDoc(siteRef);
+
+          if (siteDoc.exists()) {
+            const data = siteDoc.data();
+
+            // CAS 1 : Logo personnalisé (priorité)
+            if (data.logo) {
+              document.getElementById("headerLogo").src = data.logo;
+              // Met aussi à jour l'aperçu saisonnier avec le logo par défaut
+              document.getElementById("seasonalLogoPreview").src =
+                "assets/logo/logo.png";
+            }
+            // CAS 2 : Logo saisonnier
+            else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+              const logoMap = {
+                saintvalentin: "logo2.png",
+                poisson: "logo3.png",
+                paques: "logo4.png",
+                ete: "logo5.png",
+                usa: "logo6.png",
+                octobrerose: "logo7.png",
+                halloween: "logo8.png",
+                noel: "logo9.png",
+              };
+              const logoFile = logoMap[data.seasonalLogo] || "logo.png";
+              const logoPath = `assets/logo/${logoFile}`;
+              document.getElementById("headerLogo").src = logoPath;
+              document.getElementById("seasonalLogoPreview").src = logoPath;
+            }
+            // CAS 3 : Logo par défaut
+            else {
+              document.getElementById("headerLogo").src =
+                "assets/logo/logo.png";
+              document.getElementById("seasonalLogoPreview").src =
+                "assets/logo/logo.png";
+            }
+          }
+        } catch (error) {
+          console.error("Erreur chargement logo:", error);
+        }
+      }
+
+      // FONCTION PRINCIPALE DE MISE À JOUR DU LOGO
+      async function updateLogo() {
+        const logoUrl = document.getElementById("logoUrl").value.trim();
+        if (!logoUrl) {
+          showNotification("❌ Veuillez entrer une URL", "error");
+          return;
+        }
+
+        showNotification("⏳ Mise à jour du logo...", "info");
+
+        try {
+          const siteRef = doc(db, "site", "config");
+
+          // Sauvegarder dans Firestore - ÉCRASE le saisonnier
+          await setDoc(
+            siteRef,
+            {
+              logo: logoUrl,
+              seasonalLogo: "default",
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true },
+          );
+
+          // Mettre à jour le header
+          document.getElementById("headerLogo").src = logoUrl;
+          // Remettre l'aperçu saisonnier au logo par défaut
+          document.getElementById("seasonalLogoPreview").src =
+            "assets/logo/logo.png";
+          document.getElementById("logoUrl").value = "";
+
+          // Remettre le select sur "default"
+          document.getElementById("seasonalLogo").value = "default";
+
+          showNotification("✅ Logo mis à jour avec succès", "success");
+        } catch (error) {
+          console.error("Erreur sauvegarde logo:", error);
+          showNotification("❌ Erreur lors de la mise à jour", "error");
+        }
+      }
+
+      // ==================== GESTION LOGO SAISONNIER ====================
+      async function loadSeasonalLogo() {
+        try {
+          const siteRef = doc(db, "site", "config");
+          const siteDoc = await getDoc(siteRef);
+
+          if (siteDoc.exists() && siteDoc.data().seasonalLogo) {
+            document.getElementById("seasonalLogo").value =
+              siteDoc.data().seasonalLogo;
+          }
+
+          // Ajouter l'écouteur de changement
+          document
+            .getElementById("seasonalLogo")
+            .addEventListener("change", async (e) => {
+              const season = e.target.value;
+
+              // Déterminer le fichier logo correspondant
+              const logoMap = {
+                saintvalentin: "logo2.png",
+                poisson: "logo3.png",
+                paques: "logo4.png",
+                ete: "logo5.png",
+                usa: "logo6.png",
+                octobrerose: "logo7.png",
+                halloween: "logo8.png",
+                noel: "logo9.png",
+              };
+
+              const logoFile =
+                season === "default" ? "logo.png" : logoMap[season];
+              const logoPath = `assets/logo/${logoFile}`;
+
+              // Sauvegarder dans Firestore - ÉCRASE le logo personnalisé
+              await setDoc(
+                siteRef,
+                {
+                  seasonalLogo: season,
+                  logo: null,
+                  updatedAt: serverTimestamp(),
+                },
+                { merge: true },
+              );
+
+              // Mettre à jour le header et l'aperçu
+              document.getElementById("headerLogo").src = logoPath;
+              document.getElementById("seasonalLogoPreview").src = logoPath;
+
+              showNotification("✅ Logo saisonnier mis à jour", "success");
+            });
+        } catch (error) {
+          console.error("Erreur chargement logo saisonnier:", error);
+        }
+      }
+
+      // ==================== GESTION GALERIE ====================
+      async function loadGallery() {
+        try {
+          const galleryRef = doc(db, "gallery", "main");
+          const galleryDoc = await getDoc(galleryRef);
+
+          if (galleryDoc.exists()) {
+            const data = galleryDoc.data();
+            galleryImages = data.images || [];
+          } else {
+            galleryImages = [
+              "https://placehold.co/300x300/d4af37/1a1a1a?text=Souvenir+1",
+              "https://placehold.co/300x300/d4af37/1a1a1a?text=Souvenir+2",
+              "https://placehold.co/300x300/d4af37/1a1a1a?text=Souvenir+3",
+            ];
+          }
+          displayGalleryPreview();
+        } catch (error) {
+          console.error("Erreur chargement galerie:", error);
+          galleryImages = [];
+          displayGalleryPreview();
+        }
+      }
+
+      function displayGalleryPreview() {
+        const container = document.getElementById("galleryPreview");
+
+        if (galleryImages.length === 0) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 30px; color: var(--fw-beige); opacity: 0.7;">
+              <i class="fas fa-images" style="font-size: 2rem; margin-bottom: 15px; color: var(--fw-gold);"></i>
+              <p>Aucune photo dans la galerie. Ajoutez-en une !</p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = "";
+        galleryImages.forEach((url, index) => {
+          html += `
+            <div class="preview-item" draggable="true" data-index="${index}" data-url="${url}">
+              <img src="${url}" alt="Photo ${index + 1}" onerror="this.src='https://placehold.co/300x300/d4af37/1a1a1a?text=Erreur'">
+              <div class="preview-delete" onclick="window.deleteGalleryImage(${index})">
+                <i class="fas fa-times"></i>
+              </div>
+              <div class="drag-handle">
+                <i class="fas fa-grip-vertical"></i>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+
+        // Ajouter les événements de drag & drop
+        const items = document.querySelectorAll(".preview-item");
+        items.forEach((item) => {
+          item.addEventListener("dragstart", handleDragStart);
+          item.addEventListener("dragend", handleDragEnd);
+          item.addEventListener("dragover", handleDragOver);
+          item.addEventListener("drop", handleDrop);
+        });
+      }
+
+      function handleDragStart(e) {
+        draggedItem = this;
+        this.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/html", this.innerHTML);
+      }
+
+      function handleDragEnd(e) {
+        this.classList.remove("dragging");
+        document.querySelectorAll(".preview-item").forEach((item) => {
+          item.classList.remove("over");
+        });
+      }
+
+      function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (this !== draggedItem) {
+          this.classList.add("over");
+        }
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove("over");
+
+        if (draggedItem !== this) {
+          const allItems = [...document.querySelectorAll(".preview-item")];
+          const draggedIndex = allItems.indexOf(draggedItem);
+          const droppedIndex = allItems.indexOf(this);
+
+          // Réorganiser le tableau
+          const [draggedImage] = galleryImages.splice(draggedIndex, 1);
+          galleryImages.splice(droppedIndex, 0, draggedImage);
+
+          displayGalleryPreview();
+        }
+      }
+
+      function addGalleryImage() {
+        const url = document.getElementById("newGalleryUrl").value.trim();
+        if (!url) {
+          showNotification("❌ Veuillez entrer une URL", "error");
+          return;
+        }
+
+        galleryImages.push(url);
+        displayGalleryPreview();
+        document.getElementById("newGalleryUrl").value = "";
+        showNotification("✅ Image ajoutée à la galerie", "success");
+      }
+
+      function deleteGalleryImage(index) {
+        if (confirm("Supprimer cette image de la galerie ?")) {
+          galleryImages.splice(index, 1);
+          displayGalleryPreview();
+          showNotification("✅ Image supprimée", "success");
+        }
+      }
+
+      async function saveGalleryOrder() {
+        showNotification("⏳ Sauvegarde de la galerie...", "info");
+
+        try {
+          const galleryRef = doc(db, "gallery", "main");
+          await setDoc(
+            galleryRef,
+            {
+              images: galleryImages,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true },
+          );
+          showNotification("✅ Ordre de la galerie sauvegardé", "success");
+        } catch (error) {
+          console.error("Erreur sauvegarde galerie:", error);
+          showNotification("❌ Erreur lors de la sauvegarde", "error");
+        }
+      }
+
+      // ==================== GESTION TEAM ====================
+      function loadTeamManagement() {
+        const teamFormContainer = document.getElementById(
+          "team-management-form",
+        );
+
+        const teamMembers = [
+          {
+            id: "patron",
+            title: "Patron",
+            defaultName: "Gabriel Griffin",
+            defaultRole: "Patron",
+            defaultDesc:
+              "Dirige le garage, prend les décisions stratégiques et assure sa rentabilité.",
+            defaultImg: "assets/silhouette.png",
+          },
+          {
+            id: "copatron",
+            title: "Co-Patron",
+            defaultName: "Luna Lozano",
+            defaultRole: "Co-Patronne",
+            defaultDesc:
+              "Assiste le patron dans la gestion globale et le remplace en cas d'absence.",
+            defaultImg: "assets/silhouette.png",
+          },
+          {
+            id: "drh",
+            title: "DRH",
+            defaultName: "Ariane Payne",
+            defaultRole: "Directrice Ressources Humaines",
+            defaultDesc:
+              "Définit et pilote la politique des ressources humaines du garage.",
+            defaultImg: "assets/silhouette.png",
+          },
+          {
+            id: "rh1",
+            title: "RH 1",
+            defaultName: "Calista Winslow",
+            defaultRole: "Ressources Humaines",
+            defaultDesc:
+              "Gère au quotidien l'administration du personnel et applique la politique RH.",
+            defaultImg: "assets/silhouette.png",
+          },
+          {
+            id: "rh2",
+            title: "RH 2",
+            defaultName: "Marcus Thorne",
+            defaultRole: "Ressources Humaines",
+            defaultDesc:
+              "Assiste dans la gestion des dossiers du personnel et le suivi administratif.",
+            defaultImg: "assets/silhouette.png",
+          },
+        ];
+
+        let html = '<div class="team-grid">';
+
+        teamMembers.forEach((member) => {
+          html += `
+            <div class="team-member-card" data-member="${member.id}">
+              <div class="member-header">
+                <img id="${member.id}Avatar" src="${member.defaultImg}" class="member-avatar" alt="${member.title}" onerror="this.src='assets/silhouette.png'">
+                <div class="member-info">
+                  <h3>${member.title}</h3>
+                  <p style="color: var(--fw-beige); opacity: 0.8;">Modification des informations</p>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Poste</label>
+                <input type="text" id="${member.id}Role" class="form-input" value="${member.defaultRole}">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Nom complet</label>
+                <input type="text" id="${member.id}Name" class="form-input" value="${member.defaultName}">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="${member.id}Desc" class="form-textarea" rows="3">${member.defaultDesc}</textarea>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Lien Postimage de la photo</label>
+                <div class="url-input-container" style="margin-bottom: 5px;">
+                  <input type="url" id="${member.id}PhotoUrl" class="url-input" placeholder="https://i.postimg.cc/xxx/photo.jpg" value="${member.defaultImg}">
+                  <button class="add-url-btn" onclick="window.updateTeamPhotoUrl('${member.id}')" style="padding: 12px;">
+                    <i class="fas fa-sync-alt"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <button class="save-btn" onclick="window.saveTeamMember('${member.id}')">
+                <i class="fas fa-save"></i> Enregistrer les modifications
+              </button>
+            </div>
+          `;
+        });
+
+        html += "</div>";
+        teamFormContainer.innerHTML = html;
+
+        loadTeamDataFromFirestore();
+      }
+
+      async function loadTeamDataFromFirestore() {
+        try {
+          const teamRef = collection(db, "team");
+          const teamSnapshot = await getDocs(teamRef);
+
+          const teamData = {};
+          teamSnapshot.forEach((doc) => {
+            teamData[doc.id] = doc.data();
+          });
+
+          ["patron", "copatron", "drh", "rh1", "rh2"].forEach((memberId) => {
+            if (teamData[memberId]) {
+              const nameInput = document.getElementById(`${memberId}Name`);
+              const roleInput = document.getElementById(`${memberId}Role`);
+              const descInput = document.getElementById(`${memberId}Desc`);
+              const photoUrlInput = document.getElementById(
+                `${memberId}PhotoUrl`,
+              );
+              const avatarImg = document.getElementById(`${memberId}Avatar`);
+
+              if (nameInput && teamData[memberId].name)
+                nameInput.value = teamData[memberId].name;
+              if (roleInput && teamData[memberId].role)
+                roleInput.value = teamData[memberId].role;
+              if (descInput && teamData[memberId].description)
+                descInput.value = teamData[memberId].description;
+              if (photoUrlInput && teamData[memberId].photo)
+                photoUrlInput.value = teamData[memberId].photo;
+              if (avatarImg && teamData[memberId].photo)
+                avatarImg.src = teamData[memberId].photo;
+            }
+          });
+        } catch (error) {
+          console.error("Erreur chargement équipe:", error);
+        }
+      }
+
+      function updateTeamPhotoUrl(memberId) {
+        const photoUrl = document
+          .getElementById(`${memberId}PhotoUrl`)
+          .value.trim();
+        if (!photoUrl) {
+          showNotification("❌ Veuillez entrer une URL", "error");
+          return;
+        }
+
+        document.getElementById(`${memberId}Avatar`).src = photoUrl;
+        showNotification(
+          "✅ Aperçu mis à jour - N'oubliez pas de sauvegarder",
+          "info",
+        );
+      }
+
+      async function saveTeamMember(memberId) {
+        const memberData = {
+          name: document.getElementById(`${memberId}Name`).value,
+          role: document.getElementById(`${memberId}Role`).value,
+          description: document.getElementById(`${memberId}Desc`).value,
+          photo: document.getElementById(`${memberId}PhotoUrl`).value,
+          updatedAt: serverTimestamp(),
+        };
+
+        try {
+          const memberRef = doc(db, "team", memberId);
+          await setDoc(memberRef, memberData, { merge: true });
+          showNotification(
+            `✅ ${memberId.toUpperCase()} mis à jour avec succès`,
+            "success",
+          );
+        } catch (error) {
+          console.error("Erreur sauvegarde:", error);
+          showNotification("❌ Erreur lors de la sauvegarde", "error");
+        }
+      }
+
+      // ==================== GESTION SERVICE PRICING ====================
+      function loadServicePricing() {
+        const pricingContainer = document.getElementById(
+          "pricing-management-form",
+        );
+
+        const services = [
+          {
+            id: "reparation_complete",
+            name: "Réparation Complète",
+            icon: "fas fa-car-crash",
+            items: [
+              {
+                id: "reparation_complete_inside",
+                label: "Réparation Moteur et Carroserie",
+                defaultPrice: 550,
+              },
+              {
+                id: "reparation_complete_outside",
+                label: "En extérieur",
+                defaultPrice: 650,
+              },
+            ],
+          },
+          {
+            id: "reparation_moteur",
+            name: "Réparation Moteur",
+            icon: "fas fa-oil-can",
+            items: [
+              {
+                id: "reparation_moteur_inside",
+                label: "Réparation Moteur",
+                defaultPrice: 350,
+              },
+              {
+                id: "reparation_moteur_outside",
+                label: "En extérieur",
+                defaultPrice: 450,
+              },
+            ],
+          },
+          {
+            id: "kit_nettoyage",
+            name: "Kit de Nettoyage",
+            icon: "fas fa-spray-can",
+            items: [
+              {
+                id: "kit_nettoyage_price",
+                label: "Nettoyage extérieur professionnel",
+                defaultPrice: 50,
+              },
+            ],
+          },
+          {
+            id: "remorquage",
+            name: "Remorquage",
+            icon: "fas fa-truck",
+            items: [
+              {
+                id: "remorquage_gas",
+                label: "Remorquage a une station essence",
+                defaultPrice: 100,
+              },
+              {
+                id: "remorquage_flip",
+                label: "Retournement de véhicule",
+                defaultPrice: 100,
+              },
+            ],
+          },
+        ];
+
+        let html = '<div class="team-grid">';
+
+        services.forEach((service) => {
+          html += `
+            <div class="team-member-card" data-service="${service.id}">
+              <div class="member-header">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
+                  <i class="${service.icon}" style="color: var(--fw-gold); font-size: 1.5rem;"></i>
+                </div>
+                <div class="member-info">
+                  <h3>${service.name}</h3>
+                  <p style="color: var(--fw-beige); opacity: 0.8;">Service de réparation</p>
+                </div>
+              </div>`;
+
+          service.items.forEach((item) => {
+            html += `
+              <div class="form-group">
+                <label class="form-label">${item.label}</label>
+                <input type="number" id="${item.id}" class="form-input service-price-input" value="${item.defaultPrice}" min="0" step="1" placeholder="Prix en $">
+              </div>`;
+          });
+
+          html += `
+              <button class="save-btn" onclick="window.saveServicePrice('${service.id}')">
+                <i class="fas fa-save"></i> Enregistrer les prix
+              </button>
+            </div>`;
+        });
+
+        html += `
+          <div class="team-member-card">
+            <div class="member-header">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
+                <i class="fas fa-paint-roller" style="color: var(--fw-gold); font-size: 1.5rem;"></i>
+              </div>
+              <div class="member-info">
+                <h3>Customs</h3>
+                <p style="color: var(--fw-beige); opacity: 0.8;">Devis sur place</p>
+              </div>
+            </div>
+            <p style="color: var(--fw-beige); opacity: 0.8; text-align: center; padding: 10px;">
+              Amélioration des performances, Modifications esthétiques, Peinture sur mesure. Devis sur place.
+            </p>
+          </div>
+          
+          <div class="team-member-card">
+            <div class="member-header">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
+                <i class="fas fa-headset" style="color: var(--fw-gold); font-size: 1.5rem;"></i>
+              </div>
+              <div class="member-info">
+                <h3>Conseil Expert</h3>
+                <p style="color: var(--fw-beige); opacity: 0.8;">Service gratuit</p>
+              </div>
+            </div>
+            <p style="color: var(--fw-beige); opacity: 0.8; text-align: center; padding: 10px;">
+              Consultation personnalisée pour vos projets automobiles. Nos experts vous guident dans vos choix techniques, esthétiques et budgétaires pour des résultats optimaux.
+            </p>
+          </div>
+        `;
+
+        html += "</div>";
+        pricingContainer.innerHTML = html;
+
+        loadServicePricingFromFirestore();
+      }
+
+      async function loadServicePricingFromFirestore() {
+        try {
+          const servicesRef = collection(db, "services");
+          const servicesSnapshot = await getDocs(servicesRef);
+
+          const servicePrices = {};
+          servicesSnapshot.forEach((doc) => {
+            servicePrices[doc.id] = doc.data().prices || {};
+          });
+
+          const inputs = document.querySelectorAll(".service-price-input");
+          inputs.forEach((input) => {
+            const priceId = input.id;
+            for (const serviceKey in servicePrices) {
+              if (servicePrices[serviceKey][priceId] !== undefined) {
+                input.value = servicePrices[serviceKey][priceId];
+                break;
+              }
+            }
+          });
+        } catch (error) {
+          console.error("Erreur chargement prix:", error);
+        }
+      }
+
+      async function saveServicePrice(serviceId) {
+        const serviceData = {};
+        const inputs = document.querySelectorAll(
+          `[data-service="${serviceId}"] .service-price-input`,
+        );
+
+        inputs.forEach((input) => {
+          const price = parseInt(input.value) || 0;
+          serviceData[input.id] = price;
+        });
+
+        try {
+          const serviceRef = doc(db, "services", serviceId);
+          await setDoc(
+            serviceRef,
+            {
+              prices: serviceData,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true },
+          );
+          showNotification(
+            `✅ Prix du service "${serviceId}" mis à jour`,
+            "success",
+          );
+        } catch (error) {
+          console.error("Erreur sauvegarde:", error);
+          showNotification("❌ Erreur lors de la sauvegarde", "error");
+        }
+      }
+
+      // ==================== GESTION AVIS ====================
+      function initReviewsManagement() {
+        console.log("📝 Initialisation gestion avis...");
+
+        document
+          .getElementById("refreshReviewsBtn")
+          .addEventListener("click", loadPendingReviews);
+
+        loadPendingReviews();
+
+        setInterval(loadPendingReviews, 120000);
+      }
+
+      async function loadPendingReviews() {
+        const reviewsContainer = document.getElementById(
+          "reviews-management-list",
+        );
+        const statsContainer = document.getElementById("reviewStats");
+
+        reviewsContainer.innerHTML = `
+          <div class="loading-reviews" style="text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin" style="color: var(--fw-gold); font-size: 2rem; margin-bottom: 15px;"></i>
+            <p style="color: var(--fw-beige);">Chargement des avis en attente...</p>
+          </div>
+        `;
+        statsContainer.textContent = "Chargement...";
+
+        const GOOGLE_SHEET_URL =
+          "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRvRGjVrvHMi7r5eKwrrLG7a-6vVnuVjGWerN4VAYz7JNbLpNZTJl0LUjHS0vOo7-wSyZTXlZsMBe4/pub?gid=1185778982&single=true&output=csv";
+
+        try {
+          const response = await fetch(GOOGLE_SHEET_URL + "&t=" + Date.now());
+          if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+          const csvText = await response.text();
+
+          const reviews = parseCSVReviews(csvText);
+
+          // Récupérer les validations depuis Firestore
+          const validationsRef = collection(db, "review_validations");
+          const validationsSnapshot = await getDocs(validationsRef);
+
+          const validations = {};
+          validationsSnapshot.forEach((doc) => {
+            validations[doc.id] = doc.data().status;
+          });
+
+          let pendingCount = 0;
+          let approvedCount = 0;
+          let rejectedCount = 0;
+
+          reviews.forEach((review) => {
+            const reviewHash = btoa(
+              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
+            );
+            const status = validations[reviewHash];
+
+            if (status === true) approvedCount++;
+            else if (status === false) rejectedCount++;
+            else pendingCount++;
+          });
+
+          statsContainer.innerHTML = `
+            <span style="color: #ffc107;">${pendingCount} en attente</span> | 
+            <span style="color: #4CAF50;">${approvedCount} approuvés</span> | 
+            <span style="color: #f44336;">${rejectedCount} rejetés</span> | 
+            <span style="color: var(--fw-gold);">${reviews.length} total</span>
+          `;
+
+          const pendingReviews = reviews.filter((review) => {
+            const reviewHash = btoa(
+              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
+            );
+            return validations[reviewHash] === undefined;
+          });
+
+          displayPendingReviews(pendingReviews, validations);
+        } catch (error) {
+          console.error("Erreur chargement avis:", error);
+          reviewsContainer.innerHTML = `
+            <div class="error" style="text-align: center; padding: 40px; background: rgba(244, 67, 54, 0.1); border: 2px solid #f44336; border-radius: 10px;">
+              <i class="fas fa-exclamation-triangle" style="color: #f44336; font-size: 2rem; margin-bottom: 15px;"></i>
+              <p style="color: var(--fw-beige);">Erreur de chargement des avis</p>
+              <p style="color: var(--fw-beige); opacity: 0.8; font-size: 0.9rem; margin-top: 10px;">${error.message}</p>
+            </div>
+          `;
+          statsContainer.textContent = "Erreur de chargement";
+        }
+      }
+
+      function parseCSVReviews(csvText) {
+        const reviews = [];
+
+        csvText = csvText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+        const rows = csvText.split("\n").filter((row) => row.trim() !== "");
+
+        if (rows.length <= 1) return reviews;
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+
+          let insideQuotes = false;
+          let currentField = "";
+          const fields = [];
+
+          for (let j = 0; j < row.length; j++) {
+            const char = row[j];
+
+            if (char === '"') {
+              insideQuotes = !insideQuotes;
+              currentField += char;
+            } else if (char === "," && !insideQuotes) {
+              fields.push(currentField);
+              currentField = "";
+            } else {
+              currentField += char;
+            }
+          }
+          fields.push(currentField);
+
+          const cleanedFields = fields.map((field) => {
+            let clean = field.trim();
+            if (clean.startsWith('"') && clean.endsWith('"')) {
+              clean = clean.substring(1, clean.length - 1);
+            }
+            return clean;
+          });
+
+          if (cleanedFields.length >= 4) {
+            const rawTimestamp = cleanedFields[0] || new Date().toISOString();
+            const user = cleanedFields[1] || "Client anonyme";
+
+            let stars = 0;
+            const noteStr = cleanedFields[2] || "0";
+            const noteMatch = noteStr.match(/\d+/);
+            if (noteMatch) {
+              stars = parseInt(noteMatch[0]);
+            }
+            stars = Math.max(0, Math.min(5, stars));
+
+            const comment = cleanedFields[3] || "";
+
+            let formattedTimestamp = "";
+            let dateObj = new Date();
+            try {
+              dateObj = new Date(rawTimestamp);
+              if (!isNaN(dateObj.getTime())) {
+                const day = String(dateObj.getDate()).padStart(2, "0");
+                const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+                const year = dateObj.getFullYear();
+                const hours = String(dateObj.getHours()).padStart(2, "0");
+                const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+                formattedTimestamp = `${day}/${month}/${year} ${hours}:${minutes}`;
+              } else {
+                formattedTimestamp = rawTimestamp;
+              }
+            } catch (e) {
+              formattedTimestamp = rawTimestamp;
+            }
+
+            const cleanComment = comment
+              .replace(/\\n/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
+
+            if (cleanComment && cleanComment !== "") {
+              reviews.push({
+                user: user,
+                stars: stars,
+                comment: cleanComment,
+                timestamp: formattedTimestamp,
+                rawDate: dateObj,
+              });
+            }
+          }
+        }
+
+        reviews.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
+
+        return reviews;
+      }
+
+      function displayPendingReviews(reviews, validations) {
+        const container = document.getElementById("reviews-management-list");
+
+        if (reviews.length === 0) {
+          container.innerHTML = `
+            <div class="coming-soon">
+              <div class="coming-soon-icon" style="color: #4CAF50;">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div class="coming-soon-text">
+                Aucun avis en attente de validation
+                <p style="font-size: 1rem; margin-top: 10px; color: rgba(245, 232, 200, 0.7);">
+                  Tous les avis ont été modérés. Les nouveaux avis apparaîtront automatiquement.
+                </p>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        let html = `
+          <div style="margin-bottom: 20px; text-align: center;">
+            <div style="background: rgba(255, 193, 7, 0.1); padding: 10px 20px; border-radius: 20px; display: inline-flex; align-items: center; gap: 10px; border: 2px solid #ffc107;">
+              <i class="fas fa-clock" style="color: #ffc107;"></i>
+              <span style="color: #ffc107; font-family: 'Orbitron', sans-serif; font-weight: 600;">
+                ${reviews.length} avis en attente de validation
+              </span>
+            </div>
+          </div>
+          
+          <div class="team-grid" style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));">
+        `;
+
+        reviews.forEach((review, index) => {
+          const reviewHash = btoa(
+            `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
+          );
+          const starsHtml =
+            "★".repeat(review.stars) + "☆".repeat(5 - review.stars);
+
+          html += `
+            <div class="team-member-card" style="border-color: #ffc107; animation: pulseWarning 2s infinite;">
+              <div class="member-header">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 193, 7, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid #ffc107;">
+                  <i class="fas fa-user" style="color: #ffc107; font-size: 1.5rem;"></i>
+                </div>
+                <div class="member-info">
+                  <h3 style="color: #ffc107;">${review.user}</h3>
+                  <p style="color: var(--fw-beige); opacity: 0.8;">${review.timestamp}</p>
+                  <p style="color: #ffc107; font-size: 1.2rem; margin-top: 5px;">
+                    ${starsHtml}
+                  </p>
+                </div>
+              </div>
+              
+              <div style="background: rgba(255, 193, 7, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(255, 193, 7, 0.3); margin: 15px 0; min-height: 100px;">
+                <p style="color: var(--fw-beige); font-style: italic; line-height: 1.6;">"${review.comment}"</p>
+              </div>
+              
+              <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="save-btn" onclick="window.approveReview('${reviewHash.replace(/'/g, "\\'")}')" 
+                        style="background: linear-gradient(135deg, #4CAF50, #2E7D32); flex: 1; padding: 12px;">
+                  <i class="fas fa-check"></i> Approuver et publier
+                </button>
+                <button class="save-btn" onclick="window.rejectReview('${reviewHash.replace(/'/g, "\\'")}')" 
+                        style="background: linear-gradient(135deg, #f44336, #c62828); flex: 1; padding: 12px;">
+                  <i class="fas fa-times"></i> Rejeter
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+          </div>
+          
+          <style>
+            @keyframes pulseWarning {
+              0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+              70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+              100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+            }
+          </style>
+        `;
+
+        container.innerHTML = html;
+      }
+
+      async function approveReview(reviewHash) {
+        showNotification("⏳ Approbation de l'avis en cours...", "info");
+
+        try {
+          const reviewRef = doc(db, "review_validations", reviewHash);
+          await setDoc(reviewRef, {
+            status: true,
+            approvedAt: serverTimestamp(),
+          });
+          showNotification("✅ Avis approuvé et publié sur le site", "success");
+          setTimeout(() => loadPendingReviews(), 1000);
+        } catch (error) {
+          console.error("Erreur approbation:", error);
+          showNotification("❌ Erreur lors de l'approbation", "error");
+        }
+      }
+
+      async function rejectReview(reviewHash) {
+        showNotification("⏳ Rejet de l'avis en cours...", "info");
+
+        try {
+          const reviewRef = doc(db, "review_validations", reviewHash);
+          await setDoc(reviewRef, {
+            status: false,
+            rejectedAt: serverTimestamp(),
+          });
+          showNotification("⭕ Avis rejeté", "info");
+          setTimeout(() => loadPendingReviews(), 1000);
+        } catch (error) {
+          console.error("Erreur rejet:", error);
+          showNotification("❌ Erreur lors du rejet", "error");
+        }
+      }
+
+      // ==================== GESTION RECRUTEMENT ====================
+      async function checkInitialStatus() {
+        console.log("🔍 Vérification état initial...");
+
+        try {
+          const siteRef = doc(db, "site", "config");
+          const siteDoc = await getDoc(siteRef);
+
+          let isActive = false;
+
+          if (siteDoc.exists()) {
+            isActive = siteDoc.data().recruitmentStatus || false;
+          }
+
+          console.log("📊 État initial reçu:", isActive);
+
+          recruitmentToggle.checked = isActive;
+          updateStatusDisplay(isActive);
+
+          if (isActive) {
+            showNotification("Recrutement actuellement ACTIF", "success");
+          } else {
+            showNotification("Recrutement actuellement INACTIF", "info");
+          }
+        } catch (error) {
+          console.error("❌ Erreur lecture état:", error);
+          showNotification("Erreur de connexion à la base de données", "error");
+        }
+      }
+
+      function setupRealtimeListener() {
+        console.log("👂 Configuration écoute temps réel...");
+
+        setInterval(async () => {
+          try {
+            const siteRef = doc(db, "site", "config");
+            const siteDoc = await getDoc(siteRef);
+            if (siteDoc.exists()) {
+              const isActive = siteDoc.data().recruitmentStatus || false;
+              recruitmentToggle.checked = isActive;
+              updateStatusDisplay(isActive);
+            }
+          } catch (error) {
+            console.error("❌ Erreur vérification état:", error);
+          }
+        }, 5000);
+      }
+
+      async function handleToggleChange() {
+        const isActive = this.checked;
+        console.log(`🔄 Changement toggle: ${isActive ? "ACTIF" : "INACTIF"}`);
+
+        updateStatusDisplay(isActive);
+
+        try {
+          const siteRef = doc(db, "site", "config");
+          await setDoc(
+            siteRef,
+            {
+              recruitmentStatus: isActive,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true },
+          );
+
+          console.log("✅ État sauvegardé avec succès");
+          if (isActive) {
+            showNotification("✅ Recrutement ACTIVÉ avec succès", "success");
+          } else {
+            showNotification("⭕ Recrutement DÉSACTIVÉ", "info");
+          }
+        } catch (error) {
+          console.error("❌ Erreur sauvegarde:", error);
+          showNotification("❌ Erreur lors de la sauvegarde", "error");
+
+          recruitmentToggle.checked = !isActive;
+          updateStatusDisplay(!isActive);
+        }
+      }
+
+      function updateStatusDisplay(isActive) {
+        console.log(
+          `🎨 Mise à jour affichage: ${isActive ? "ACTIF" : "INACTIF"}`,
+        );
+
+        if (isActive) {
+          statusText.textContent = "ACTIF";
+          statusText.className = "current-status-value status-active-text";
+          currentStatusDisplay.style.borderColor = "#4caf50";
+          currentStatusDisplay.style.boxShadow =
+            "0 0 15px rgba(76, 175, 80, 0.5)";
+          currentStatusDisplay.style.border = "2px solid #4caf50";
+        } else {
+          statusText.textContent = "INACTIF";
+          statusText.className = "current-status-value status-inactive-text";
+          currentStatusDisplay.style.borderColor = "#f44336";
+          currentStatusDisplay.style.boxShadow =
+            "0 0 15px rgba(244, 67, 54, 0.5)";
+          currentStatusDisplay.style.border = "2px solid #f44336";
+        }
+      }
+
+      async function handleLogout(e) {
+        e.preventDefault();
+        console.log("🚪 Déconnexion en cours...");
+
+        try {
+          await signOut(auth);
+          showNotification("✅ Déconnexion réussie", "success");
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1000);
+        } catch (error) {
+          console.error("❌ Erreur déconnexion:", error);
+          showNotification("❌ Erreur de déconnexion", "error");
+        }
+      }
+
+      window.addEventListener("scroll", () => {
+        const header = document.querySelector("header");
+        if (window.scrollY > 50) {
+          header.style.background =
+            "linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(51, 51, 51, 0.98) 100%)";
+          header.style.boxShadow = "0 5px 25px rgba(212, 175, 55, 0.3)";
+        } else {
+          header.style.background =
+            "linear-gradient(135deg, var(--fw-dark) 0%, var(--fw-gray) 100%)";
+          header.style.boxShadow = "0 4px 20px rgba(212, 175, 55, 0.2)";
+        }
+      });
+
+      window.addEventListener("load", () => {
+        console.log("🌐 Dashboard V2 chargé");
+      });
+    </script>
+  </body>
+</html>
