@@ -191,14 +191,28 @@
         margin-left: 15px;
       }
 
+      .logo-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 15px;
+      }
+
       .logo-text {
         font-family: "Orbitron", sans-serif;
         font-size: 1.4rem;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 2px;
-        color: var(--fw-beige);
-        text-shadow: 0 0 10px rgba(245, 232, 200, 0.5);
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
       }
 
       .logo-subtitle {
@@ -225,7 +239,6 @@
       }
 
       nav a {
-        color: var(--fw-beige);
         text-decoration: none;
         font-family: "Orbitron", sans-serif;
         font-weight: 600;
@@ -246,15 +259,22 @@
       .nav-icon {
         font-size: 1rem;
         margin-bottom: 3px;
-        color: var(--fw-beige);
+        color: var(--fw-gold);
         display: block;
-        color: #d4af37;
+        filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
       }
 
       .nav-text {
         font-size: 0.8rem;
         display: block;
-        color: #d4af37;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
 
       nav a:hover {
