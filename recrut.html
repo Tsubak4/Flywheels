@@ -208,8 +208,15 @@
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 2px;
-        color: var(--fw-beige);
-        text-shadow: 0 0 10px rgba(245, 232, 200, 0.5);
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
       }
 
       .logo-subtitle {
@@ -373,23 +380,53 @@
         margin-bottom: 40px;
         padding-bottom: 20px;
         border-bottom: 2px solid var(--fw-gold);
+        position: relative;
       }
 
       .form-header h1 {
         font-family: "Orbitron", sans-serif;
         font-size: 2.5rem;
-        color: var(--fw-beige-light);
         margin-bottom: 10px;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 2px;
+        text-align: center;
         text-shadow:
           0 0 10px rgba(212, 175, 55, 0.8),
           0 0 20px rgba(212, 175, 55, 0.5);
+        background: linear-gradient(
+          to bottom,
+          var(--fw-beige-light) 0%,
+          var(--fw-beige) 50%,
+          var(--fw-gold-dark) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+      }
+
+      .form-header h1::after {
+        content: "";
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--fw-gold);
       }
 
       .form-header p {
         font-size: 1.1rem;
         color: var(--fw-beige);
+        margin-top: 25px;
       }
 
       .form-section {
