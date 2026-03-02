@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyWheels - FlashFA</title>
+
+    <!-- Firebase SDK -->
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        color: #333;
+        background-color: #1a1a1a;
+        overflow-x: hidden;
+      }
+
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        opacity: 0.5;
+        box-shadow: 0 0 10px var(--fw-gold);
+        animation: floatUp 20s infinite linear;
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(100vh) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.5;
+        }
+        90% {
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(100px);
+          opacity: 0;
+        }
+      }
+
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+        --fw-yellow: #ffd700;
+        --fw-amber: #ffbf00;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        padding: 1rem 0;
+        border-bottom: 3px solid var(--fw-gold);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      header.scrolled {
+        background: linear-gradient(
+          135deg,
+          rgba(26, 26, 26, 0.98) 0%,
+          rgba(51, 51, 51, 0.98) 100%
+        );
+        box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        padding: 8px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        animation: logoGlow 2s infinite alternate;
+        transition: all 0.3s ease;
+      }
+
+      @keyframes logoGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .logo-container:hover {
+        transform: translateY(-2px);
+        border-color: var(--fw-gold-light);
+      }
+
+      .logo-container img {
+        height: 60px;
+        width: auto;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        transition: transform 0.3s ease;
+      }
+
+      .logo-container:hover img {
+        transform: scale(1.05);
+      }
+
+      .logo-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 15px;
+      }
+
+      .logo-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+      }
+
+      .logo-subtitle {
+        font-family: "Roboto", sans-serif;
+        font-size: 0.9rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+        width: 100%;
+        margin-top: 2px;
+        text-transform: uppercase;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 5px;
+      }
+
+      nav a {
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 12px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: 2px solid var(--fw-beige);
+        position: relative;
+        overflow: hidden;
+        background: rgba(245, 232, 200, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 90px;
+      }
+
+      .nav-icon {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        color: var(--fw-gold);
+        display: block;
+        filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
+      }
+
+      .nav-text {
+        font-size: 0.9rem;
+        display: block;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      nav a:hover {
+        border: 2px solid var(--fw-gold);
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        transform: translateY(-2px);
+      }
+
+      nav a::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+      }
+
+      nav a:hover::before {
+        opacity: 0.4;
+      }
+
+      .burger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid var(--fw-gold);
+        margin-left: 15px;
+        animation: burgerGlow 2s infinite alternate;
+      }
+
+      @keyframes burgerGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 10px var(--fw-gold),
+            0 0 20px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .burger span {
+        width: 25px;
+        height: 3px;
+        background: var(--fw-gold);
+        margin: 3px 0;
+        transition: 0.3s;
+        border-radius: 2px;
+      }
+
+      .burger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .burger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .burger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+      }
+
+      .main-content {
+        min-height: calc(100vh - 100px);
+        padding-top: 150px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        position: relative;
+        z-index: 2;
+      }
+
+      .main-content::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 30%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          );
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .services-header {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto 60px;
+        padding: 40px;
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 15px;
+        position: relative;
+        transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+        transform-style: preserve-3d;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.7),
+          0 0 30px rgba(212, 175, 55, 0.4),
+          0 0 50px rgba(212, 175, 55, 0.3);
+        animation: rectangleGlow 3s infinite alternate;
+      }
+
+      @keyframes rectangleGlow {
+        0% {
+          box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.7),
+            0 0 30px rgba(212, 175, 55, 0.4),
+            0 0 50px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.7),
+            0 0 40px rgba(212, 175, 55, 0.7),
+            0 0 60px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .services-header h1 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.8rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.8),
+          0 0 20px rgba(212, 175, 55, 0.5);
+        background: linear-gradient(
+          to bottom,
+          var(--fw-beige-light) 0%,
+          var(--fw-beige) 50%,
+          var(--fw-beige-dark) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .services-header p {
+        font-size: 1.3rem;
+        color: var(--fw-beige);
+        line-height: 1.6;
+        opacity: 0.9;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        width: 100%;
+      }
+
+      .service-card {
+        background: linear-gradient(135deg, var(--fw-dark), var(--fw-gray));
+        border: 2px solid var(--fw-beige);
+        border-radius: 15px;
+        padding: 35px 30px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 100%;
+        min-height: 320px;
+      }
+
+      .service-card:hover {
+        border-color: var(--fw-gold);
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
+      }
+
+      .service-card::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 17px;
+      }
+
+      .service-card:hover::before {
+        opacity: 0.3;
+      }
+
+      .service-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid var(--fw-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 25px;
+        background: rgba(212, 175, 55, 0.1);
+        position: relative;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .service-icon i {
+        font-size: 2.5rem;
+        color: var(--fw-gold);
+      }
+
+      .service-card:hover .service-icon {
+        background: rgba(212, 175, 55, 0.2);
+        transform: scale(1.05);
+      }
+
+      .service-icon::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          circle at center,
+          rgba(212, 175, 55, 0.1) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+
+      .service-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .service-name {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        color: var(--fw-beige);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .service-description {
+        color: var(--fw-beige);
+        line-height: 1.6;
+        opacity: 0.9;
+        font-size: 1.1rem;
+        margin-top: 10px;
+      }
+
+      .title-bar {
+        width: 50%;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        margin: 30px auto 50px;
+        border-radius: 2px;
+        position: relative;
+        animation: titleBarGlow 2s infinite alternate;
+      }
+
+      @keyframes titleBarGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5),
+            0 0 35px rgba(212, 175, 55, 0.2);
+        }
+      }
+
+      footer {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        padding: 30px 0;
+        border-top: 3px solid var(--fw-gold);
+        text-align: center;
+        position: relative;
+        margin-top: 80px;
+        z-index: 2;
+      }
+
+      footer::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--fw-gold);
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .footer-bottom {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+
+      .footer-bottom a {
+        color: var(--fw-gold);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .footer-bottom a::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--fw-gold);
+        transition: width 0.3s ease;
+      }
+
+      .footer-bottom a:hover {
+        color: var(--fw-beige-light);
+        text-decoration: none;
+      }
+
+      .footer-bottom a:hover::after {
+        width: 100%;
+      }
+
+      @media (max-width: 1200px) {
+        .container {
+          padding: 0 20px;
+        }
+
+        nav a {
+          padding: 12px 15px;
+          min-width: 80px;
+        }
+
+        .nav-icon {
+          font-size: 1.1rem;
+        }
+
+        .nav-text {
+          font-size: 0.85rem;
+        }
+
+        .services-header h1 {
+          font-size: 2.5rem;
+        }
+
+        .service-icon {
+          width: 90px;
+          height: 90px;
+        }
+
+        .service-icon i {
+          font-size: 2.3rem;
+        }
+      }
+
+      @media (max-width: 992px) {
+        nav ul {
+          gap: 3px;
+        }
+
+        nav a {
+          padding: 10px 12px;
+          min-width: 75px;
+          border-radius: 8px;
+        }
+
+        .nav-icon {
+          font-size: 1rem;
+        }
+
+        .nav-text {
+          font-size: 0.8rem;
+        }
+
+        .services-header h1 {
+          font-size: 2.2rem;
+        }
+
+        .services-header p {
+          font-size: 1.2rem;
+        }
+
+        .services-grid {
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 30px;
+        }
+
+        .service-icon {
+          width: 85px;
+          height: 85px;
+        }
+
+        .service-icon i {
+          font-size: 2.1rem;
+        }
+
+        .service-name {
+          font-size: 1.6rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        nav ul {
+          display: none;
+          position: fixed;
+          top: 100px;
+          left: 0;
+          width: 100%;
+          background: linear-gradient(
+            135deg,
+            var(--fw-dark) 0%,
+            var(--fw-gray) 100%
+          );
+          flex-direction: column;
+          padding: 20px;
+          text-align: center;
+          gap: 10px;
+          border-top: 2px solid var(--fw-gold);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+
+        nav ul.active {
+          display: flex;
+        }
+
+        nav a {
+          padding: 15px;
+          min-width: auto;
+          width: 100%;
+          max-width: 300px;
+          margin: 0 auto;
+          flex-direction: row;
+          justify-content: center;
+          gap: 10px;
+          border-radius: 8px;
+        }
+
+        .nav-icon {
+          margin-bottom: 0;
+          font-size: 1.1rem;
+        }
+
+        .nav-text {
+          font-size: 0.95rem;
+        }
+
+        .burger {
+          display: flex;
+        }
+
+        .logo-text {
+          font-size: 1.5rem;
+        }
+
+        .logo-container img {
+          height: 50px;
+        }
+
+        .main-content {
+          padding-top: 120px;
+        }
+
+        .services-header {
+          padding: 30px 20px;
+          margin-bottom: 40px;
+        }
+
+        .services-header h1 {
+          font-size: 2rem;
+        }
+
+        .services-header p {
+          font-size: 1.1rem;
+        }
+
+        .services-grid {
+          grid-template-columns: 1fr;
+          max-width: 500px;
+          gap: 30px;
+        }
+
+        .service-card {
+          padding: 30px 25px;
+          min-height: 300px;
+        }
+
+        .service-icon {
+          width: 80px;
+          height: 80px;
+        }
+
+        .service-icon i {
+          font-size: 2rem;
+        }
+
+        .title-bar {
+          width: 70%;
+          margin: 20px auto 40px;
+        }
+
+        footer {
+          margin-top: 60px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .logo-text {
+          font-size: 1.2rem;
+        }
+
+        .logo-container img {
+          height: 40px;
+        }
+
+        .services-header h1 {
+          font-size: 1.8rem;
+          letter-spacing: 1px;
+        }
+
+        .services-header p {
+          font-size: 1rem;
+        }
+
+        .container {
+          padding: 0 15px;
+        }
+
+        .services-header {
+          padding: 25px 15px;
+        }
+
+        .services-grid {
+          padding: 0 15px;
+        }
+
+        .service-card {
+          padding: 25px 20px;
+          min-height: 280px;
+        }
+
+        .service-icon {
+          width: 70px;
+          height: 70px;
+        }
+
+        .service-icon i {
+          font-size: 1.8rem;
+        }
+
+        .service-name {
+          font-size: 1.5rem;
+        }
+
+        .service-description {
+          font-size: 1rem;
+        }
+
+        footer {
+          margin-top: 50px;
+          padding: 25px 0;
+        }
+
+        .footer-bottom {
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="particles" id="particles"></div>
+
+    <header id="header">
+      <div class="container">
+        <div class="nav-container">
+          <div class="logo-container">
+            <img
+              src="assets/logo/logo.png"
+              alt="FlyWheels Logo"
+              id="headerLogo"
+            />
+            <div class="logo-text-container">
+              <div class="logo-text">FLYWHEELS</div>
+              <div class="logo-subtitle">GARAGE AUTOMOBILE</div>
+            </div>
+          </div>
+
+          <nav>
+            <ul id="nav-menu">
+              <li>
+                <a href="index.html">
+                  <span class="nav-icon"><i class="fas fa-home"></i></span>
+                  <span class="nav-text">Accueil</span>
+                </a>
+              </li>
+              <li>
+                <a href="services.html">
+                  <span class="nav-icon"><i class="fas fa-tools"></i></span>
+                  <span class="nav-text">Services</span>
+                </a>
+              </li>
+              <li>
+                <a href="equipe.html">
+                  <span class="nav-icon"><i class="fas fa-users"></i></span>
+                  <span class="nav-text">Équipe</span>
+                </a>
+              </li>
+              <li>
+                <a href="avis.html">
+                  <span class="nav-icon"><i class="fas fa-star"></i></span>
+                  <span class="nav-text">Avis</span>
+                </a>
+              </li>
+              <li>
+                <a href="contact.html">
+                  <span class="nav-icon"><i class="fas fa-phone"></i></span>
+                  <span class="nav-text">Contactez-nous</span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="burger" id="burger">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="services-header">
+        <h1>Nos Services</h1>
+        <p>
+          Des solutions complètes pour tous vos besoins automobiles, de la
+          réparation à la personnalisation
+        </p>
+      </div>
+
+      <div class="title-bar"></div>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-car-crash"></i>
+          </div>
+          <div class="service-info">
+            <h2 class="service-name">Réparation Complète</h2>
+            <p class="service-description" id="reparation_complete_inside">
+              - Réparation Moteur et Carroserie : 550 $
+            </p>
+            <p class="service-description" id="reparation_complete_outside">
+              - En extérieur : 650 $
+            </p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-oil-can"></i>
+          </div>
+          <div class="service-info">
+            <h2 class="service-name">Réparation Moteur</h2>
+            <p class="service-description" id="reparation_moteur_inside">
+              - Réparation Moteur : 350 $
+            </p>
+            <p class="service-description" id="reparation_moteur_outside">
+              - En extérieur : 450 $
+            </p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-spray-can"></i>
+          </div>
+          <div class="service-info">
+            <h2 class="service-name">Kit de Nettoyage</h2>
+            <p class="service-description" id="kit_nettoyage_price">
+              Nettoyage extérieur professionnel : 50$
+            </p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-truck"></i>
+          </div>
+          <div class="service-info">
+            <h2 class="service-name">Remorquage</h2>
+            <p class="service-description" id="remorquage_gas">
+              - Remorquage a une station essence : 100 $
+            </p>
+            <p class="service-description" id="remorquage_flip">
+              - Retournement de véhicule : 100 $
+            </p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-paint-roller"></i>
+          </div>
+          <div class="service-info">
+            <h2 class="service-name">Customs</h2>
+            <p class="service-description">
+              Amélioration des performances, Modifications esthétiques, Peinture
+              sur mesure. Devis sur place.
+            </p>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div class="service-info">
+            <h2 class="service-name">Conseil Expert</h2>
+            <p class="service-description">
+              Consultation personnalisée pour vos projets automobiles. Nos
+              experts vous guident dans vos choix techniques, esthétiques et
+              budgétaires pour des résultats optimaux.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-bottom">
+            © 2026 FlyWheels Garage - Mentions légales
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getFirestore,
+        doc,
+        onSnapshot,
+        collection,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcIopLaEJQGqSx6S6t-IoXAmT4ghRoYo8",
+        authDomain: "flywheels-eb854.firebaseapp.com",
+        projectId: "flywheels-eb854",
+        storageBucket: "flywheels-eb854.firebasestorage.app",
+        messagingSenderId: "644938564681",
+        appId: "1:644938564681:web:03f18ec31ee5d87a2feb98",
+        measurementId: "G-BM6XVDGNY0",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      function createParticles() {
+        const particlesContainer = document.getElementById("particles");
+        if (!particlesContainer) return;
+
+        particlesContainer.innerHTML = "";
+
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 20 + "s";
+          particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      // ========== GESTION DU LOGO ==========
+      function initLogoListener() {
+        const siteRef = doc(db, "site", "config");
+
+        onSnapshot(
+          siteRef,
+          (doc) => {
+            if (doc.exists()) {
+              const data = doc.data();
+              const headerLogo = document.getElementById("headerLogo");
+
+              if (!headerLogo) return;
+
+              // CAS 1 : Logo personnalisé (priorité)
+              if (data.logo) {
+                headerLogo.src = data.logo;
+              }
+              // CAS 2 : Logo saisonnier
+              else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+                const logoMap = {
+                  saintvalentin: "logo2.png",
+                  poisson: "logo3.png",
+                  paques: "logo4.png",
+                  ete: "logo5.png",
+                  usa: "logo6.png",
+                  octobrerose: "logo7.png",
+                  halloween: "logo8.png",
+                  noel: "logo9.png",
+                };
+                const logoFile = logoMap[data.seasonalLogo] || "logo.png";
+                headerLogo.src = `assets/logo/${logoFile}`;
+              }
+              // CAS 3 : Logo par défaut
+              else {
+                headerLogo.src = "assets/logo/logo.png";
+              }
+            }
+          },
+          (error) => {
+            console.error("Erreur écoute logo:", error);
+          },
+        );
+      }
+
+      function loadServicePrices() {
+        const servicesRef = collection(db, "services");
+
+        getDocs(servicesRef)
+          .then((snapshot) => {
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              if (data.prices) {
+                updateServicePrices(doc.id, data.prices);
+              }
+            });
+          })
+          .catch((error) => {
+            console.error("❌ Erreur chargement prix:", error);
+          });
+      }
+
+      function setupPricesListener() {
+        const servicesRef = collection(db, "services");
+
+        onSnapshot(
+          servicesRef,
+          (snapshot) => {
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              if (data.prices) {
+                updateServicePrices(doc.id, data.prices);
+              }
+            });
+          },
+          (error) => {
+            console.error("❌ Erreur écoute prix:", error);
+          },
+        );
+      }
+
+      function updateServicePrices(serviceId, prices) {
+        if (!prices) return;
+
+        Object.keys(prices).forEach((priceId) => {
+          const element = document.getElementById(priceId);
+          if (element) {
+            const price = prices[priceId];
+
+            if (priceId === "kit_nettoyage_price") {
+              element.textContent = `Nettoyage extérieur professionnel : ${price}$`;
+            } else if (priceId.includes("reparation_complete_inside")) {
+              element.textContent = `- Réparation Moteur et Carroserie : ${price} $`;
+            } else if (priceId.includes("reparation_complete_outside")) {
+              element.textContent = `- En extérieur : ${price} $`;
+            } else if (priceId.includes("reparation_moteur_inside")) {
+              element.textContent = `- Réparation Moteur : ${price} $`;
+            } else if (priceId.includes("reparation_moteur_outside")) {
+              element.textContent = `- En extérieur : ${price} $`;
+            } else if (priceId.includes("remorquage_gas")) {
+              element.textContent = `- Remorquage a une station essence : ${price} $`;
+            } else if (priceId.includes("remorquage_flip")) {
+              element.textContent = `- Retournement de véhicule : ${price} $`;
+            }
+          }
+        });
+      }
+
+      const burger = document.getElementById("burger");
+      const navMenu = document.getElementById("nav-menu");
+
+      burger.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+        burger.classList.toggle("active");
+      });
+
+      document.querySelectorAll("#nav-menu a").forEach((link) => {
+        link.addEventListener("click", () => {
+          navMenu.classList.remove("active");
+          burger.classList.remove("active");
+        });
+      });
+
+      const header = document.getElementById("header");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        createParticles();
+        initLogoListener();
+        loadServicePrices();
+        setupPricesListener();
+
+        const servicesHeader = document.querySelector(".services-header");
+        if (servicesHeader) {
+          servicesHeader.style.opacity = "0";
+          servicesHeader.style.transform =
+            "perspective(1000px) rotateY(-15deg) rotateX(10deg) scale(0.95)";
+          servicesHeader.style.transition =
+            "all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s";
+
+          setTimeout(() => {
+            servicesHeader.style.opacity = "1";
+            servicesHeader.style.transform =
+              "perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)";
+          }, 400);
+        }
+
+        const serviceCards = document.querySelectorAll(".service-card");
+        serviceCards.forEach((card, index) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(30px)";
+          card.style.transition = `all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${0.6 + index * 0.15}s`;
+
+          setTimeout(
+            () => {
+              card.style.opacity = "1";
+              card.style.transform = "translateY(0)";
+            },
+            600 + index * 150,
+          );
+        });
+      });
+    </script>
+  </body>
+</html>
