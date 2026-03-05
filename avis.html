@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyWheels - FlashFA</title>
+
+    <!-- Firebase SDK -->
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
+    ></script>
+    <script
+      type="module"
+      src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    ></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        color: #fff;
+        background-color: #1a1a1a;
+        overflow-x: hidden;
+        padding-top: 100px;
+      }
+
+      /* ========== PARTICULES ========== */
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        opacity: 0.5;
+        box-shadow: 0 0 10px var(--fw-gold);
+        animation: floatUp 20s infinite linear;
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(100vh) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.5;
+        }
+        90% {
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(100px);
+          opacity: 0;
+        }
+      }
+
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+        --fw-yellow: #ffd700;
+        --fw-amber: #ffbf00;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+        padding: 1rem 0;
+        border-bottom: 3px solid var(--fw-gold);
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      header.scrolled {
+        background: linear-gradient(
+          135deg,
+          rgba(26, 26, 26, 0.98) 0%,
+          rgba(51, 51, 51, 0.98) 100%
+        );
+        box-shadow: 0 5px 25px rgba(212, 175, 55, 0.3);
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 30px;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        padding: 8px 15px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        animation: logoGlow 2s infinite alternate;
+        transition: all 0.3s ease;
+      }
+
+      @keyframes logoGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 15px var(--fw-gold),
+            0 0 25px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .logo-container:hover {
+        transform: translateY(-2px);
+        border-color: var(--fw-gold-light);
+      }
+
+      .logo-container img {
+        height: 60px;
+        width: auto;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        transition: transform 0.3s ease;
+      }
+
+      .logo-container:hover img {
+        transform: scale(1.05);
+      }
+
+      .logo-text-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 15px;
+      }
+
+      .logo-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+      }
+
+      .logo-subtitle {
+        font-family: "Roboto", sans-serif;
+        font-size: 0.9rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-align: center;
+        width: 100%;
+        margin-top: 2px;
+        text-transform: uppercase;
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+        gap: 5px;
+      }
+
+      nav a {
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 12px 20px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: 2px solid var(--fw-beige);
+        position: relative;
+        overflow: hidden;
+        background: rgba(245, 232, 200, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 90px;
+      }
+
+      .nav-icon {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        color: var(--fw-gold);
+        display: block;
+        filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
+      }
+
+      .nav-text {
+        font-size: 0.9rem;
+        display: block;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      nav a:hover {
+        border: 2px solid var(--fw-gold);
+        background: rgba(212, 175, 55, 0.15);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        transform: translateY(-2px);
+      }
+
+      nav a::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(
+          45deg,
+          var(--fw-gold),
+          transparent,
+          var(--fw-gold)
+        );
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border-radius: 12px;
+      }
+
+      nav a:hover::before {
+        opacity: 0.4;
+      }
+
+      .burger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid var(--fw-gold);
+        margin-left: 15px;
+        animation: burgerGlow 2s infinite alternate;
+      }
+
+      @keyframes burgerGlow {
+        0% {
+          box-shadow:
+            0 0 5px var(--fw-gold),
+            0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 10px var(--fw-gold),
+            0 0 20px rgba(212, 175, 55, 0.5);
+        }
+      }
+
+      .burger span {
+        width: 25px;
+        height: 3px;
+        background: var(--fw-gold);
+        margin: 3px 0;
+        transition: 0.3s;
+        border-radius: 2px;
+      }
+
+      .burger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .burger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .burger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+      }
+
+      .main-content {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 40px;
+        background: linear-gradient(
+          145deg,
+          rgba(26, 26, 26, 0.9),
+          rgba(51, 51, 51, 0.95)
+        );
+        border: 3px solid var(--fw-gold);
+        border-radius: 15px;
+        box-shadow:
+          0 10px 40px rgba(0, 0, 0, 0.5),
+          0 0 20px rgba(212, 175, 55, 0.2);
+        position: relative;
+        z-index: 2;
+      }
+
+      .main-content::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 30%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          );
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .reviews-header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      .reviews-header h1 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2.8rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.8),
+          0 0 20px rgba(212, 175, 55, 0.5);
+        background: linear-gradient(
+          to bottom,
+          var(--fw-beige-light) 0%,
+          var(--fw-beige) 50%,
+          var(--fw-beige-dark) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .reviews-header p {
+        font-size: 1.3rem;
+        color: var(--fw-beige);
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .add-review-btn {
+        padding: 15px 40px;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold),
+          var(--fw-gold-dark)
+        );
+        color: var(--fw-dark);
+        border: 3px solid var(--fw-gold);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 auto;
+      }
+
+      .add-review-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(212, 175, 55, 0.5);
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold-light),
+          var(--fw-gold)
+        );
+      }
+
+      .reviews-container {
+        margin-top: 50px;
+      }
+
+      .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+      }
+
+      .review-card {
+        background: rgba(245, 232, 200, 0.05);
+        border: 2px solid var(--fw-gold);
+        border-radius: 12px;
+        padding: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .review-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(212, 175, 55, 0.2);
+        border-color: var(--fw-gold-light);
+      }
+
+      .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+      }
+
+      .review-user {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.3rem;
+        color: var(--fw-beige);
+        font-weight: 600;
+      }
+
+      .review-timestamp {
+        font-size: 0.8rem;
+        color: var(--fw-gold);
+        opacity: 0.8;
+        font-style: italic;
+        text-align: right;
+        flex-shrink: 0;
+      }
+
+      .review-stars {
+        margin: 15px 0;
+        display: flex;
+        gap: 5px;
+      }
+
+      .star {
+        color: var(--fw-gold);
+        font-size: 1.2rem;
+      }
+
+      .star.empty {
+        color: var(--fw-gray);
+      }
+
+      .review-comment {
+        font-size: 1rem;
+        color: var(--fw-beige);
+        line-height: 1.6;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+      }
+
+      .no-reviews {
+        text-align: center;
+        padding: 50px;
+        font-size: 1.2rem;
+        color: var(--fw-beige);
+        background: rgba(245, 232, 200, 0.05);
+        border: 2px dashed var(--fw-gold);
+        border-radius: 12px;
+        margin: 20px 0;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 30px;
+        font-size: 1.1rem;
+        color: var(--fw-beige);
+      }
+
+      footer {
+        background: linear-gradient(
+          135deg,
+          var(--fw-dark) 0%,
+          var(--fw-gray) 100%
+        );
+        padding: 30px 0;
+        border-top: 3px solid var(--fw-gold);
+        text-align: center;
+        position: relative;
+        margin-top: 80px;
+        z-index: 2;
+      }
+
+      footer::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--fw-gold);
+      }
+
+      .footer-bottom {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        color: var(--fw-gold);
+        font-weight: 500;
+        letter-spacing: 1px;
+      }
+
+      .footer-bottom a {
+        color: var(--fw-gold);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .footer-bottom a::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--fw-gold);
+        transition: width 0.3s ease;
+      }
+
+      .footer-bottom a:hover {
+        color: var(--fw-beige-light);
+        text-decoration: none;
+      }
+
+      .footer-bottom a:hover::after {
+        width: 100%;
+      }
+
+      .form-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .form-modal-content {
+        background: linear-gradient(145deg, var(--fw-dark), var(--fw-gray));
+        padding: 40px;
+        border-radius: 15px;
+        border: 3px solid var(--fw-gold);
+        max-width: 800px;
+        width: 90%;
+        height: 80%;
+        position: relative;
+        animation: modalAppear 0.3s ease;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.7),
+          0 0 30px rgba(212, 175, 55, 0.4);
+      }
+
+      @keyframes modalAppear {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .form-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--fw-gold);
+      }
+
+      .form-modal-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        color: var(--fw-beige-light);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .close-form-modal {
+        background: #dc3545;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .close-form-modal:hover {
+        background: #c82333;
+        transform: scale(1.1);
+      }
+
+      .form-modal-body {
+        height: calc(100% - 80px);
+        position: relative;
+      }
+
+      .form-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 8px;
+        background: white;
+      }
+
+      @media (max-width: 992px) {
+        .main-content {
+          padding: 30px;
+          margin: 30px 20px;
+        }
+
+        .reviews-header h1 {
+          font-size: 2.2rem;
+        }
+
+        .reviews-grid {
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+
+        .form-modal-content {
+          width: 95%;
+          height: 85%;
+          padding: 20px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding-top: 120px;
+        }
+
+        nav ul {
+          display: none;
+          position: fixed;
+          top: 100px;
+          left: 0;
+          width: 100%;
+          background: linear-gradient(
+            135deg,
+            var(--fw-dark) 0%,
+            var(--fw-gray) 100%
+          );
+          flex-direction: column;
+          padding: 20px;
+          text-align: center;
+          gap: 10px;
+          border-top: 2px solid var(--fw-gold);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+
+        nav ul.active {
+          display: flex;
+        }
+
+        nav a {
+          padding: 15px;
+          min-width: auto;
+          width: 100%;
+          max-width: 300px;
+          margin: 0 auto;
+          flex-direction: row;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        .nav-icon {
+          margin-bottom: 0;
+          font-size: 1.1rem;
+        }
+
+        .nav-text {
+          font-size: 0.95rem;
+        }
+
+        .burger {
+          display: flex;
+        }
+
+        .reviews-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .form-modal-content {
+          padding: 15px;
+        }
+
+        .form-modal-title {
+          font-size: 1.4rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .main-content {
+          padding: 20px;
+          margin: 20px 10px;
+        }
+
+        .reviews-header h1 {
+          font-size: 1.8rem;
+        }
+
+        .reviews-header p {
+          font-size: 1.1rem;
+        }
+
+        .add-review-btn {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .form-modal-content {
+          height: 90%;
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="particles" id="particles"></div>
+
+    <header id="header">
+      <div class="container">
+        <div class="nav-container">
+          <div class="logo-container">
+            <img
+              src="assets/logo/logo.png"
+              alt="FlyWheels Logo"
+              id="headerLogo"
+            />
+            <div class="logo-text-container">
+              <div class="logo-text">FLYWHEELS</div>
+              <div class="logo-subtitle">GARAGE AUTOMOBILE</div>
+            </div>
+          </div>
+
+          <nav>
+            <ul id="nav-menu">
+              <li>
+                <a href="index.html">
+                  <span class="nav-icon"><i class="fas fa-home"></i></span>
+                  <span class="nav-text">Accueil</span>
+                </a>
+              </li>
+              <li>
+                <a href="services.html">
+                  <span class="nav-icon"><i class="fas fa-tools"></i></span>
+                  <span class="nav-text">Services</span>
+                </a>
+              </li>
+              <li>
+                <a href="equipe.html">
+                  <span class="nav-icon"><i class="fas fa-users"></i></span>
+                  <span class="nav-text">Équipe</span>
+                </a>
+              </li>
+              <li>
+                <a href="avis.html">
+                  <span class="nav-icon"><i class="fas fa-star"></i></span>
+                  <span class="nav-text">Avis</span>
+                </a>
+              </li>
+              <li>
+                <a href="contact.html">
+                  <span class="nav-icon"><i class="fas fa-phone"></i></span>
+                  <span class="nav-text">Contactez-nous</span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="burger" id="burger">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="reviews-header">
+        <h1>Avis Clients</h1>
+        <p>Partagez votre expérience avec nous</p>
+        <button class="add-review-btn" id="addReviewBtn">
+          <i class="fas fa-pen"></i> Laisser un Avis
+        </button>
+      </div>
+
+      <div class="reviews-container" id="reviewsContainer">
+        <div class="loading" id="loadingMessage">
+          <i class="fas fa-spinner fa-spin"></i> Chargement des avis...
+        </div>
+
+        <div class="reviews-grid" id="reviewsGrid"></div>
+
+        <div class="no-reviews" id="noReviewsMessage" style="display: none">
+          <i class="fas fa-comment-slash"></i><br /><br />
+          Aucun avis pour le moment. Soyez le premier à partager votre
+          expérience !
+        </div>
+      </div>
+    </main>
+
+    <div class="form-modal" id="googleFormModal">
+      <div class="form-modal-content">
+        <div class="form-modal-header">
+          <h2 class="form-modal-title">Laisser un Avis</h2>
+          <button class="close-form-modal" id="closeGoogleFormModal">×</button>
+        </div>
+        <div class="form-modal-body">
+          <iframe
+            class="form-iframe"
+            id="googleFormIframe"
+            src=""
+            title="Formulaire d'avis Fly Wheels"
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+            "
+            allowfullscreen
+          >
+          </iframe>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-bottom">
+            © 2026 FlyWheels Garage - Mentions légales
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      // ==================== CONFIGURATION FIREBASE ====================
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs,
+        onSnapshot,
+      } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCcIopLaEJQGqSx6S6t-IoXAmT4ghRoYo8",
+        authDomain: "flywheels-eb854.firebaseapp.com",
+        projectId: "flywheels-eb854",
+        storageBucket: "flywheels-eb854.firebasestorage.app",
+        messagingSenderId: "644938564681",
+        appId: "1:644938564681:web:03f18ec31ee5d87a2feb98",
+        measurementId: "G-BM6XVDGNY0",
+      };
+
+      // Initialisation Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // ========== VARIABLES GLOBALES ==========
+      const GOOGLE_SHEET_URL =
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRvRGjVrvHMi7r5eKwrrLG7a-6vVnuVjGWerN4VAYz7JNbLpNZTJl0LUjHS0vOo7-wSyZTXlZsMBe4/pub?gid=1185778982&single=true&output=csv";
+      const GOOGLE_FORM_URL =
+        "https://docs.google.com/forms/d/e/1FAIpQLSclKV8Ehyz0RjZSlM6-H4KDW6CusLqNMByxwJHKjpsZcBwSjg/viewform?embedded=true";
+
+      const DISCORD_WEBHOOK_URL =
+        "https://discord.com/api/webhooks/1477838280492847154/oWMQB_XUTeTpsPhyWG7tQBdxxyZpjjODvpudXhWpy8t-didnDTfLb706zGgaAyEuYKDF";
+      const DISCORD_ROLE_ID = "1320838530334720062";
+
+      // Éléments DOM
+      const burger = document.getElementById("burger");
+      const navMenu = document.getElementById("nav-menu");
+      const addReviewBtn = document.getElementById("addReviewBtn");
+      const googleFormModal = document.getElementById("googleFormModal");
+      const closeGoogleFormModal = document.getElementById(
+        "closeGoogleFormModal",
+      );
+      const googleFormIframe = document.getElementById("googleFormIframe");
+      const reviewsGrid = document.getElementById("reviewsGrid");
+      const loadingMessage = document.getElementById("loadingMessage");
+      const noReviewsMessage = document.getElementById("noReviewsMessage");
+      const header = document.getElementById("header");
+
+      let knownReviewsHashes = [];
+      let isFirstLoad = true;
+      let validationsListener = null;
+
+      // ========== PARTICULES ==========
+      function createParticles() {
+        const particlesContainer = document.getElementById("particles");
+        if (!particlesContainer) return;
+
+        particlesContainer.innerHTML = "";
+
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 20 + "s";
+          particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      // ========== GESTION DU LOGO ==========
+      function initLogoListener() {
+        const siteRef = doc(db, "site", "config");
+
+        onSnapshot(
+          siteRef,
+          (doc) => {
+            if (doc.exists()) {
+              const data = doc.data();
+              const headerLogo = document.getElementById("headerLogo");
+
+              if (!headerLogo) return;
+
+              // CAS 1 : Logo personnalisé (priorité)
+              if (data.logo) {
+                headerLogo.src = data.logo;
+              }
+              // CAS 2 : Logo saisonnier
+              else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+                const logoMap = {
+                  saintvalentin: "logo2.png",
+                  poisson: "logo3.png",
+                  paques: "logo4.png",
+                  ete: "logo5.png",
+                  usa: "logo6.png",
+                  octobrerose: "logo7.png",
+                  halloween: "logo8.png",
+                  noel: "logo9.png",
+                };
+                const logoFile = logoMap[data.seasonalLogo] || "logo.png";
+                headerLogo.src = `assets/logo/${logoFile}`;
+              }
+              // CAS 3 : Logo par défaut
+              else {
+                headerLogo.src = "assets/logo/logo.png";
+              }
+            }
+          },
+          (error) => {
+            console.error("Erreur écoute logo:", error);
+          },
+        );
+      }
+
+      // ========== CHARGEMENT DES VALIDATIONS ==========
+      async function loadValidations() {
+        try {
+          const validationsRef = collection(db, "review_validations");
+          const snapshot = await getDocs(validationsRef);
+          const validations = {};
+          snapshot.forEach((doc) => {
+            validations[doc.id] = doc.data().status;
+          });
+          return validations;
+        } catch (error) {
+          console.error("Erreur chargement validations:", error);
+          return {};
+        }
+      }
+
+      // ========== ÉCOUTEUR TEMPS RÉEL DES VALIDATIONS ==========
+      function setupValidationsListener() {
+        const validationsRef = collection(db, "review_validations");
+
+        onSnapshot(
+          validationsRef,
+          () => {
+            console.log(
+              "📡 Mise à jour des validations détectée, rechargement...",
+            );
+            loadReviews();
+          },
+          (error) => {
+            console.error("Erreur écoute validations:", error);
+          },
+        );
+      }
+
+      // ========== CHARGEMENT DES AVIS ==========
+      async function loadReviews() {
+        try {
+          loadingMessage.style.display = "block";
+          reviewsGrid.innerHTML = "";
+          noReviewsMessage.style.display = "none";
+
+          // Charger les validations depuis Firestore
+          const validations = await loadValidations();
+
+          const response = await fetch(GOOGLE_SHEET_URL + "&t=" + Date.now());
+
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+          }
+
+          const csvText = await response.text();
+          const allReviews = parseCSV(csvText);
+
+          // Filtrer seulement les avis validés
+          const validatedReviews = [];
+
+          allReviews.forEach((review) => {
+            const reviewHash = btoa(
+              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
+            );
+            const isValidated = validations[reviewHash] === true;
+
+            if (isValidated) {
+              validatedReviews.push(review);
+            }
+          });
+
+          // Afficher les avis validés
+          if (validatedReviews.length > 0) {
+            validatedReviews.sort(
+              (a, b) => new Date(b.rawDate) - new Date(a.rawDate),
+            );
+            validatedReviews.forEach((review) => {
+              const reviewCard = createReviewCard(review);
+              reviewsGrid.appendChild(reviewCard);
+            });
+            loadingMessage.style.display = "none";
+          } else {
+            loadingMessage.style.display = "none";
+            noReviewsMessage.style.display = "block";
+          }
+
+          // Vérifier les nouveaux avis pour Discord
+          const currentHashes = allReviews.map((review) =>
+            btoa(
+              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
+            ),
+          );
+
+          const newReviews = allReviews.filter((review, index) => {
+            const reviewHash = currentHashes[index];
+            return !knownReviewsHashes.includes(reviewHash);
+          });
+
+          if (newReviews.length > 0 && !isFirstLoad) {
+            newReviews.sort(
+              (a, b) => new Date(a.rawDate) - new Date(b.rawDate),
+            );
+            newReviews.forEach((review) => {
+              sendDiscordNotification(review);
+            });
+            console.log(`${newReviews.length} nouveau(x) avis notifié(s)`);
+          }
+
+          knownReviewsHashes = currentHashes;
+          localStorage.setItem(
+            "flywheels_known_reviews",
+            JSON.stringify(knownReviewsHashes),
+          );
+
+          if (isFirstLoad) {
+            isFirstLoad = false;
+          }
+        } catch (error) {
+          console.error("Erreur lors du chargement des avis:", error);
+          loadingMessage.innerHTML =
+            '<i class="fas fa-exclamation-triangle"></i><br><br>Erreur lors du chargement des avis. Veuillez réessayer plus tard.';
+        }
+      }
+
+      function parseCSV(csvText) {
+        const reviews = [];
+
+        csvText = csvText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+        const rows = csvText.split("\n").filter((row) => row.trim() !== "");
+
+        if (rows.length <= 1) return reviews;
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+
+          let insideQuotes = false;
+          let currentField = "";
+          const fields = [];
+
+          for (let j = 0; j < row.length; j++) {
+            const char = row[j];
+
+            if (char === '"') {
+              insideQuotes = !insideQuotes;
+              currentField += char;
+            } else if (char === "," && !insideQuotes) {
+              fields.push(currentField);
+              currentField = "";
+            } else {
+              currentField += char;
+            }
+          }
+          fields.push(currentField);
+
+          const cleanedFields = fields.map((field) => {
+            let clean = field.trim();
+            if (clean.startsWith('"') && clean.endsWith('"')) {
+              clean = clean.substring(1, clean.length - 1);
+            }
+            return clean;
+          });
+
+          if (cleanedFields.length >= 4) {
+            const rawTimestamp = cleanedFields[0] || new Date().toISOString();
+            const user = cleanedFields[1] || "Client anonyme";
+
+            let stars = 0;
+            const noteStr = cleanedFields[2] || "0";
+            const noteMatch = noteStr.match(/\d+/);
+            if (noteMatch) {
+              stars = parseInt(noteMatch[0]);
+            }
+            stars = Math.max(0, Math.min(5, stars));
+
+            const comment = cleanedFields[3] || "";
+
+            let formattedTimestamp = "";
+            let dateObj = new Date();
+            try {
+              dateObj = new Date(rawTimestamp);
+              if (!isNaN(dateObj.getTime())) {
+                const day = String(dateObj.getDate()).padStart(2, "0");
+                const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+                const year = dateObj.getFullYear();
+                const hours = String(dateObj.getHours()).padStart(2, "0");
+                const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+                formattedTimestamp = `${day}/${month}/${year} ${hours}:${minutes}`;
+              } else {
+                formattedTimestamp = rawTimestamp;
+              }
+            } catch (e) {
+              formattedTimestamp = rawTimestamp;
+            }
+
+            const cleanComment = comment
+              .replace(/\\n/g, " ")
+              .replace(/\s+/g, " ")
+              .trim();
+
+            if (cleanComment && cleanComment !== "") {
+              reviews.push({
+                user: user,
+                stars: stars,
+                comment: cleanComment,
+                timestamp: formattedTimestamp,
+                rawDate: dateObj,
+              });
+            }
+          }
+        }
+
+        return reviews;
+      }
+
+      function createReviewCard(review) {
+        const card = document.createElement("div");
+        card.className = "review-card";
+
+        const starsHtml = Array(5)
+          .fill(0)
+          .map(
+            (_, index) =>
+              `<span class="star ${index < review.stars ? "" : "empty"}">★</span>`,
+          )
+          .join("");
+
+        card.innerHTML = `
+          <div class="review-header">
+            <div class="review-user">${escapeHtml(review.user)}</div>
+            ${review.timestamp ? `<div class="review-timestamp">${escapeHtml(review.timestamp)}</div>` : ""}
+          </div>
+          <div class="review-stars">
+            ${starsHtml}
+          </div>
+          <div class="review-comment">${escapeHtml(review.comment)}</div>
+        `;
+
+        return card;
+      }
+
+      function escapeHtml(text) {
+        if (!text) return "";
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      async function sendDiscordNotification(review) {
+        if (!DISCORD_WEBHOOK_URL) {
+          console.log("URL Discord webhook non configurée");
+          return;
+        }
+
+        try {
+          const starsEmoji =
+            "⭐".repeat(review.stars) + "☆".repeat(5 - review.stars);
+          const message = {
+            content: `📢 **Bonjour** <@&${DISCORD_ROLE_ID}>**, NOUVEL AVIS REÇU !** `,
+            embeds: [
+              {
+                title: `Avis de ${review.user}`,
+                description: review.comment,
+                color: 0xd4af37,
+                fields: [
+                  {
+                    name: "Note",
+                    value: starsEmoji,
+                    inline: true,
+                  },
+                  {
+                    name: "Date",
+                    value: review.timestamp,
+                    inline: true,
+                  },
+                ],
+                footer: {
+                  text: "Fly Wheels Garage - Nouvel avis",
+                },
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          };
+
+          await fetch(DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+          });
+
+          console.log("Notification Discord envoyée");
+        } catch (error) {
+          console.error("Erreur lors de l'envoi à Discord:", error);
+        }
+      }
+
+      // ========== GESTION DU FORMULAIRE ==========
+      function openGoogleForm() {
+        googleFormIframe.src = GOOGLE_FORM_URL;
+        googleFormModal.style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeGoogleFormModalFunc() {
+        googleFormModal.style.display = "none";
+        googleFormIframe.src = "";
+        document.body.style.overflow = "auto";
+      }
+
+      // ========== MENU BURGER ==========
+      burger.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+        burger.classList.toggle("active");
+      });
+
+      document.querySelectorAll("#nav-menu a").forEach((link) => {
+        link.addEventListener("click", () => {
+          navMenu.classList.remove("active");
+          burger.classList.remove("active");
+        });
+      });
+
+      // ========== GESTION DU SCROLL ==========
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      });
+
+      // ========== INITIALISATION ==========
+      document.addEventListener("DOMContentLoaded", function () {
+        // Charger les hashes connus depuis localStorage
+        const savedHashes = localStorage.getItem("flywheels_known_reviews");
+        if (savedHashes) {
+          knownReviewsHashes = JSON.parse(savedHashes);
+        }
+
+        createParticles();
+        initLogoListener();
+        setupValidationsListener();
+
+        // Événements du formulaire
+        addReviewBtn.addEventListener("click", openGoogleForm);
+        closeGoogleFormModal.addEventListener(
+          "click",
+          closeGoogleFormModalFunc,
+        );
+
+        window.addEventListener("click", (e) => {
+          if (e.target === googleFormModal) {
+            closeGoogleFormModalFunc();
+          }
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && googleFormModal.style.display === "flex") {
+            closeGoogleFormModalFunc();
+          }
+        });
+
+        // Charger les avis initialement
+        loadReviews();
+
+        // Écouter les messages du formulaire
+        window.addEventListener("message", function (event) {
+          if (event.data === "formSubmitted") {
+            closeGoogleFormModalFunc();
+            setTimeout(() => {
+              loadReviews();
+            }, 3000);
+          }
+        });
+      });
+
+      // Rafraîchissement périodique (toutes les 5 minutes)
+      setInterval(() => {
+        loadReviews();
+      }, 300000);
+
+      // Exposer la fonction de rafraîchissement pour la console
+      window.refreshReviews = loadReviews;
+    </script>
+  </body>
+</html>
