@@ -1005,16 +1005,15 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="recruitAge"
-                ><i class="fas fa-birthday-cake"></i> Âge</label
+              <label for="recruitBirthdate"
+                ><i class="fas fa-birthday-cake"></i> Date de naissance</label
               >
               <input
-                type="number"
-                id="recruitAge"
-                placeholder="Votre âge"
-                min="16"
-                max="99"
+                type="date"
+                id="recruitBirthdate"
                 required
+                max="2025-12-31"
+                min="1900-01-01"
               />
             </div>
             <div class="form-group">
@@ -1531,7 +1530,7 @@
         const formData = {
           nom: document.getElementById("recruitNom").value.trim(),
           prenom: document.getElementById("recruitPrenom").value.trim(),
-          age: document.getElementById("recruitAge").value.trim(),
+          birthdate: document.getElementById("recruitBirthdate").value,
           telephone: document.getElementById("recruitPhone").value.trim(),
           horaire: document.getElementById("recruitHoraire").value.trim(),
           permis: document.getElementById("recruitPermis").checked,
@@ -1542,7 +1541,7 @@
         if (
           !formData.nom ||
           !formData.prenom ||
-          !formData.age ||
+          !formData.birthdate ||
           !formData.telephone ||
           !formData.horaire
         ) {
@@ -1656,6 +1655,17 @@
       }
 
       function formatRecruitmentEmbed(data) {
+        let formattedBirthdate = "Non renseignée";
+        if (data.birthdate) {
+          const date = new Date(data.birthdate);
+          if (!isNaN(date.getTime())) {
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const year = date.getFullYear();
+            formattedBirthdate = `${day}/${month}/${year}`;
+          }
+        }
+
         return {
           embeds: [
             {
@@ -1667,7 +1677,11 @@
                   value: `${data.nom} ${data.prenom}`,
                   inline: false,
                 },
-                { name: "🎂 Âge", value: data.age, inline: false },
+                {
+                  name: "🎂 Date de naissance",
+                  value: formattedBirthdate,
+                  inline: false,
+                },
                 { name: "☎️ Téléphone", value: data.telephone, inline: false },
                 {
                   name: "⏰ Horaire disponible",
