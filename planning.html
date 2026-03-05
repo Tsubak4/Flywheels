@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyWheels - Maintenance</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #1a1a1a;
+        overflow-x: hidden;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      /* ========== PARTICULES ========== */
+      .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        opacity: 0.5;
+        box-shadow: 0 0 10px var(--fw-gold);
+        animation: floatUp 20s infinite linear;
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(100vh) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.5;
+        }
+        90% {
+          opacity: 0.5;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(100px);
+          opacity: 0;
+        }
+      }
+
+      :root {
+        --fw-dark: #1a1a1a;
+        --fw-darker: #0a0a0a;
+        --fw-gold: #d4af37;
+        --fw-gold-dark: #b8941f;
+        --fw-gold-light: #e6c158;
+        --fw-beige: #f5e8c8;
+        --fw-beige-dark: #e8d9b0;
+        --fw-beige-light: #faf3e0;
+        --fw-gray: #333333;
+        --fw-white: #ffffff;
+        --fw-black: #000000;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+          radial-gradient(
+            circle at 20% 30%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(212, 175, 55, 0.05) 0%,
+            transparent 30%
+          );
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .back-button {
+        position: fixed;
+        top: 30px;
+        left: 30px;
+        z-index: 100;
+      }
+
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 25px;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-gold);
+        border-radius: 10px;
+        color: var(--fw-beige);
+        text-decoration: none;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+      }
+
+      .back-btn i {
+        color: var(--fw-gold);
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+      }
+
+      .back-btn:hover {
+        background: rgba(212, 175, 55, 0.15);
+        border-color: var(--fw-gold-light);
+        transform: translateX(-5px);
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+      }
+
+      .back-btn:hover i {
+        transform: translateX(-3px);
+      }
+
+      .maintenance-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .maintenance-card {
+        max-width: 800px;
+        width: 100%;
+        padding: 60px 40px;
+        background: linear-gradient(
+          145deg,
+          rgba(26, 26, 26, 0.95),
+          rgba(51, 51, 51, 0.98)
+        );
+        border: 3px solid var(--fw-gold);
+        border-radius: 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.7),
+          0 0 30px rgba(212, 175, 55, 0.3);
+        animation: cardGlow 3s infinite alternate;
+        backdrop-filter: blur(10px);
+      }
+
+      @keyframes cardGlow {
+        0% {
+          box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.7),
+            0 0 30px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.7),
+            0 0 50px rgba(212, 175, 55, 0.6),
+            0 0 70px rgba(212, 175, 55, 0.3);
+        }
+      }
+
+      .maintenance-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          circle at 30% 30%,
+          rgba(212, 175, 55, 0.1),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .maintenance-card::after {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: 15px;
+        pointer-events: none;
+      }
+
+      .icon-wrapper {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 30px;
+        border-radius: 50%;
+        background: rgba(212, 175, 55, 0.1);
+        border: 3px solid var(--fw-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: iconPulse 2s infinite alternate;
+        position: relative;
+      }
+
+      .icon-wrapper i {
+        font-size: 4rem;
+        color: var(--fw-gold);
+        animation: wrenchWiggle 3s infinite ease-in-out;
+      }
+
+      @keyframes iconPulse {
+        0% {
+          box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        100% {
+          box-shadow:
+            0 0 40px rgba(212, 175, 55, 0.6),
+            0 0 60px rgba(212, 175, 55, 0.3);
+        }
+      }
+
+      @keyframes wrenchWiggle {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(-10deg);
+        }
+        75% {
+          transform: rotate(10deg);
+        }
+      }
+
+      .maintenance-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 3.5rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 20px;
+        background: linear-gradient(
+          135deg,
+          var(--fw-beige-light),
+          var(--fw-gold)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow:
+          0 0 10px rgba(212, 175, 55, 0.5),
+          0 0 20px rgba(212, 175, 55, 0.3);
+        position: relative;
+        display: inline-block;
+      }
+
+      .maintenance-title::after {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 10%;
+        width: 80%;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--fw-gold),
+          transparent
+        );
+        border-radius: 2px;
+      }
+
+      .maintenance-subtitle {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.8rem;
+        color: var(--fw-beige);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        opacity: 0.9;
+      }
+
+      .maintenance-text {
+        font-size: 1.2rem;
+        color: var(--fw-beige-light);
+        line-height: 1.8;
+        margin-bottom: 30px;
+        opacity: 0.8;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .progress-bar-container {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        margin: 40px 0 20px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        width: 65%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--fw-gold), var(--fw-gold-light));
+        border-radius: 3px;
+        animation: progressPulse 2s infinite alternate;
+        position: relative;
+      }
+
+      .progress-bar::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.5);
+        filter: blur(5px);
+        animation: shine 2s infinite;
+      }
+
+      @keyframes progressPulse {
+        0% {
+          opacity: 0.8;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes shine {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(500%);
+        }
+      }
+
+      .progress-text {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        color: var(--fw-gold);
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 25px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        border-radius: 30px;
+        margin-bottom: 30px;
+      }
+
+      .status-dot {
+        width: 12px;
+        height: 12px;
+        background: var(--fw-gold);
+        border-radius: 50%;
+        animation: dotPulse 1.5s infinite;
+      }
+
+      @keyframes dotPulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 0 10px var(--fw-gold);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.8);
+          box-shadow: 0 0 20px var(--fw-gold);
+        }
+      }
+
+      .status-text {
+        font-family: "Orbitron", sans-serif;
+        color: var(--fw-beige);
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+      }
+
+      .social-link {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: rgba(212, 175, 55, 0.1);
+        border: 2px solid var(--fw-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--fw-gold);
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .social-link:hover {
+        background: var(--fw-gold);
+        color: var(--fw-dark);
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.5);
+      }
+
+      .social-link i {
+        font-size: 1.2rem;
+      }
+
+      @media (max-width: 768px) {
+        .back-button {
+          top: 20px;
+          left: 20px;
+        }
+
+        .back-btn {
+          padding: 10px 20px;
+          font-size: 0.9rem;
+        }
+
+        .maintenance-card {
+          padding: 40px 25px;
+        }
+
+        .icon-wrapper {
+          width: 100px;
+          height: 100px;
+        }
+
+        .icon-wrapper i {
+          font-size: 3rem;
+        }
+
+        .maintenance-title {
+          font-size: 2.5rem;
+        }
+
+        .maintenance-subtitle {
+          font-size: 1.5rem;
+        }
+
+        .maintenance-text {
+          font-size: 1rem;
+        }
+
+        .social-links {
+          gap: 15px;
+        }
+
+        .social-link {
+          width: 40px;
+          height: 40px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .maintenance-title {
+          font-size: 2rem;
+        }
+
+        .maintenance-subtitle {
+          font-size: 1.2rem;
+        }
+
+        .back-btn span {
+          display: none;
+        }
+
+        .back-btn i {
+          margin-right: 0;
+        }
+
+        .back-btn {
+          padding: 12px;
+          border-radius: 50%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ========== PARTICULES ========== -->
+    <div class="particles" id="particles"></div>
+
+    <!-- ========== BOUTON RETOUR ========== -->
+    <div class="back-button">
+      <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        <span>Retour à l'accueil</span>
+      </a>
+    </div>
+
+    <!-- ========== CONTENU PRINCIPAL ========== -->
+    <div class="maintenance-container">
+      <div class="maintenance-card">
+        <div class="icon-wrapper">
+          <i class="fas fa-tools"></i>
+        </div>
+
+        <h1 class="maintenance-title">EN MAINTENANCE</h1>
+        
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          <span class="status-text">Travaux en cours</span>
+        </div>
+
+        <p class="maintenance-text">
+          Notre équipe s'affaire actuellement à améliorer votre expérience.
+          Cette page sera bientôt disponible avec du contenu encore plus passionnant !
+        </p>
+
+        <div class="progress-bar-container">
+          <div class="progress-bar"></div>
+        </div>
+        
+        <div class="progress-text">
+          <i class="fas fa-clock"></i> Progression estimée : 65%
+        </div>
+
+        <p class="maintenance-text" style="font-size: 1rem; margin-bottom: 20px;">
+          En attendant, vous pouvez nous suivre sur les réseaux sociaux pour rester informé de nos actualités.
+        </p>
+
+        <div class="social-links">
+          <a href="#" class="social-link" target="_blank">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="#" class="social-link" target="_blank">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="social-link" target="_blank">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="social-link" target="_blank">
+            <i class="fab fa-discord"></i>
+          </a>
+        </div>
+
+        <p class="maintenance-text" style="font-size: 0.9rem; margin-top: 30px; margin-bottom: 0;">
+          <i class="fas fa-wrench"></i> FlyWheels Garage - L'excellence automobile
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // ========== CRÉATION DES PARTICULES ==========
+      function createParticles() {
+        const particlesContainer = document.getElementById("particles");
+        if (!particlesContainer) return;
+
+        particlesContainer.innerHTML = "";
+
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement("div");
+          particle.className = "particle";
+          particle.style.left = Math.random() * 100 + "%";
+          particle.style.animationDelay = Math.random() * 20 + "s";
+          particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      // ========== INITIALISATION ==========
+      document.addEventListener("DOMContentLoaded", () => {
+        createParticles();
+
+        // Animation supplémentaire au chargement
+        const card = document.querySelector(".maintenance-card");
+        if (card) {
+          card.style.opacity = "0";
+          card.style.transform = "scale(0.95)";
+          card.style.transition = "all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+
+          setTimeout(() => {
+            card.style.opacity = "1";
+            card.style.transform = "scale(1)";
+          }, 200);
+        }
+      });
+    </script>
+  </body>
+</html>
