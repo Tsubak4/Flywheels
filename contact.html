@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FlyWheels - FlashFA</title>
 
-    <!-- Firebase SDK  -->
     <script
       type="module"
       src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
@@ -1227,12 +1226,12 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // ========== VARIABLES GLOBALES ==========
       const RECRUITMENT_WEBHOOK_URL =
         "https://discord.com/api/webhooks/1477837793811234818/jPoMqHzddx4SDaEr6OSX39I6qN7xElqVMYad-IMElqoWOe5wDU935if62YENhGxVliX6";
       const CONTACT_WEBHOOK_URL =
         "https://discord.com/api/webhooks/1477838106278232144/pU_NrV7dcXroNO29aMe6nkwujaXPtNQOw4_1DotbRDq_Ayc6IKpe8_SUB5GBfRne2jtf";
-      const DISCORD_ROLE_ID = "1320838530334720062";
+      const RECRUITMENT_ROLE_ID = "1445478997088665731";
+      const CONTACT_ROLE_ID = "1455965349815255051";
       const COOLDOWN_TIME = 6 * 60 * 60 * 1000;
 
       let recruitmentActive = false;
@@ -1242,7 +1241,6 @@
         CONTACT: "flywheels_contact_cooldown",
       };
 
-      // Éléments DOM
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
       const recruitmentStatusIndicator =
@@ -1259,7 +1257,6 @@
       const contactSuccess = document.getElementById("contactSuccess");
       const header = document.getElementById("header");
 
-      // ========== PARTICULES ==========
       function createParticles() {
         const particlesContainer = document.getElementById("particles");
         if (!particlesContainer) return;
@@ -1276,7 +1273,6 @@
         }
       }
 
-      // ========== GESTION DU LOGO ==========
       function initLogoListener() {
         const siteRef = doc(db, "site", "config");
 
@@ -1289,12 +1285,9 @@
 
               if (!headerLogo) return;
 
-              // CAS 1 : Logo personnalisé (priorité)
               if (data.logo) {
                 headerLogo.src = data.logo;
-              }
-              // CAS 2 : Logo saisonnier
-              else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+              } else if (data.seasonalLogo && data.seasonalLogo !== "default") {
                 const logoMap = {
                   saintvalentin: "logo2.png",
                   poisson: "logo3.png",
@@ -1307,9 +1300,7 @@
                 };
                 const logoFile = logoMap[data.seasonalLogo] || "logo.png";
                 headerLogo.src = `assets/logo/${logoFile}`;
-              }
-              // CAS 3 : Logo par défaut
-              else {
+              } else {
                 headerLogo.src = "assets/logo/logo.png";
               }
             }
@@ -1320,7 +1311,6 @@
         );
       }
 
-      // ========== GESTION DU STATUT RECRUTEMENT ==========
       function setupRecruitmentListener() {
         console.log("👂 Contact: Configuration écoute recrutement...");
 
@@ -1389,7 +1379,6 @@
         }
       }
 
-      // ========== NOTIFICATIONS ==========
       function showNotification(message, type) {
         console.log(`💬 Contact: Notification [${type}]: ${message}`);
 
@@ -1456,7 +1445,6 @@
       `;
       document.head.appendChild(style);
 
-      // ========== GESTION DES COOLDOWNS ==========
       function checkCooldowns() {
         const recruitmentCooldown = getRemainingCooldown(
           STORAGE_KEYS.RECRUITMENT,
@@ -1507,7 +1495,6 @@
         }, 1000);
       }
 
-      // ========== ENVOI DES FORMULAIRES ==========
       async function handleRecruitmentSubmit(e) {
         e.preventDefault();
 
@@ -1558,7 +1545,7 @@
 
         try {
           const discordPayload = formatRecruitmentEmbed(formData);
-          discordPayload.content = `📋 **Bonjour** <@&${DISCORD_ROLE_ID}>**, NOUVELLE CANDIDATURE !**`;
+          discordPayload.content = `📋 **Bonjour** <@&${RECRUITMENT_ROLE_ID}>**, NOUVELLE CANDIDATURE !**`;
 
           await sendToDiscord(RECRUITMENT_WEBHOOK_URL, discordPayload);
 
@@ -1629,7 +1616,7 @@
 
         try {
           const discordPayload = formatContactEmbed(formData);
-          discordPayload.content = `📋 **Bonjour** <@&${DISCORD_ROLE_ID}>**, NOUVELLE DEMANDE DE CONTACT !**`;
+          discordPayload.content = `📋 **Bonjour** <@&${CONTACT_ROLE_ID}>**, NOUVELLE DEMANDE DE CONTACT !**`;
 
           await sendToDiscord(CONTACT_WEBHOOK_URL, discordPayload);
 
@@ -1776,7 +1763,6 @@
         return response;
       }
 
-      // ========== MENU BURGER ==========
       burger.addEventListener("click", () => {
         navMenu.classList.toggle("active");
         burger.classList.toggle("active");
@@ -1789,7 +1775,6 @@
         });
       });
 
-      // ========== GESTION DU SCROLL ==========
       window.addEventListener("scroll", () => {
         if (window.scrollY > 50) {
           header.classList.add("scrolled");
@@ -1798,7 +1783,6 @@
         }
       });
 
-      // ========== INITIALISATION ==========
       document.addEventListener("DOMContentLoaded", () => {
         console.log("🚀 Contact: Page chargée - Initialisation...");
 
@@ -1807,7 +1791,6 @@
         setupRecruitmentListener();
         checkCooldowns();
 
-        // Gestion des formulaires
         recruitmentForm.addEventListener("submit", handleRecruitmentSubmit);
         generalContactForm.addEventListener("submit", handleContactSubmit);
       });
