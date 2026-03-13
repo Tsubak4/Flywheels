@@ -599,12 +599,7 @@
           showMessage("Connexion réussie ! Redirection...", "success");
 
           setTimeout(() => {
-            // Redirection spéciale pour poke@fly.com
-            if (email === "poke@fly.com") {
-              window.location.href = "poke.html";
-            } else {
-              window.location.href = "dashboard.html";
-            }
+            window.location.href = "dashboard.html";
           }, 1500);
         } catch (error) {
           console.error("Erreur de connexion:", error);
