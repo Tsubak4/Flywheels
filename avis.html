@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FlyWheels - FlashFA</title>
+    <title>FlyWheels - Avis Clients</title>
 
-    <!-- Firebase SDK -->
     <script
       type="module"
       src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"
@@ -14,7 +13,6 @@
       type="module"
       src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
     ></script>
-
     <link
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
@@ -43,7 +41,6 @@
         padding-top: 100px;
       }
 
-      /* ========== PARTICULES ========== */
       .particles {
         position: fixed;
         top: 0;
@@ -686,24 +683,41 @@
         background: white;
       }
 
-      @media (max-width: 992px) {
-        .main-content {
-          padding: 30px;
-          margin: 30px 20px;
+      @media (max-width: 1200px) {
+        .container {
+          padding: 0 20px;
         }
+        nav a {
+          padding: 12px 15px;
+          min-width: 80px;
+        }
+        .nav-icon {
+          font-size: 1.1rem;
+        }
+        .nav-text {
+          font-size: 0.85rem;
+        }
+        .reviews-header h1 {
+          font-size: 2.5rem;
+        }
+      }
 
+      @media (max-width: 992px) {
+        nav ul {
+          gap: 3px;
+        }
+        nav a {
+          padding: 10px 12px;
+          min-width: 75px;
+        }
+        .nav-icon {
+          font-size: 1rem;
+        }
+        .nav-text {
+          font-size: 0.8rem;
+        }
         .reviews-header h1 {
           font-size: 2.2rem;
-        }
-
-        .reviews-grid {
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        }
-
-        .form-modal-content {
-          width: 95%;
-          height: 85%;
-          padding: 20px;
         }
       }
 
@@ -745,6 +759,7 @@
           flex-direction: row;
           justify-content: center;
           gap: 10px;
+          border-radius: 8px;
         }
 
         .nav-icon {
@@ -760,16 +775,25 @@
           display: flex;
         }
 
+        .logo-text {
+          font-size: 1.5rem;
+        }
+
+        .logo-container img {
+          height: 50px;
+        }
+
+        .main-content {
+          margin: 30px 20px;
+          padding: 30px;
+        }
+
+        .reviews-header h1 {
+          font-size: 2rem;
+        }
+
         .reviews-grid {
           grid-template-columns: 1fr;
-        }
-
-        .form-modal-content {
-          padding: 15px;
-        }
-
-        .form-modal-title {
-          font-size: 1.4rem;
         }
       }
 
@@ -792,9 +816,12 @@
           justify-content: center;
         }
 
-        .form-modal-content {
-          height: 90%;
-          padding: 10px;
+        .logo-text {
+          font-size: 1.2rem;
+        }
+
+        .logo-container img {
+          height: 40px;
         }
       }
     </style>
@@ -930,6 +957,7 @@
         collection,
         getDocs,
         onSnapshot,
+        doc,
       } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -949,6 +977,7 @@
       // ========== VARIABLES GLOBALES ==========
       const GOOGLE_SHEET_URL =
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRvRGjVrvHMi7r5eKwrrLG7a-6vVnuVjGWerN4VAYz7JNbLpNZTJl0LUjHS0vOo7-wSyZTXlZsMBe4/pub?gid=1185778982&single=true&output=csv";
+
       const GOOGLE_FORM_URL =
         "https://docs.google.com/forms/d/e/1FAIpQLSclKV8Ehyz0RjZSlM6-H4KDW6CusLqNMByxwJHKjpsZcBwSjg/viewform?embedded=true";
 
@@ -973,6 +1002,17 @@
       let knownReviewsHashes = [];
       let isFirstLoad = true;
       let validationsListener = null;
+      let isLoading = false;
+
+      // ========== FONCTION DE HACHAGE SÉCURISÉE ==========
+      function safeBase64Encode(str) {
+        try {
+          return btoa(unescape(encodeURIComponent(str)));
+        } catch (e) {
+          console.error("Erreur encodage:", e);
+          return btoa(str);
+        }
+      }
 
       // ========== PARTICULES ==========
       function createParticles() {
@@ -1004,12 +1044,9 @@
 
               if (!headerLogo) return;
 
-              // CAS 1 : Logo personnalisé (priorité)
               if (data.logo) {
                 headerLogo.src = data.logo;
-              }
-              // CAS 2 : Logo saisonnier
-              else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+              } else if (data.seasonalLogo && data.seasonalLogo !== "default") {
                 const logoMap = {
                   saintvalentin: "logo2.png",
                   poisson: "logo3.png",
@@ -1022,9 +1059,7 @@
                 };
                 const logoFile = logoMap[data.seasonalLogo] || "logo.png";
                 headerLogo.src = `assets/logo/${logoFile}`;
-              }
-              // CAS 3 : Logo par défaut
-              else {
+              } else {
                 headerLogo.src = "assets/logo/logo.png";
               }
             }
@@ -1044,41 +1079,110 @@
           snapshot.forEach((doc) => {
             validations[doc.id] = doc.data().status;
           });
+          console.log(
+            "✅ Validations chargées:",
+            Object.keys(validations).length,
+          );
           return validations;
         } catch (error) {
-          console.error("Erreur chargement validations:", error);
+          console.error("❌ Erreur chargement validations:", error);
           return {};
         }
       }
 
       // ========== ÉCOUTEUR TEMPS RÉEL DES VALIDATIONS ==========
       function setupValidationsListener() {
-        const validationsRef = collection(db, "review_validations");
+        try {
+          const validationsRef = collection(db, "review_validations");
 
-        onSnapshot(
-          validationsRef,
-          () => {
-            console.log(
-              "📡 Mise à jour des validations détectée, rechargement...",
-            );
-            loadReviews();
-          },
-          (error) => {
-            console.error("Erreur écoute validations:", error);
-          },
-        );
+          validationsListener = onSnapshot(
+            validationsRef,
+            () => {
+              console.log(
+                "📡 Mise à jour des validations détectée, rechargement...",
+              );
+              loadReviews();
+            },
+            (error) => {
+              console.error("❌ Erreur écoute validations:", error);
+            },
+          );
+        } catch (error) {
+          console.error("❌ Erreur setup écouteur:", error);
+        }
+      }
+
+      // ========== ENVOI NOTIFICATION DISCORD ==========
+      async function sendDiscordNotification(review) {
+        if (!DISCORD_WEBHOOK_URL) return;
+
+        try {
+          const starsEmoji =
+            "⭐".repeat(review.stars) + "☆".repeat(5 - review.stars);
+
+          const message = {
+            content: `📢 **Bonjour** <@&${DISCORD_ROLE_ID}>**, NOUVEL AVIS REÇU !**`,
+            embeds: [
+              {
+                title: `Avis de ${review.user}`,
+                description: review.comment,
+                color: 0xd4af37,
+                fields: [
+                  {
+                    name: "Note",
+                    value: starsEmoji,
+                    inline: true,
+                  },
+                  {
+                    name: "Date",
+                    value: review.timestamp,
+                    inline: true,
+                  },
+                ],
+                footer: {
+                  text: "Fly Wheels Garage - Nouvel avis à modérer",
+                },
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          };
+
+          const response = await fetch(DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(message),
+          });
+
+          if (response.ok) {
+            console.log("✅ Notification Discord envoyée pour le nouvel avis");
+          } else {
+            console.error("❌ Erreur envoi Discord:", response.status);
+          }
+        } catch (error) {
+          console.error("❌ Erreur lors de l'envoi à Discord:", error);
+        }
       }
 
       // ========== CHARGEMENT DES AVIS ==========
       async function loadReviews() {
+        if (isLoading) {
+          console.log("⏳ Chargement déjà en cours, ignoré");
+          return;
+        }
+
         try {
+          isLoading = true;
           loadingMessage.style.display = "block";
           reviewsGrid.innerHTML = "";
           noReviewsMessage.style.display = "none";
 
-          // Charger les validations depuis Firestore
+          // 1️⃣ CHARGER LES VALIDATIONS
           const validations = await loadValidations();
 
+          // 2️⃣ CHARGER LES AVIS DEPUIS GOOGLE SHEETS
+          console.log("📡 Chargement Google Sheets...");
           const response = await fetch(GOOGLE_SHEET_URL + "&t=" + Date.now());
 
           if (!response.ok) {
@@ -1087,22 +1191,53 @@
 
           const csvText = await response.text();
           const allReviews = parseCSV(csvText);
+          console.log(
+            `📊 ${allReviews.length} avis trouvés dans Google Sheets`,
+          );
 
-          // Filtrer seulement les avis validés
-          const validatedReviews = [];
+          // 3️⃣ CRÉER UN MAP POUR ÉVITER LES DOUBLONS (par hash)
+          const reviewsMap = new Map();
 
           allReviews.forEach((review) => {
-            const reviewHash = btoa(
-              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
-            );
-            const isValidated = validations[reviewHash] === true;
+            try {
+              const textToHash = `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`;
+              const reviewHash = safeBase64Encode(textToHash);
 
-            if (isValidated) {
-              validatedReviews.push(review);
+              if (!reviewsMap.has(reviewHash)) {
+                reviewsMap.set(reviewHash, review);
+              } else {
+                console.warn("⚠️ Doublon détecté et ignoré:", review.user);
+              }
+            } catch (e) {
+              console.error("Erreur de hachage pour un avis:", e);
             }
           });
 
-          // Afficher les avis validés
+          const uniqueReviews = Array.from(reviewsMap.values());
+          console.log(
+            `📊 ${uniqueReviews.length} avis uniques après dédoublonnage`,
+          );
+
+          // 4️⃣ FILTRER SEULEMENT LES AVIS VALIDÉS
+          const validatedReviews = [];
+
+          uniqueReviews.forEach((review) => {
+            try {
+              const textToHash = `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`;
+              const reviewHash = safeBase64Encode(textToHash);
+              const isValidated = validations[reviewHash] === true;
+
+              if (isValidated) {
+                validatedReviews.push(review);
+              }
+            } catch (e) {
+              console.error("Erreur de hachage pour un avis:", e);
+            }
+          });
+
+          console.log(`✅ ${validatedReviews.length} avis validés à afficher`);
+
+          // 5️⃣ AFFICHER UNIQUEMENT LES AVIS VALIDÉS
           if (validatedReviews.length > 0) {
             validatedReviews.sort(
               (a, b) => new Date(b.rawDate) - new Date(a.rawDate),
@@ -1117,28 +1252,42 @@
             noReviewsMessage.style.display = "block";
           }
 
-          // Vérifier les nouveaux avis pour Discord
-          const currentHashes = allReviews.map((review) =>
-            btoa(
-              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
-            ),
+          // 6️⃣ DÉTECTER LES NOUVEAUX AVIS POUR DISCORD
+          const currentHashes = Array.from(reviewsMap.keys());
+
+          const newHashes = currentHashes.filter(
+            (hash) => !knownReviewsHashes.includes(hash),
           );
 
-          const newReviews = allReviews.filter((review, index) => {
-            const reviewHash = currentHashes[index];
-            return !knownReviewsHashes.includes(reviewHash);
+          // Récupérer les avis correspondants
+          const newReviews = [];
+          newHashes.forEach((hash) => {
+            const review = reviewsMap.get(hash);
+            if (review && !validations[hash]) {
+              // Ne pas notifier si déjà validé
+              newReviews.push(review);
+            }
           });
 
+          // Envoyer une notification pour chaque nouvel avis (sauf au premier chargement)
           if (newReviews.length > 0 && !isFirstLoad) {
+            console.log(
+              `📢 ${newReviews.length} nouvel(s) avis détecté(s), envoi notification Discord...`,
+            );
+
+            // Trier par date croissante pour notifier dans l'ordre
             newReviews.sort(
               (a, b) => new Date(a.rawDate) - new Date(b.rawDate),
             );
-            newReviews.forEach((review) => {
-              sendDiscordNotification(review);
-            });
-            console.log(`${newReviews.length} nouveau(x) avis notifié(s)`);
+
+            for (const review of newReviews) {
+              await sendDiscordNotification(review);
+              // Petit délai pour éviter de spammer l'API Discord
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
           }
 
+          // 7️⃣ METTRE À JOUR L'HISTORIQUE
           knownReviewsHashes = currentHashes;
           localStorage.setItem(
             "flywheels_known_reviews",
@@ -1150,8 +1299,12 @@
           }
         } catch (error) {
           console.error("Erreur lors du chargement des avis:", error);
-          loadingMessage.innerHTML =
-            '<i class="fas fa-exclamation-triangle"></i><br><br>Erreur lors du chargement des avis. Veuillez réessayer plus tard.';
+          loadingMessage.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i><br><br />
+            Erreur lors du chargement des avis. Veuillez réessayer plus tard.
+          `;
+        } finally {
+          isLoading = false;
         }
       }
 
@@ -1278,56 +1431,6 @@
         return div.innerHTML;
       }
 
-      async function sendDiscordNotification(review) {
-        if (!DISCORD_WEBHOOK_URL) {
-          console.log("URL Discord webhook non configurée");
-          return;
-        }
-
-        try {
-          const starsEmoji =
-            "⭐".repeat(review.stars) + "☆".repeat(5 - review.stars);
-          const message = {
-            content: `📢 **Bonjour** <@&${DISCORD_ROLE_ID}>**, NOUVEL AVIS REÇU !** `,
-            embeds: [
-              {
-                title: `Avis de ${review.user}`,
-                description: review.comment,
-                color: 0xd4af37,
-                fields: [
-                  {
-                    name: "Note",
-                    value: starsEmoji,
-                    inline: true,
-                  },
-                  {
-                    name: "Date",
-                    value: review.timestamp,
-                    inline: true,
-                  },
-                ],
-                footer: {
-                  text: "Fly Wheels Garage - Nouvel avis",
-                },
-                timestamp: new Date().toISOString(),
-              },
-            ],
-          };
-
-          await fetch(DISCORD_WEBHOOK_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(message),
-          });
-
-          console.log("Notification Discord envoyée");
-        } catch (error) {
-          console.error("Erreur lors de l'envoi à Discord:", error);
-        }
-      }
-
       // ========== GESTION DU FORMULAIRE ==========
       function openGoogleForm() {
         googleFormIframe.src = GOOGLE_FORM_URL;
@@ -1368,7 +1471,11 @@
         // Charger les hashes connus depuis localStorage
         const savedHashes = localStorage.getItem("flywheels_known_reviews");
         if (savedHashes) {
-          knownReviewsHashes = JSON.parse(savedHashes);
+          try {
+            knownReviewsHashes = JSON.parse(savedHashes);
+          } catch (e) {
+            knownReviewsHashes = [];
+          }
         }
 
         createParticles();
@@ -1408,12 +1515,11 @@
         });
       });
 
-      // Rafraîchissement périodique (toutes les 5 minutes)
+      // Rafraîchissement périodique (toutes les 2 minutes)
       setInterval(() => {
         loadReviews();
-      }, 300000);
+      }, 120000);
 
-      // Exposer la fonction de rafraîchissement pour la console
       window.refreshReviews = loadReviews;
     </script>
   </body>
