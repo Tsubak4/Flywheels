@@ -1844,7 +1844,7 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-bottom">
-            © 2026 Fly Wheels Garage - Dashboard Admin V2
+            © 2024 Fly Wheels Garage - Dashboard Admin V2
           </div>
         </div>
       </div>
@@ -1907,6 +1907,16 @@
       window.approveReview = approveReview;
       window.rejectReview = rejectReview;
 
+      // ==================== FONCTION DE HACHAGE ====================
+      function safeBase64Encode(str) {
+        try {
+          return btoa(unescape(encodeURIComponent(str)));
+        } catch (e) {
+          console.error("Erreur encodage:", e);
+          return btoa(str);
+        }
+      }
+
       // ==================== CRÉATION DES PARTICULES ====================
       function createParticles() {
         const particlesContainer = document.getElementById("particles");
@@ -1955,7 +1965,6 @@
         } else {
           console.log("✅ Utilisateur authentifié:", user.email);
           showNotification("✅ Connecté en tant que " + user.email, "success");
-          // Créer les particules
           createParticles();
           initDashboard();
         }
@@ -2743,9 +2752,8 @@
           let rejectedCount = 0;
 
           reviews.forEach((review) => {
-            const reviewHash = btoa(
-              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
-            );
+            const textToHash = `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`;
+            const reviewHash = safeBase64Encode(textToHash);
             const status = validations[reviewHash];
 
             if (status === true) approvedCount++;
@@ -2761,9 +2769,8 @@
           `;
 
           const pendingReviews = reviews.filter((review) => {
-            const reviewHash = btoa(
-              `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
-            );
+            const textToHash = `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`;
+            const reviewHash = safeBase64Encode(textToHash);
             return validations[reviewHash] === undefined;
           });
 
@@ -2907,9 +2914,8 @@
         `;
 
         reviews.forEach((review, index) => {
-          const reviewHash = btoa(
-            `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`,
-          );
+          const textToHash = `${review.user}|${review.rawDate}|${review.comment.substring(0, 50)}`;
+          const reviewHash = safeBase64Encode(textToHash);
           const starsHtml =
             "★".repeat(review.stars) + "☆".repeat(5 - review.stars);
 
