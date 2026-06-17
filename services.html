@@ -433,12 +433,219 @@
 
       .services-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        grid-template-columns: repeat(3, 1fr);
         gap: 40px;
         max-width: 1200px;
-        margin: 0 auto;
+        margin: 0 auto 60px;
         padding: 0 20px;
         width: 100%;
+      }
+
+      /* SECTION RECHERCHE VÉHICULES */
+      .search-section {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto 60px;
+        padding: 0 20px;
+      }
+
+      .search-container {
+        background: linear-gradient(135deg, var(--fw-darker), var(--fw-gray));
+        border: 3px solid var(--fw-gold);
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      }
+
+      .search-container h2 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .search-container .subtitle {
+        color: var(--fw-beige);
+        opacity: 0.8;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+      }
+
+      .search-input-wrapper {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+
+      .search-input-wrapper input {
+        flex: 1;
+        padding: 15px 20px;
+        font-size: 1.1rem;
+        border: 2px solid var(--fw-beige);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--fw-beige-light);
+        transition: all 0.3s ease;
+        min-width: 200px;
+      }
+
+      .search-input-wrapper input::placeholder {
+        color: rgba(245, 232, 200, 0.5);
+      }
+
+      .search-input-wrapper input:focus {
+        outline: none;
+        border-color: var(--fw-gold);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .search-input-wrapper button {
+        padding: 15px 30px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(
+          135deg,
+          var(--fw-gold),
+          var(--fw-gold-dark)
+        );
+        color: var(--fw-dark);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .search-input-wrapper button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+      }
+
+      .search-stats {
+        color: var(--fw-beige);
+        opacity: 0.7;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      /* RÉSULTATS RECHERCHE */
+      .results-container {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        padding: 20px;
+        min-height: 100px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+      }
+
+      .results-container .no-results {
+        color: var(--fw-beige);
+        opacity: 0.6;
+        font-size: 1.1rem;
+        text-align: center;
+        padding: 30px;
+      }
+
+      .result-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 4px solid var(--fw-gold);
+        text-align: left;
+        transition: all 0.3s ease;
+      }
+
+      .result-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateX(5px);
+      }
+
+      .result-item .vehicle-name {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.2rem;
+        color: var(--fw-gold);
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .result-item .vehicle-kit {
+        color: var(--fw-beige);
+        font-size: 1rem;
+      }
+
+      .result-item .vehicle-kit strong {
+        color: var(--fw-beige-light);
+      }
+
+      /* PRIX DES KITS */
+      .prices-section {
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid rgba(212, 175, 55, 0.3);
+      }
+
+      .prices-section h3 {
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.4rem;
+        color: var(--fw-beige-light);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .prices-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+
+      .price-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 15px 20px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        text-align: left;
+      }
+
+      .price-card .price-category {
+        font-family: "Orbitron", sans-serif;
+        font-size: 0.9rem;
+        color: var(--fw-gold);
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .price-card .price-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        color: var(--fw-beige);
+        font-size: 0.95rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .price-card .price-item:last-child {
+        border-bottom: none;
+      }
+
+      .price-card .price-item .price-value {
+        color: var(--fw-gold);
+        font-weight: 600;
+      }
+
+      .price-loading {
+        color: var(--fw-beige);
+        opacity: 0.6;
+        text-align: center;
+        padding: 20px;
       }
 
       .service-card {
@@ -579,6 +786,21 @@
         }
       }
 
+      .section-title {
+        font-family: "Orbitron", sans-serif;
+        font-size: 2rem;
+        color: var(--fw-beige-light);
+        text-align: center;
+        margin: 30px auto 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      }
+
+      .section-title span {
+        color: var(--fw-gold);
+      }
+
       footer {
         background: linear-gradient(
           135deg,
@@ -647,6 +869,7 @@
         width: 100%;
       }
 
+      /* RESPONSIVE */
       @media (max-width: 1200px) {
         .container {
           padding: 0 20px;
@@ -676,6 +899,10 @@
 
         .service-icon i {
           font-size: 2.3rem;
+        }
+
+        .prices-grid {
+          grid-template-columns: repeat(3, 1fr);
         }
       }
 
@@ -707,7 +934,7 @@
         }
 
         .services-grid {
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          grid-template-columns: repeat(2, 1fr);
           gap: 30px;
         }
 
@@ -722,6 +949,10 @@
 
         .service-name {
           font-size: 1.6rem;
+        }
+
+        .prices-grid {
+          grid-template-columns: repeat(2, 1fr);
         }
       }
 
@@ -825,6 +1056,26 @@
           margin: 20px auto 40px;
         }
 
+        .search-container {
+          padding: 25px 20px;
+        }
+
+        .search-container h2 {
+          font-size: 1.5rem;
+        }
+
+        .search-input-wrapper {
+          flex-direction: column;
+        }
+
+        .search-input-wrapper button {
+          width: 100%;
+        }
+
+        .prices-grid {
+          grid-template-columns: 1fr;
+        }
+
         footer {
           margin-top: 60px;
         }
@@ -879,6 +1130,22 @@
         }
 
         .service-description {
+          font-size: 1rem;
+        }
+
+        .search-container {
+          padding: 20px 15px;
+        }
+
+        .search-container h2 {
+          font-size: 1.2rem;
+        }
+
+        .search-container .subtitle {
+          font-size: 0.95rem;
+        }
+
+        .result-item .vehicle-name {
           font-size: 1rem;
         }
 
@@ -967,37 +1234,9 @@
 
       <div class="title-bar"></div>
 
+      <!-- SERVICES GRID - 3 CARTES UNIQUEMENT -->
       <div class="services-grid">
-        <div class="service-card">
-          <div class="service-icon">
-            <i class="fas fa-car-crash"></i>
-          </div>
-          <div class="service-info">
-            <h2 class="service-name">Réparation Complète</h2>
-            <p class="service-description" id="reparation_complete_inside">
-              - Réparation Moteur et Carroserie : 550 $
-            </p>
-            <p class="service-description" id="reparation_complete_outside">
-              - En extérieur : 650 $
-            </p>
-          </div>
-        </div>
-
-        <div class="service-card">
-          <div class="service-icon">
-            <i class="fas fa-oil-can"></i>
-          </div>
-          <div class="service-info">
-            <h2 class="service-name">Réparation Moteur</h2>
-            <p class="service-description" id="reparation_moteur_inside">
-              - Réparation Moteur : 350 $
-            </p>
-            <p class="service-description" id="reparation_moteur_outside">
-              - En extérieur : 450 $
-            </p>
-          </div>
-        </div>
-
+        <!-- Kit de Nettoyage -->
         <div class="service-card">
           <div class="service-icon">
             <i class="fas fa-spray-can"></i>
@@ -1010,6 +1249,7 @@
           </div>
         </div>
 
+        <!-- Remorquage -->
         <div class="service-card">
           <div class="service-icon">
             <i class="fas fa-truck"></i>
@@ -1017,7 +1257,7 @@
           <div class="service-info">
             <h2 class="service-name">Remorquage</h2>
             <p class="service-description" id="remorquage_gas">
-              - Remorquage a une station essence : 100 $
+              - Remorquage à une station essence : 100 $
             </p>
             <p class="service-description" id="remorquage_flip">
               - Retournement de véhicule : 100 $
@@ -1025,6 +1265,7 @@
           </div>
         </div>
 
+        <!-- Customs -->
         <div class="service-card">
           <div class="service-icon">
             <i class="fas fa-paint-roller"></i>
@@ -1037,18 +1278,57 @@
             </p>
           </div>
         </div>
+      </div>
 
-        <div class="service-card">
-          <div class="service-icon">
-            <i class="fas fa-headset"></i>
+      <div class="title-bar"></div>
+
+      <!-- ============================================ -->
+      <!-- SECTION RECHERCHE DE VÉHICULES               -->
+      <!-- ============================================ -->
+      <div class="search-section">
+        <div class="search-container">
+          <h2>🔍 Recherche de Véhicules</h2>
+          <p class="subtitle">
+            Trouvez le kit de réparation adapté à votre véhicule
+          </p>
+
+          <div class="search-input-wrapper">
+            <input
+              type="text"
+              id="vehicleSearch"
+              placeholder="Entrez le nom d'un véhicule"
+              autocomplete="off"
+            />
+            <button id="searchBtn">
+              <i class="fas fa-search"></i> Rechercher
+            </button>
           </div>
-          <div class="service-info">
-            <h2 class="service-name">Conseil Expert</h2>
-            <p class="service-description">
-              Consultation personnalisée pour vos projets automobiles. Nos
-              experts vous guident dans vos choix techniques, esthétiques et
-              budgétaires pour des résultats optimaux.
-            </p>
+
+          <div class="search-stats" id="searchStats">
+            Chargement des données...
+          </div>
+
+          <div class="results-container" id="resultsContainer">
+            <div class="no-results">
+              <i
+                class="fas fa-car"
+                style="
+                  font-size: 2rem;
+                  display: block;
+                  margin-bottom: 15px;
+                  opacity: 0.5;
+                "
+              ></i>
+              Recherchez un véhicule pour voir les kits disponibles
+            </div>
+          </div>
+
+          <!-- SECTION PRIX DES KITS -->
+          <div class="prices-section" id="pricesSection">
+            <h3>💰 Tarifs des Kits de Réparation</h3>
+            <div id="pricesContainer">
+              <div class="price-loading">Chargement des prix...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1074,6 +1354,7 @@
         getDocs,
       } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+      // ========== FIREBASE CONFIG ==========
       const firebaseConfig = {
         apiKey: "AIzaSyCcIopLaEJQGqSx6S6t-IoXAmT4ghRoYo8",
         authDomain: "flywheels-eb854.firebaseapp.com",
@@ -1087,12 +1368,226 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
+      // ========== GOOGLE SHEETS CONFIG ==========
+      const SPREADSHEET_ID = "18-C3auNK0nom_fxlWM9AKQ197piKJ_CvVAqog6vHBiw";
+      const SHEET_NAME = "Sheet1";
+      const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+      let vehicleData = [];
+      let headers = [];
+
+      // ========== CHARGEMENT GOOGLE SHEETS ==========
+      async function loadSheetData() {
+        const statsEl = document.getElementById("searchStats");
+        const resultsEl = document.getElementById("resultsContainer");
+
+        try {
+          statsEl.textContent = "⏳ Chargement des données du catalogue...";
+
+          const response = await fetch(SHEET_URL);
+          const text = await response.text();
+
+          const jsonString = text.substring(47, text.length - 2);
+          const jsonData = JSON.parse(jsonString);
+
+          headers = jsonData.table.cols.map((col) => col.label);
+          const rows = jsonData.table.rows;
+
+          vehicleData = rows.map((row) => {
+            const obj = {};
+            row.c.forEach((cell, index) => {
+              obj[headers[index]] = cell ? cell.v : "";
+            });
+            return obj;
+          });
+
+          statsEl.textContent = `📊 ${vehicleData.length} véhicules disponibles dans le catalogue`;
+          resultsEl.innerHTML = `
+            <div class="no-results">
+              <i class="fas fa-car" style="font-size:2rem;display:block;margin-bottom:15px;opacity:0.5;"></i>
+              Recherchez un véhicule pour voir les kits disponibles
+            </div>
+          `;
+        } catch (error) {
+          console.error("Erreur chargement sheet:", error);
+          statsEl.textContent = "❌ Erreur lors du chargement des données";
+          resultsEl.innerHTML = `
+            <div class="no-results" style="color:#ff6b6b;">
+              ❌ Impossible de charger le catalogue des véhicules.<br>
+              Vérifiez que le document est accessible publiquement.
+            </div>
+          `;
+        }
+      }
+
+      // ========== RECHERCHE DE VÉHICULES ==========
+      function searchVehicles(query) {
+        const resultsEl = document.getElementById("resultsContainer");
+        const statsEl = document.getElementById("searchStats");
+
+        if (!query.trim() || vehicleData.length === 0) {
+          resultsEl.innerHTML = `
+            <div class="no-results">
+              <i class="fas fa-car" style="font-size:2rem;display:block;margin-bottom:15px;opacity:0.5;"></i>
+              Recherchez un véhicule pour voir les kits disponibles
+            </div>
+          `;
+          if (vehicleData.length > 0) {
+            statsEl.textContent = `📊 ${vehicleData.length} véhicules disponibles - Entrez un nom pour rechercher`;
+          }
+          return;
+        }
+
+        const searchTerm = query.toLowerCase().trim();
+
+        // Colonne C = index 2 (0-based)
+        const vehicleColIndex = 2;
+        const kitColIndex = 5; // Colonne F = index 5
+
+        const results = vehicleData.filter((row) => {
+          const vehicleName = Object.values(row)[vehicleColIndex] || "";
+          return vehicleName.toLowerCase().includes(searchTerm);
+        });
+
+        if (results.length === 0) {
+          statsEl.textContent = `🔍 Aucun véhicule trouvé pour "${query}" - ${vehicleData.length} véhicules dans le catalogue`;
+          resultsEl.innerHTML = `
+            <div class="no-results">
+              <i class="fas fa-search" style="font-size:2rem;display:block;margin-bottom:15px;opacity:0.5;"></i>
+              Aucun véhicule ne correspond à "<strong>${query}</strong>"
+            </div>
+          `;
+          return;
+        }
+
+        statsEl.textContent = `✅ ${results.length} véhicule(s) trouvé(s) pour "${query}"`;
+
+        let html = "";
+        results.forEach((row) => {
+          const values = Object.values(row);
+          const vehicleName = values[vehicleColIndex] || "Nom inconnu";
+          const kit = values[kitColIndex] || "Kit non spécifié";
+
+          html += `
+            <div class="result-item">
+              <div class="vehicle-name">🚗 ${vehicleName}</div>
+              <div class="vehicle-kit"><strong>Kit :</strong> ${kit}</div>
+            </div>
+          `;
+        });
+
+        resultsEl.innerHTML = html;
+      }
+
+      function loadPricesFromFirestore() {
+        const container = document.getElementById("pricesContainer");
+
+        const categories = {
+          kit_moteur: {
+            label: "Kit Moteur",
+            gammes: [
+              "bas_de_gamme",
+              "moyenne_gamme",
+              "haute_gamme",
+              "performance",
+              "utilitaire",
+            ],
+          },
+          kit_carrosserie: {
+            label: "Kit Carrosserie",
+            gammes: [
+              "bas_de_gamme",
+              "moyenne_gamme",
+              "haute_gamme",
+              "performance",
+              "utilitaire",
+            ],
+          },
+          kit_total: {
+            label: "Kit Total",
+            gammes: [
+              "bas_de_gamme",
+              "moyenne_gamme",
+              "haute_gamme",
+              "performance",
+              "utilitaire",
+            ],
+          },
+        };
+
+        const gammeLabels = {
+          bas_de_gamme: "Bas de gamme",
+          moyenne_gamme: "Moyenne gamme",
+          haute_gamme: "Haute gamme",
+          performance: "Performance",
+          utilitaire: "Utilitaire",
+        };
+
+        const pricesRef = collection(db, "service_prices");
+
+        onSnapshot(
+          pricesRef,
+          (snapshot) => {
+            let pricesData = {};
+
+            snapshot.forEach((doc) => {
+              pricesData[doc.id] = doc.data();
+            });
+
+            let html = '<div class="prices-grid">';
+
+            Object.keys(categories).forEach((catKey) => {
+              const cat = categories[catKey];
+              const catData = pricesData[catKey] || {};
+
+              html += `
+              <div class="price-card">
+                <div class="price-category">${cat.label}</div>
+            `;
+
+              cat.gammes.forEach((gamme) => {
+                const price =
+                  catData[gamme] !== undefined ? catData[gamme] : "—";
+                html += `
+                <div class="price-item">
+                  <span>${gammeLabels[gamme] || gamme}</span>
+                  <span class="price-value">${price !== "—" ? price + " $" : "—"}</span>
+                </div>
+              `;
+              });
+
+              html += "</div>";
+            });
+
+            html += "</div>";
+
+            const hasData = Object.keys(pricesData).length > 0;
+            if (!hasData) {
+              html = `
+              <div class="price-loading">
+                ⚠️ Aucun prix configuré dans Firestore.<br>
+                <small>Collection "service_prices" avec les documents : kit_moteur, kit_carrosserie, kit_total</small>
+              </div>
+            `;
+            }
+
+            container.innerHTML = html;
+          },
+          (error) => {
+            console.error("Erreur écoute prix:", error);
+            container.innerHTML = `
+            <div class="price-loading" style="color:#ff6b6b;">
+              ❌ Erreur de chargement des prix depuis Firestore
+            </div>
+          `;
+          },
+        );
+      }
+
       function createParticles() {
         const particlesContainer = document.getElementById("particles");
         if (!particlesContainer) return;
-
         particlesContainer.innerHTML = "";
-
         for (let i = 0; i < 50; i++) {
           const particle = document.createElement("div");
           particle.className = "particle";
@@ -1103,25 +1598,18 @@
         }
       }
 
-      // ========== GESTION DU LOGO ==========
       function initLogoListener() {
         const siteRef = doc(db, "site", "config");
-
         onSnapshot(
           siteRef,
           (doc) => {
             if (doc.exists()) {
               const data = doc.data();
               const headerLogo = document.getElementById("headerLogo");
-
               if (!headerLogo) return;
-
-              // CAS 1 : Logo personnalisé (priorité)
               if (data.logo) {
                 headerLogo.src = data.logo;
-              }
-              // CAS 2 : Logo saisonnier
-              else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+              } else if (data.seasonalLogo && data.seasonalLogo !== "default") {
                 const logoMap = {
                   saintvalentin: "logo2.png",
                   poisson: "logo3.png",
@@ -1134,9 +1622,7 @@
                 };
                 const logoFile = logoMap[data.seasonalLogo] || "logo.png";
                 headerLogo.src = `assets/logo/${logoFile}`;
-              }
-              // CAS 3 : Logo par défaut
-              else {
+              } else {
                 headerLogo.src = "assets/logo/logo.png";
               }
             }
@@ -1149,7 +1635,6 @@
 
       function loadServicePrices() {
         const servicesRef = collection(db, "services");
-
         getDocs(servicesRef)
           .then((snapshot) => {
             snapshot.forEach((doc) => {
@@ -1160,13 +1645,12 @@
             });
           })
           .catch((error) => {
-            console.error("❌ Erreur chargement prix:", error);
+            console.error("❌ Erreur chargement prix services:", error);
           });
       }
 
       function setupPricesListener() {
         const servicesRef = collection(db, "services");
-
         onSnapshot(
           servicesRef,
           (snapshot) => {
@@ -1178,31 +1662,21 @@
             });
           },
           (error) => {
-            console.error("❌ Erreur écoute prix:", error);
+            console.error("❌ Erreur écoute prix services:", error);
           },
         );
       }
 
       function updateServicePrices(serviceId, prices) {
         if (!prices) return;
-
         Object.keys(prices).forEach((priceId) => {
           const element = document.getElementById(priceId);
           if (element) {
             const price = prices[priceId];
-
             if (priceId === "kit_nettoyage_price") {
               element.textContent = `Nettoyage extérieur professionnel : ${price}$`;
-            } else if (priceId.includes("reparation_complete_inside")) {
-              element.textContent = `- Réparation Moteur et Carroserie : ${price} $`;
-            } else if (priceId.includes("reparation_complete_outside")) {
-              element.textContent = `- En extérieur : ${price} $`;
-            } else if (priceId.includes("reparation_moteur_inside")) {
-              element.textContent = `- Réparation Moteur : ${price} $`;
-            } else if (priceId.includes("reparation_moteur_outside")) {
-              element.textContent = `- En extérieur : ${price} $`;
             } else if (priceId.includes("remorquage_gas")) {
-              element.textContent = `- Remorquage a une station essence : ${price} $`;
+              element.textContent = `- Remorquage à une station essence : ${price} $`;
             } else if (priceId.includes("remorquage_flip")) {
               element.textContent = `- Retournement de véhicule : ${price} $`;
             }
@@ -1210,6 +1684,7 @@
         });
       }
 
+      // ========== GESTION BURGER ==========
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
 
@@ -1226,7 +1701,6 @@
       });
 
       const header = document.getElementById("header");
-
       window.addEventListener("scroll", () => {
         if (window.scrollY > 50) {
           header.classList.add("scrolled");
@@ -1235,11 +1709,33 @@
         }
       });
 
+      // ========== INIT ==========
       document.addEventListener("DOMContentLoaded", () => {
         createParticles();
         initLogoListener();
         loadServicePrices();
         setupPricesListener();
+
+        loadPricesFromFirestore();
+
+        loadSheetData();
+
+        const searchInput = document.getElementById("vehicleSearch");
+        const searchBtn = document.getElementById("searchBtn");
+
+        searchInput.addEventListener("input", (e) => {
+          searchVehicles(e.target.value);
+        });
+
+        searchBtn.addEventListener("click", () => {
+          searchVehicles(searchInput.value);
+        });
+
+        searchInput.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            searchVehicles(searchInput.value);
+          }
+        });
 
         const servicesHeader = document.querySelector(".services-header");
         if (servicesHeader) {
@@ -1248,7 +1744,6 @@
             "perspective(1000px) rotateY(-15deg) rotateX(10deg) scale(0.95)";
           servicesHeader.style.transition =
             "all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s";
-
           setTimeout(() => {
             servicesHeader.style.opacity = "1";
             servicesHeader.style.transform =
@@ -1261,7 +1756,6 @@
           card.style.opacity = "0";
           card.style.transform = "translateY(30px)";
           card.style.transition = `all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${0.6 + index * 0.15}s`;
-
           setTimeout(
             () => {
               card.style.opacity = "1";
