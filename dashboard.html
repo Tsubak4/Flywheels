@@ -191,13 +191,6 @@
         margin-left: 15px;
       }
 
-      .logo-text-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        margin-left: 15px;
-      }
-
       .logo-text {
         font-family: "Orbitron", sans-serif;
         font-size: 1.4rem;
@@ -441,7 +434,7 @@
       }
 
       .tab-content.open {
-        max-height: 3000px;
+        max-height: 5000px;
         transition: max-height 0.8s ease-in;
       }
 
@@ -750,7 +743,7 @@
 
       .team-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         gap: 20px;
         margin-top: 20px;
       }
@@ -871,6 +864,7 @@
         font-family: "Orbitron", sans-serif;
         font-size: 0.9rem;
         transition: all 0.3s ease;
+        white-space: nowrap;
       }
 
       .add-url-btn:hover {
@@ -1097,6 +1091,52 @@
         }
       }
 
+      .price-sub-label {
+        font-size: 0.8rem;
+        color: rgba(245, 232, 200, 0.5);
+        margin-left: 10px;
+        font-weight: 300;
+      }
+
+      .price-input-row {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+
+      .price-input-row label {
+        min-width: 140px;
+        color: var(--fw-beige);
+        font-size: 0.95rem;
+        opacity: 0.8;
+      }
+
+      .price-input-row input {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 14px;
+        background: rgba(26, 26, 26, 0.8);
+        border: 2px solid var(--fw-beige);
+        border-radius: 8px;
+        color: var(--fw-beige);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      .price-input-row input:focus {
+        border-color: var(--fw-gold);
+        box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+      }
+
+      .price-input-row .currency {
+        color: var(--fw-gold);
+        font-weight: 600;
+        min-width: 25px;
+      }
+
       @media (max-width: 1200px) {
         .container {
           padding: 0 20px;
@@ -1210,6 +1250,16 @@
 
         .preview-container {
           grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+
+        .price-input-row {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 5px;
+        }
+
+        .price-input-row label {
+          min-width: auto;
         }
       }
 
@@ -1336,7 +1386,6 @@
         <h1 class="dashboard-title">TABLEAU DE BORD ADMIN</h1>
 
         <div class="tabs-container" id="accordionContainer">
-          <!-- SECTION 1: Gestion logo -->
           <div class="tab-section">
             <div class="tab-header" data-tab="logo">
               <div class="tab-title">
@@ -1375,7 +1424,6 @@
                       <option value="noel">🎄 Noël – 25 décembre</option>
                     </select>
 
-                    <!-- APERÇU SAISONNIER -->
                     <div class="seasonal-logo-preview" id="seasonalPreview">
                       <img
                         src="assets/logo/logo.png"
@@ -1429,7 +1477,6 @@
             </div>
           </div>
 
-          <!-- SECTION 2: Gestion Tarif -->
           <div class="tab-section">
             <div class="tab-header" data-tab="pricing">
               <div class="tab-title">
@@ -1484,7 +1531,6 @@
             </div>
           </div>
 
-          <!-- SECTION 3: Gestion Equipe -->
           <div class="tab-section">
             <div class="tab-header" data-tab="team">
               <div class="tab-title">
@@ -1539,7 +1585,6 @@
             </div>
           </div>
 
-          <!-- SECTION 4: Gestion Galerie -->
           <div class="tab-section">
             <div class="tab-header" data-tab="gallery">
               <div class="tab-title">
@@ -1626,7 +1671,6 @@
             </div>
           </div>
 
-          <!-- SECTION 5: Gestion Avis -->
           <div class="tab-section">
             <div class="tab-header" data-tab="reviews">
               <div class="tab-title">
@@ -1760,7 +1804,6 @@
             </div>
           </div>
 
-          <!-- SECTION 6: Gestion Recrutement -->
           <div class="tab-section">
             <div class="tab-header" data-tab="recruitment">
               <div class="tab-title">
@@ -1877,16 +1920,13 @@
         measurementId: "G-BM6XVDGNY0",
       };
 
-      // Initialisation Firebase
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      // Variables globales
       let draggedItem = null;
       let galleryImages = [];
 
-      // Éléments DOM
       const burger = document.getElementById("burger");
       const navMenu = document.getElementById("nav-menu");
       const recruitmentToggle = document.getElementById("recruitmentToggle");
@@ -1896,18 +1936,17 @@
       );
       const logoutBtn = document.getElementById("logoutBtn");
 
-      // Exposer les fonctions nécessaires au scope global pour les attributs onclick
       window.updateLogo = updateLogo;
       window.addGalleryImage = addGalleryImage;
       window.saveGalleryOrder = saveGalleryOrder;
       window.deleteGalleryImage = deleteGalleryImage;
       window.updateTeamPhotoUrl = updateTeamPhotoUrl;
       window.saveTeamMember = saveTeamMember;
+      window.saveKitPrice = saveKitPrice;
       window.saveServicePrice = saveServicePrice;
       window.approveReview = approveReview;
       window.rejectReview = rejectReview;
 
-      // ==================== FONCTION DE HACHAGE ====================
       function safeBase64Encode(str) {
         try {
           return btoa(unescape(encodeURIComponent(str)));
@@ -1917,14 +1956,10 @@
         }
       }
 
-      // ==================== CRÉATION DES PARTICULES ====================
       function createParticles() {
         const particlesContainer = document.getElementById("particles");
         if (!particlesContainer) return;
-
-        // Vider le conteneur au cas où
         particlesContainer.innerHTML = "";
-
         for (let i = 0; i < 50; i++) {
           const particle = document.createElement("div");
           particle.className = "particle";
@@ -1935,26 +1970,19 @@
         }
       }
 
-      // ==================== NOTIFICATION ====================
       function showNotification(message, type = "info") {
-        // Supprimer les anciennes notifications
         const oldNotifications = document.querySelectorAll(".fw-notification");
         oldNotifications.forEach((n) => n.remove());
-
-        // Créer la notification
         const notification = document.createElement("div");
         notification.className = `fw-notification ${type}`;
         notification.textContent = message;
         document.body.appendChild(notification);
-
-        // Disparition après 3 secondes
         setTimeout(() => {
           notification.style.animation = "slideOut 0.3s ease";
           setTimeout(() => notification.remove(), 300);
         }, 3000);
       }
 
-      // Vérification authentification
       onAuthStateChanged(auth, (user) => {
         if (!user) {
           console.log("❌ Non authentifié, redirection...");
@@ -1970,17 +1998,14 @@
         }
       });
 
-      // Initialisation du dashboard
       function initDashboard() {
         console.log("🚀 Initialisation du dashboard V2...");
 
-        // Menu burger
         burger.addEventListener("click", () => {
           navMenu.classList.toggle("active");
           burger.classList.toggle("active");
         });
 
-        // Fermer le menu au clic sur un lien
         document.querySelectorAll("#nav-menu a").forEach((link) => {
           link.addEventListener("click", () => {
             navMenu.classList.remove("active");
@@ -1988,25 +2013,21 @@
           });
         });
 
-        // Initialisation de l'accordéon
         initAccordion();
 
-        // Charger les données
         loadLogo();
         loadSeasonalLogo();
         checkInitialStatus();
         setupRealtimeListener();
         recruitmentToggle.addEventListener("change", handleToggleChange);
         loadTeamManagement();
-        loadServicePricing();
+        loadPricingManagement();
         initReviewsManagement();
         loadGallery();
 
-        // Logout
         logoutBtn.addEventListener("click", handleLogout);
       }
 
-      // FONCTION ACCORDÉON
       function initAccordion() {
         const headers = document.querySelectorAll(".tab-header");
 
@@ -2016,7 +2037,6 @@
             const content = document.getElementById(`tab-${tabId}`);
             const arrow = header.querySelector(".tab-arrow");
 
-            // Fermer les autres sections
             document.querySelectorAll(".tab-content").forEach((c) => {
               if (c.id !== `tab-${tabId}`) {
                 c.classList.remove("open");
@@ -2031,7 +2051,6 @@
               }
             });
 
-            // Ouvrir/fermer la section cliquée
             content.classList.toggle("open");
             header.classList.toggle("active");
             arrow.classList.toggle("rotated");
@@ -2039,7 +2058,6 @@
         });
       }
 
-      // ==================== GESTION LOGO ====================
       async function loadLogo() {
         try {
           const siteRef = doc(db, "site", "config");
@@ -2048,15 +2066,11 @@
           if (siteDoc.exists()) {
             const data = siteDoc.data();
 
-            // CAS 1 : Logo personnalisé (priorité)
             if (data.logo) {
               document.getElementById("headerLogo").src = data.logo;
-              // Met aussi à jour l'aperçu saisonnier avec le logo par défaut
               document.getElementById("seasonalLogoPreview").src =
                 "assets/logo/logo.png";
-            }
-            // CAS 2 : Logo saisonnier
-            else if (data.seasonalLogo && data.seasonalLogo !== "default") {
+            } else if (data.seasonalLogo && data.seasonalLogo !== "default") {
               const logoMap = {
                 saintvalentin: "logo2.png",
                 poisson: "logo3.png",
@@ -2071,9 +2085,7 @@
               const logoPath = `assets/logo/${logoFile}`;
               document.getElementById("headerLogo").src = logoPath;
               document.getElementById("seasonalLogoPreview").src = logoPath;
-            }
-            // CAS 3 : Logo par défaut
-            else {
+            } else {
               document.getElementById("headerLogo").src =
                 "assets/logo/logo.png";
               document.getElementById("seasonalLogoPreview").src =
@@ -2085,7 +2097,6 @@
         }
       }
 
-      // FONCTION PRINCIPALE DE MISE À JOUR DU LOGO
       async function updateLogo() {
         const logoUrl = document.getElementById("logoUrl").value.trim();
         if (!logoUrl) {
@@ -2097,8 +2108,6 @@
 
         try {
           const siteRef = doc(db, "site", "config");
-
-          // Sauvegarder dans Firestore - ÉCRASE le saisonnier
           await setDoc(
             siteRef,
             {
@@ -2109,14 +2118,10 @@
             { merge: true },
           );
 
-          // Mettre à jour le header
           document.getElementById("headerLogo").src = logoUrl;
-          // Remettre l'aperçu saisonnier au logo par défaut
           document.getElementById("seasonalLogoPreview").src =
             "assets/logo/logo.png";
           document.getElementById("logoUrl").value = "";
-
-          // Remettre le select sur "default"
           document.getElementById("seasonalLogo").value = "default";
 
           showNotification("✅ Logo mis à jour avec succès", "success");
@@ -2126,7 +2131,6 @@
         }
       }
 
-      // ==================== GESTION LOGO SAISONNIER ====================
       async function loadSeasonalLogo() {
         try {
           const siteRef = doc(db, "site", "config");
@@ -2137,13 +2141,11 @@
               siteDoc.data().seasonalLogo;
           }
 
-          // Ajouter l'écouteur de changement
           document
             .getElementById("seasonalLogo")
             .addEventListener("change", async (e) => {
               const season = e.target.value;
 
-              // Déterminer le fichier logo correspondant
               const logoMap = {
                 saintvalentin: "logo2.png",
                 poisson: "logo3.png",
@@ -2159,7 +2161,6 @@
                 season === "default" ? "logo.png" : logoMap[season];
               const logoPath = `assets/logo/${logoFile}`;
 
-              // Sauvegarder dans Firestore - ÉCRASE le logo personnalisé
               await setDoc(
                 siteRef,
                 {
@@ -2170,7 +2171,6 @@
                 { merge: true },
               );
 
-              // Mettre à jour le header et l'aperçu
               document.getElementById("headerLogo").src = logoPath;
               document.getElementById("seasonalLogoPreview").src = logoPath;
 
@@ -2181,7 +2181,6 @@
         }
       }
 
-      // ==================== GESTION GALERIE ====================
       async function loadGallery() {
         try {
           const galleryRef = doc(db, "gallery", "main");
@@ -2235,7 +2234,6 @@
 
         container.innerHTML = html;
 
-        // Ajouter les événements de drag & drop
         const items = document.querySelectorAll(".preview-item");
         items.forEach((item) => {
           item.addEventListener("dragstart", handleDragStart);
@@ -2276,7 +2274,6 @@
           const draggedIndex = allItems.indexOf(draggedItem);
           const droppedIndex = allItems.indexOf(this);
 
-          // Réorganiser le tableau
           const [draggedImage] = galleryImages.splice(draggedIndex, 1);
           galleryImages.splice(droppedIndex, 0, draggedImage);
 
@@ -2325,7 +2322,6 @@
         }
       }
 
-      // ==================== GESTION TEAM ====================
       function loadTeamManagement() {
         const teamFormContainer = document.getElementById(
           "team-management-form",
@@ -2505,51 +2501,73 @@
         }
       }
 
-      // ==================== GESTION SERVICE PRICING ====================
-      function loadServicePricing() {
+      function loadPricingManagement() {
         const pricingContainer = document.getElementById(
           "pricing-management-form",
         );
 
         const services = [
           {
-            id: "reparation_complete",
-            name: "Réparation Complète",
-            icon: "fas fa-car-crash",
-            items: [
-              {
-                id: "reparation_complete_inside",
-                label: "Réparation Moteur et Carroserie",
-                defaultPrice: 550,
-              },
-              {
-                id: "reparation_complete_outside",
-                label: "En extérieur",
-                defaultPrice: 650,
-              },
+            id: "kit_moteur",
+            name: "🔧 Kit Moteur",
+            type: "kit",
+            gammes: [
+              { id: "bas_de_gamme", label: "Bas de gamme" },
+              { id: "moyenne_gamme", label: "Moyenne gamme" },
+              { id: "haute_gamme", label: "Haute gamme" },
+              { id: "performance", label: "Performance" },
+              { id: "utilitaire", label: "Utilitaire" },
             ],
+            defaultPrices: {
+              bas_de_gamme: 150,
+              moyenne_gamme: 250,
+              haute_gamme: 400,
+              performance: 600,
+              utilitaire: 350,
+            },
           },
           {
-            id: "reparation_moteur",
-            name: "Réparation Moteur",
-            icon: "fas fa-oil-can",
-            items: [
-              {
-                id: "reparation_moteur_inside",
-                label: "Réparation Moteur",
-                defaultPrice: 350,
-              },
-              {
-                id: "reparation_moteur_outside",
-                label: "En extérieur",
-                defaultPrice: 450,
-              },
+            id: "kit_carrosserie",
+            name: "🎨 Kit Carrosserie",
+            type: "kit",
+            gammes: [
+              { id: "bas_de_gamme", label: "Bas de gamme" },
+              { id: "moyenne_gamme", label: "Moyenne gamme" },
+              { id: "haute_gamme", label: "Haute gamme" },
+              { id: "performance", label: "Performance" },
+              { id: "utilitaire", label: "Utilitaire" },
             ],
+            defaultPrices: {
+              bas_de_gamme: 120,
+              moyenne_gamme: 200,
+              haute_gamme: 350,
+              performance: 500,
+              utilitaire: 300,
+            },
+          },
+          {
+            id: "kit_total",
+            name: "📦 Kit Total",
+            type: "kit",
+            gammes: [
+              { id: "bas_de_gamme", label: "Bas de gamme" },
+              { id: "moyenne_gamme", label: "Moyenne gamme" },
+              { id: "haute_gamme", label: "Haute gamme" },
+              { id: "performance", label: "Performance" },
+              { id: "utilitaire", label: "Utilitaire" },
+            ],
+            defaultPrices: {
+              bas_de_gamme: 250,
+              moyenne_gamme: 400,
+              haute_gamme: 650,
+              performance: 900,
+              utilitaire: 550,
+            },
           },
           {
             id: "kit_nettoyage",
-            name: "Kit de Nettoyage",
-            icon: "fas fa-spray-can",
+            name: "🧼 Kit de Nettoyage",
+            type: "service",
             items: [
               {
                 id: "kit_nettoyage_price",
@@ -2560,12 +2578,12 @@
           },
           {
             id: "remorquage",
-            name: "Remorquage",
-            icon: "fas fa-truck",
+            name: "🚛 Remorquage",
+            type: "service",
             items: [
               {
                 id: "remorquage_gas",
-                label: "Remorquage a une station essence",
+                label: "Remorquage à une station essence",
                 defaultPrice: 100,
               },
               {
@@ -2580,72 +2598,134 @@
         let html = '<div class="team-grid">';
 
         services.forEach((service) => {
-          html += `
-            <div class="team-member-card" data-service="${service.id}">
-              <div class="member-header">
-                <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
-                  <i class="${service.icon}" style="color: var(--fw-gold); font-size: 1.5rem;"></i>
-                </div>
-                <div class="member-info">
-                  <h3>${service.name}</h3>
-                  <p style="color: var(--fw-beige); opacity: 0.8;">Service de réparation</p>
-                </div>
-              </div>`;
-
-          service.items.forEach((item) => {
+          if (service.type === "kit") {
             html += `
-              <div class="form-group">
-                <label class="form-label">${item.label}</label>
-                <input type="number" id="${item.id}" class="form-input service-price-input" value="${item.defaultPrice}" min="0" step="1" placeholder="Prix en $">
-              </div>`;
-          });
+              <div class="team-member-card" data-kit="${service.id}">
+                <div class="member-header">
+                  <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
+                    <span style="color: var(--fw-gold); font-size: 1.8rem;">${service.name.split(" ")[0]}</span>
+                  </div>
+                  <div class="member-info">
+                    <h3>${service.name}</h3>
+                    <p style="color: var(--fw-beige); opacity: 0.8;">5 gammes de prix</p>
+                  </div>
+                </div>
+            `;
 
-          html += `
-              <button class="save-btn" onclick="window.saveServicePrice('${service.id}')">
-                <i class="fas fa-save"></i> Enregistrer les prix
-              </button>
-            </div>`;
+            service.gammes.forEach((gamme) => {
+              const priceId = `${service.id}_${gamme.id}`;
+              const defaultPrice = service.defaultPrices[gamme.id] || 0;
+
+              html += `
+                <div class="price-input-row">
+                  <label for="${priceId}">${gamme.label}</label>
+                  <input
+                    type="number"
+                    id="${priceId}"
+                    class="form-input kit-price-input"
+                    data-kit="${service.id}"
+                    data-gamme="${gamme.id}"
+                    value="${defaultPrice}"
+                    min="0"
+                    step="1"
+                    placeholder="Prix"
+                  />
+                  <span class="currency">$</span>
+                </div>
+              `;
+            });
+
+            html += `
+                <button class="save-btn" onclick="window.saveKitPrice('${service.id}')" style="margin-top: 15px;">
+                  <i class="fas fa-save"></i> Enregistrer les prix
+                </button>
+              </div>
+            `;
+          } else if (service.type === "service") {
+            html += `
+              <div class="team-member-card" data-service="${service.id}">
+                <div class="member-header">
+                  <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
+                    <span style="color: var(--fw-gold); font-size: 1.8rem;">${service.name.split(" ")[0]}</span>
+                  </div>
+                  <div class="member-info">
+                    <h3>${service.name}</h3>
+                    <p style="color: var(--fw-beige); opacity: 0.8;">Service de réparation</p>
+                  </div>
+                </div>
+            `;
+
+            service.items.forEach((item) => {
+              html += `
+                <div class="price-input-row">
+                  <label for="${item.id}">${item.label}</label>
+                  <input
+                    type="number"
+                    id="${item.id}"
+                    class="form-input service-price-input"
+                    data-service="${service.id}"
+                    data-item="${item.id}"
+                    value="${item.defaultPrice}"
+                    min="0"
+                    step="1"
+                    placeholder="Prix"
+                  />
+                  <span class="currency">$</span>
+                </div>
+              `;
+            });
+
+            html += `
+                <button class="save-btn" onclick="window.saveServicePrice('${service.id}')" style="margin-top: 15px;">
+                  <i class="fas fa-save"></i> Enregistrer les prix
+                </button>
+              </div>
+            `;
+          }
         });
-
-        html += `
-          <div class="team-member-card">
-            <div class="member-header">
-              <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
-                <i class="fas fa-paint-roller" style="color: var(--fw-gold); font-size: 1.5rem;"></i>
-              </div>
-              <div class="member-info">
-                <h3>Customs</h3>
-                <p style="color: var(--fw-beige); opacity: 0.8;">Devis sur place</p>
-              </div>
-            </div>
-            <p style="color: var(--fw-beige); opacity: 0.8; text-align: center; padding: 10px;">
-              Amélioration des performances, Modifications esthétiques, Peinture sur mesure. Devis sur place.
-            </p>
-          </div>
-          
-          <div class="team-member-card">
-            <div class="member-header">
-              <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: center; margin-right: 15px; border: 2px solid var(--fw-gold);">
-                <i class="fas fa-headset" style="color: var(--fw-gold); font-size: 1.5rem;"></i>
-              </div>
-              <div class="member-info">
-                <h3>Conseil Expert</h3>
-                <p style="color: var(--fw-beige); opacity: 0.8;">Service gratuit</p>
-              </div>
-            </div>
-            <p style="color: var(--fw-beige); opacity: 0.8; text-align: center; padding: 10px;">
-              Consultation personnalisée pour vos projets automobiles. Nos experts vous guident dans vos choix techniques, esthétiques et budgétaires pour des résultats optimaux.
-            </p>
-          </div>
-        `;
 
         html += "</div>";
         pricingContainer.innerHTML = html;
 
-        loadServicePricingFromFirestore();
+        loadKitPricesFromFirestore();
+        loadServicePricesFromFirestore();
       }
 
-      async function loadServicePricingFromFirestore() {
+      async function loadKitPricesFromFirestore() {
+        try {
+          const pricesRef = collection(db, "service_prices");
+          const pricesSnapshot = await getDocs(pricesRef);
+
+          const kitPrices = {};
+          pricesSnapshot.forEach((doc) => {
+            kitPrices[doc.id] = doc.data();
+          });
+
+          const kitIds = ["kit_moteur", "kit_carrosserie", "kit_total"];
+          const gammeIds = [
+            "bas_de_gamme",
+            "moyenne_gamme",
+            "haute_gamme",
+            "performance",
+            "utilitaire",
+          ];
+
+          kitIds.forEach((kitId) => {
+            if (kitPrices[kitId]) {
+              gammeIds.forEach((gammeId) => {
+                const input = document.getElementById(`${kitId}_${gammeId}`);
+                if (input && kitPrices[kitId][gammeId] !== undefined) {
+                  input.value = kitPrices[kitId][gammeId];
+                }
+              });
+            }
+          });
+        } catch (error) {
+          console.error("Erreur chargement prix des kits:", error);
+        }
+      }
+
+      async function loadServicePricesFromFirestore() {
         try {
           const servicesRef = collection(db, "services");
           const servicesSnapshot = await getDocs(servicesRef);
@@ -2655,18 +2735,63 @@
             servicePrices[doc.id] = doc.data().prices || {};
           });
 
-          const inputs = document.querySelectorAll(".service-price-input");
-          inputs.forEach((input) => {
-            const priceId = input.id;
-            for (const serviceKey in servicePrices) {
-              if (servicePrices[serviceKey][priceId] !== undefined) {
-                input.value = servicePrices[serviceKey][priceId];
-                break;
-              }
+          const serviceIds = ["kit_nettoyage", "remorquage"];
+          const itemIds = {
+            kit_nettoyage: ["kit_nettoyage_price"],
+            remorquage: ["remorquage_gas", "remorquage_flip"],
+          };
+
+          serviceIds.forEach((serviceId) => {
+            if (servicePrices[serviceId]) {
+              itemIds[serviceId].forEach((itemId) => {
+                const input = document.getElementById(itemId);
+                if (input && servicePrices[serviceId][itemId] !== undefined) {
+                  input.value = servicePrices[serviceId][itemId];
+                }
+              });
             }
           });
         } catch (error) {
-          console.error("Erreur chargement prix:", error);
+          console.error("Erreur chargement prix des services:", error);
+        }
+      }
+
+      async function saveKitPrice(kitId) {
+        const kitPrices = {};
+        const inputs = document.querySelectorAll(
+          `[data-kit="${kitId}"] .kit-price-input`,
+        );
+
+        inputs.forEach((input) => {
+          const gamme = input.dataset.gamme;
+          const price = parseFloat(input.value);
+          if (!isNaN(price) && price >= 0) {
+            kitPrices[gamme] = price;
+          }
+        });
+
+        if (Object.keys(kitPrices).length === 0) {
+          showNotification("❌ Aucun prix valide à sauvegarder", "error");
+          return;
+        }
+
+        try {
+          const kitRef = doc(db, "service_prices", kitId);
+          await setDoc(
+            kitRef,
+            {
+              ...kitPrices,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true },
+          );
+          showNotification(
+            `✅ Prix du ${kitId.replace("_", " ")} mis à jour`,
+            "success",
+          );
+        } catch (error) {
+          console.error("Erreur sauvegarde kit:", error);
+          showNotification("❌ Erreur lors de la sauvegarde", "error");
         }
       }
 
@@ -2677,9 +2802,17 @@
         );
 
         inputs.forEach((input) => {
-          const price = parseInt(input.value) || 0;
-          serviceData[input.id] = price;
+          const itemId = input.dataset.item;
+          const price = parseFloat(input.value);
+          if (!isNaN(price) && price >= 0) {
+            serviceData[itemId] = price;
+          }
         });
+
+        if (Object.keys(serviceData).length === 0) {
+          showNotification("❌ Aucun prix valide à sauvegarder", "error");
+          return;
+        }
 
         try {
           const serviceRef = doc(db, "services", serviceId);
@@ -2692,16 +2825,15 @@
             { merge: true },
           );
           showNotification(
-            `✅ Prix du service "${serviceId}" mis à jour`,
+            `✅ Prix du ${serviceId.replace("_", " ")} mis à jour`,
             "success",
           );
         } catch (error) {
-          console.error("Erreur sauvegarde:", error);
+          console.error("Erreur sauvegarde service:", error);
           showNotification("❌ Erreur lors de la sauvegarde", "error");
         }
       }
 
-      // ==================== GESTION AVIS ====================
       function initReviewsManagement() {
         console.log("📝 Initialisation gestion avis...");
 
@@ -2738,7 +2870,6 @@
 
           const reviews = parseCSVReviews(csvText);
 
-          // Récupérer les validations depuis Firestore
           const validationsRef = collection(db, "review_validations");
           const validationsSnapshot = await getDocs(validationsRef);
 
@@ -3001,7 +3132,6 @@
         }
       }
 
-      // ==================== GESTION RECRUTEMENT ====================
       async function checkInitialStatus() {
         console.log("🔍 Vérification état initial...");
 
